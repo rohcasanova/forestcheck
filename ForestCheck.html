@@ -815,7 +815,7 @@ function latLonToUTM(lat, lon){
   // Conversión simplificada a UTM zona 19S
   var a=6378137, e2=0.00669438, k0=0.9996;
   var latR=lat*Math.PI/180, lonR=lon*Math.PI/180;
-  var lon0=(-3+cfg.zonaUTM*6)*Math.PI/180; // zona configurable (18=-75°, 19=-69°)
+  var lon0=(cfg.zonaUTM*6-183)*Math.PI/180; // zona configurable (18=-75°, 19=-69°)
   var N=a/Math.sqrt(1-e2*Math.sin(latR)*Math.sin(latR));
   var T=Math.tan(latR)*Math.tan(latR);
   var C=e2/(1-e2)*Math.cos(latR)*Math.cos(latR);
