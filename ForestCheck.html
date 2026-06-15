@@ -268,6 +268,18 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-se
   .mets{gap:16px}
 }
 
+
+.btn-gps{
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  width:100%;padding:10px;margin-top:6px;
+  background:#E8F5E9;color:#1A3D28;
+  border:1.5px solid #A5D6A7;border-radius:10px;
+  font-size:13px;font-weight:600;cursor:pointer;
+  font-family:inherit;-webkit-appearance:none
+}
+.btn-gps:active{opacity:.8}
+.gps-acc{font-size:11px;color:#8E8E93;margin-left:4px}
+
 </style>
 </head>
 <body>
@@ -400,6 +412,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-se
 </select></div></div>
         <div class="r2"><div><span class="lbl">DAP (cm)</span><input class="inp" type="number" id="t-dap" placeholder="18.5" step="0.1" min="0" inputmode="decimal"></div><div><span class="lbl">Especie</span><select class="inp" id="t-sp"></select></div></div>
         <div class="r2"><div><span class="lbl">Altura (m)</span><input class="inp" type="number" id="t-alt" placeholder="14.0" step="0.1" min="0" inputmode="decimal"></div><div><span class="lbl">Obs.</span><input class="inp" type="text" id="t-obs" placeholder="..."></div></div>
+        <div class="r2"><div><span class="lbl">Coord. E (UTM)</span><input class="inp" type="number" id="t-e" placeholder="700000" inputmode="numeric"></div><div><span class="lbl">Coord. N (UTM)</span><input class="inp" type="number" id="t-norte" placeholder="5900000" inputmode="numeric"></div></div>
+        <button class="btn-gps" onclick="showGPSBtn('t-e','t-norte','t-acc')">📍 GPS · Zona <span id="zona-lbl-t"></span>S <span class="gps-acc" id="t-acc"></span></button>
         <button class="btn btn-p" onclick="addArb('t')"><i class="ti ti-plus"></i>Agregar árbol</button>
       </div>
       <div class="card" id="card-t" style="display:none">
@@ -431,6 +445,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-se
       <div class="card">
         <h3><i class="ti ti-map-pin"></i>Punto de muestreo</h3>
         <div class="r2"><div><span class="lbl">N° punto</span><input class="inp" type="text" id="c-pid" placeholder="PT-01" autocomplete="off" autocapitalize="none"></div><div><span class="lbl">N° árboles contados</span><input class="inp" type="number" id="c-n" placeholder="22" step="1" min="0" inputmode="numeric" oninput="prevC()"></div></div>
+        <div class="r2"><div><span class="lbl">Coord. E (UTM)</span><input class="inp" type="number" id="c-e" placeholder="700000" inputmode="numeric"></div><div><span class="lbl">Coord. N (UTM)</span><input class="inp" type="number" id="c-norte" placeholder="5900000" inputmode="numeric"></div></div>
+        <button class="btn-gps" onclick="showGPSBtn('c-e','c-norte','c-acc')">📍 GPS · Zona <span id="zona-lbl-c"></span>S <span class="gps-acc" id="c-acc"></span></button>
         <div id="c-prev" style="display:none;margin-top:10px;padding:14px;background:#FEF3C7;border-radius:10px;text-align:center">
           <div style="font-size:11px;color:#92400E;font-weight:700;margin-bottom:4px">AB/ha CALCULADA</div>
           <div style="font-size:40px;font-weight:800;color:#92400E" id="c-abha-p">—</div>
@@ -500,6 +516,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-se
       <div class="card">
         <h3><i class="ti ti-map-pin"></i>Punto de conteo</h3>
         <div class="r2"><div><span class="lbl">N° punto</span><input class="inp" type="text" id="b-pid" placeholder="PT-01" autocomplete="off" autocapitalize="none"></div><div><span class="lbl">N° árboles contados</span><input class="inp" type="number" id="b-n" placeholder="22" step="1" min="0" inputmode="numeric" oninput="prevB()"></div></div>
+        <div class="r2"><div><span class="lbl">Coord. E (UTM)</span><input class="inp" type="number" id="b-e" placeholder="700000" inputmode="numeric"></div><div><span class="lbl">Coord. N (UTM)</span><input class="inp" type="number" id="b-norte" placeholder="5900000" inputmode="numeric"></div></div>
+        <button class="btn-gps" onclick="showGPSBtn('b-e','b-norte','b-acc')">📍 GPS · Zona <span id="zona-lbl-b"></span>S <span class="gps-acc" id="b-acc"></span></button>
         <div id="b-prev" style="display:none;margin-top:12px;padding:16px;background:#EDE9FE;border-radius:10px;text-align:center">
           <div style="font-size:10px;color:#5B21B6;font-weight:700;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px">AB/ha calculada</div>
           <div class="bitbig" id="b-abha-p">—</div>
@@ -634,6 +652,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-se
 </select></div>
         <div class="crow" id="cfg-fab-row"><span style="color:#8E8E93">FAB Bitterlich</span><input type="number" id="cfg-fab" value="1" min="0.5" step="0.5" onchange="cfg.fab=+this.value;syncFab();save()"></div>
         <div class="crow"><span style="color:#8E8E93">Nivel confianza (%)</span><input type="number" id="cfg-nc" value="95" min="90" max="99" onchange="cfg.nc=+this.value;save()"></div>
+        <div class="crow"><span style="color:#8E8E93">Zona UTM</span>
+          <select id="cfg-zona" style="width:85px;text-align:center;padding:7px;border:1.5px solid #E5E5EA;border-radius:8px;font-size:14px" onchange="cfg.zonaUTM=+this.value;save()">
+            <option value="18">18S</option>
+            <option value="19">19S</option>
+          </select>
+        </div>
       </div>
       <div class="card">
         <h3><i class="ti ti-leaf"></i>Especies</h3>
@@ -697,7 +721,7 @@ function sr2(k){ try{ sessionStorage.removeItem(k); localStorage.removeItem(k); 
 // ═══ ESTADO ═══
 var CU = null; // current user
 var metodo = null;
-var cfg = {sup:100,fab:1,nc:95,etN:null,etAB:null,etVol:null,etNp:null};
+var cfg = {sup:100,fab:1,nc:95,etN:null,etAB:null,etVol:null,etNp:null,zonaUTM:18};
 var adm = {pmbn:'',fecha:'',prop:'',predio:'',rol:'',provincia:'',comuna:'',region:'',prof:''};
 var especies = [{cod:'Ro',nom:'Roble'},{cod:'Ra',nom:'Raulí'},{cod:'Co',nom:'Coigüe'},{cod:'La',nom:'Laurel'},{cod:'Li',nom:'Lingue'},{cod:'Te',nom:'Tepa'},{cod:'Ti',nom:'Tineo'},{cod:'Ol',nom:'Olivillo'},{cod:'Ul',nom:'Ulmo'},{cod:'Ot',nom:'Otras'}];
 var arb_t=[],pid_t='',parc_t=[];
@@ -764,6 +788,60 @@ function updateComunas(){
     ? '<option value="">-- Selecciona --</option>' + lista.map(function(c){return '<option value="'+c+'">'+c+'</option>';}).join('')
     : '<option value="">-- Selecciona provincia primero --</option>';
   saveAdmin();
+}
+
+
+// ═══ GPS ═══
+function getGPS(cb){
+  if(!navigator.geolocation){alert('GPS no disponible en este dispositivo');return;}
+  navigator.geolocation.getCurrentPosition(
+    function(pos){
+      var lat=pos.coords.latitude, lon=pos.coords.longitude;
+      var acc=pos.coords.accuracy;
+      // Convertir a UTM zona 19S (La Araucanía)
+      var utm=latLonToUTM(lat,lon);
+      cb(utm.e, utm.n, lat, lon, acc);
+    },
+    function(err){
+      var msg=err.code===1?'Permiso de ubicación denegado':
+              err.code===2?'GPS no disponible':'Tiempo de espera agotado';
+      alert('Error GPS: '+msg);
+    },
+    {enableHighAccuracy:true, timeout:10000, maximumAge:0}
+  );
+}
+
+function latLonToUTM(lat, lon){
+  // Conversión simplificada a UTM zona 19S
+  var a=6378137, e2=0.00669438, k0=0.9996;
+  var latR=lat*Math.PI/180, lonR=lon*Math.PI/180;
+  var lon0=(-3+cfg.zonaUTM*6)*Math.PI/180; // zona configurable (18=-75°, 19=-69°)
+  var N=a/Math.sqrt(1-e2*Math.sin(latR)*Math.sin(latR));
+  var T=Math.tan(latR)*Math.tan(latR);
+  var C=e2/(1-e2)*Math.cos(latR)*Math.cos(latR);
+  var A=Math.cos(latR)*(lonR-lon0);
+  var e4=e2*e2, e6=e2*e2*e2;
+  var M=a*((1-e2/4-3*e4/64-5*e6/256)*latR
+           -(3*e2/8+3*e4/32+45*e6/1024)*Math.sin(2*latR)
+           +(15*e4/256+45*e6/1024)*Math.sin(4*latR)
+           -(35*e6/3072)*Math.sin(6*latR));
+  var E=k0*N*(A+(1-T+C)*A*A*A/6+(5-18*T+T*T+72*C-58*(e2/(1-e2)))*A*A*A*A*A/120)+500000;
+  var N2=k0*(M+N*Math.tan(latR)*(A*A/2+(5-T+9*C+4*C*C)*A*A*A*A/24+(61-58*T+T*T+600*C-330*(e2/(1-e2)))*A*A*A*A*A*A/720));
+  if(lat<0) N2+=10000000;
+  return {e:Math.round(E), n:Math.round(N2)};
+}
+
+function showGPSBtn(eId, nId, accId){
+  getGPS(function(e,n,lat,lon,acc){
+    var eEl=document.getElementById(eId);
+    var nEl=document.getElementById(nId);
+    if(eEl) eEl.value=e;
+    if(nEl) nEl.value=n;
+    if(accId){
+      var aEl=document.getElementById(accId);
+      if(aEl) aEl.textContent='±'+Math.round(acc)+'m';
+    }
+  });
 }
 
 // ═══ LOGIN ═══
@@ -883,6 +961,7 @@ function applyConfig(){
   syncSup(); syncFab();
   var f=document.getElementById('cfg-fab'); if(f) f.value=cfg.fab;
   var n=document.getElementById('cfg-nc'); if(n) n.value=cfg.nc;
+  var z=document.getElementById('cfg-zona'); if(z) z.value=cfg.zonaUTM||18;
   if(cfg.etN){var e=document.getElementById('r-etn');if(e)e.value=cfg.etN;}
   if(cfg.etAB){var e=document.getElementById('r-etab');if(e)e.value=cfg.etAB;}
   if(cfg.etVol){var e=document.getElementById('r-etvol');if(e)e.value=cfg.etVol;}
@@ -1011,7 +1090,11 @@ function saveParc(t){
   var dg=2*100*Math.sqrt(avg(abs_)/Math.PI);
   var vols=arb.filter(function(a){return a.alt;}).map(function(a){return volm(a.dap,a.alt,a.sp)*10000/cfg.sup;});
   var volha=vols.length?avg(vols)*n/vols.length:null;
-  var p={id:pid,n:n,nha:nha,abha:abha,dapM:dapM,dg:dg,volha:volha,sup:cfg.sup,arboles:arb.slice()};
+  var eEl=document.getElementById(t==='t'?'t-e':'cp-e');
+  var nEl=document.getElementById(t==='t'?'t-norte':'cp-norte');
+  var coordE=eEl?+eEl.value||null:null;
+  var coordN=nEl?+nEl.value||null:null;
+  var p={id:pid,n:n,nha:nha,abha:abha,dapM:dapM,dg:dg,volha:volha,sup:cfg.sup,coordE:coordE,coordN:coordN,arboles:arb.slice()};
   if(t==='t'){ var i=parc_t.findIndex(function(x){return x.id===pid;}); if(i>=0)parc_t[i]=p;else parc_t.push(p); arb_t=[]; pid_t=''; document.getElementById('t-pid').value=''; document.getElementById('card-t').style.display='none'; renderArb('t'); renderLT(); }
   else { var i=parc_c.findIndex(function(x){return x.id===pid;}); if(i>=0)parc_c[i]=p;else parc_c.push(p); arb_c=[]; pid_c=''; document.getElementById('cp-pid').value=''; document.getElementById('card-c').style.display='none'; renderArb('c'); renderLCPF(); }
   updateTop(); save();
