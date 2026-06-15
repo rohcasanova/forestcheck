@@ -827,7 +827,8 @@ function latLonToUTM(lat, lon){
            -(35*e6/3072)*Math.sin(6*latR));
   var E=k0*N*(A+(1-T+C)*A*A*A/6+(5-18*T+T*T+72*C-58*(e2/(1-e2)))*A*A*A*A*A/120)+500000;
   var N2=k0*(M+N*Math.tan(latR)*(A*A/2+(5-T+9*C+4*C*C)*A*A*A*A/24+(61-58*T+T*T+600*C-330*(e2/(1-e2)))*A*A*A*A*A*A/720));
-  if(lat<0) N2+=10000000;
+  if(lat<0) N2+=10000000; // Falso norte hemisferio sur
+  N2=Math.abs(N2); // Asegurar positivo
   return {e:Math.round(E), n:Math.round(N2)};
 }
 
@@ -892,6 +893,7 @@ function initApp(){
   load();
   renderEspSel();
   applyConfig();
+  syncFab(); // sincronizar zona UTM en botones GPS
   renderLists();
   loadAdmForm();
   if(metodo) iniciarUI(); else showSel();
