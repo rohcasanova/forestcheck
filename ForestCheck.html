@@ -958,7 +958,18 @@ function syncSup(){
     }
   });
 }
-function syncFab(){ ['fab-c','fab-b'].forEach(function(id){ var e=document.getElementById(id); if(e) e.textContent=cfg.fab; }); }
+function syncFab(){
+  ['fab-c','fab-b'].forEach(function(id){
+    var e=document.getElementById(id);
+    if(e) e.textContent=cfg.fab;
+  });
+  // Actualizar zona UTM en botones GPS
+  var zona=cfg.zonaUTM||18;
+  ['zona-lbl-b','zona-lbl-c','zona-lbl-t'].forEach(function(id){
+    var e=document.getElementById(id);
+    if(e) e.textContent=zona;
+  });
+}
 function applyConfig(){
   syncSup(); syncFab();
   var f=document.getElementById('cfg-fab'); if(f) f.value=cfg.fab;
