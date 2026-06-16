@@ -327,7 +327,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-se
     <div class="feat"><i class="ti ti-chart-histogram"></i><span>Estadígrafos y distribución diamétrica</span></div>
     <div class="feat"><i class="ti ti-file-spreadsheet"></i><span>Exportación directa a Excel</span></div>
   </div>
-  <button class="btn-enter" id="btn-go" onclick="document.getElementById('s-welcome').classList.remove('active');document.getElementById('s-login').classList.add('active');">🌲 Ingresar al sistema</button>
+  <button class="btn-enter" id="btn-go">🌲 Ingresar al sistema</button>
 </div>
 
 <!-- LOGIN -->
@@ -346,9 +346,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-se
     </div>
     <div class="field">
       <label>Contraseña</label>
-      <input type="password" id="fp" placeholder="contraseña" autocomplete="off" onkeydown="if(event.key==='Enter')doLogin()">
+      <input type="password" id="fp" placeholder="contraseña" autocomplete="off">
     </div>
-    <button class="btn-login" id="btn-do-login" onclick="doLogin()">Ingresar</button>
+    <button class="btn-login" id="btn-do-login">Ingresar</button>
     <div class="login-err" id="login-err">Usuario o contraseña incorrectos</div>
   </div>
 </div>
@@ -901,9 +901,13 @@ function showGPSBtn(eId, nId, accId){
 }
 
 // ═══ LOGIN ═══
-// btn-go usa onclick inline
-
-// login listeners en HTML
+// document.getElementById('btn-go').addEventListener('click', function(){
+  document.getElementById('s-welcome').classList.remove('active');
+  document.getElementById('s-login').classList.add('active');
+  setTimeout(function(){ document.getElementById('fu').focus(); }, 100);
+});
+document.getElementById('btn-do-login').addEventListener('click', doLogin);
+document.getElementById('fp').addEventListener('keydown', function(e){ if(e.key==='Enter') doLogin(); });
 
 function doLogin(){
   try{
