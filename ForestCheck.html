@@ -532,12 +532,20 @@ function initDefaultUsers(){
 let currentUser = null;
 
 function showLogin(){
-  document.getElementById('screen-welcome').style.display='none';
-  document.getElementById('screen-login').style.display='flex';
-  setTimeout(()=>document.getElementById('inp-user').focus(), 100);
+  try{
+    var sw = document.getElementById('screen-welcome');
+    var sl = document.getElementById('screen-login');
+    if(sw) sw.style.display='none';
+    if(sl){ sl.style.display='flex'; sl.style.flexDirection='column'; }
+    setTimeout(function(){ 
+      var inp = document.getElementById('inp-user'); 
+      if(inp) inp.focus(); 
+    }, 100);
+  } catch(e){ alert('Error: '+e.message); }
 }
 
 function doLogin(){
+  try{
   const user = document.getElementById('inp-user').value.trim().toLowerCase();
   const pass = document.getElementById('inp-pass').value;
   const users = getUsers();
@@ -553,6 +561,7 @@ function doLogin(){
     document.getElementById('inp-pass').value='';
     document.getElementById('inp-pass').focus();
   }
+  } catch(e){ alert('Error login: '+e.message); }
 }
 
 function doLogout(){
