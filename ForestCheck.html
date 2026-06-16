@@ -266,6 +266,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-se
 
     <!-- TRAD: PARCELAS -->
     <div class="pg" id="pg-p1-trad">
+      <div style="text-align:right;margin-bottom:6px"><button onclick="cambiar()" style="background:none;border:1.5px solid #E5E5EA;border-radius:8px;padding:5px 12px;font-size:12px;color:#8E8E93;cursor:pointer;font-family:inherit">↔ Cambiar método</button></div>
       <div class="ibox ib-v"><strong>Forcípula</strong> — DAP + altura opcional → N/ha · AB/ha · VOL</div>
       <div class="card">
         <div class="card-title"><span class="card-icon">📍</span>Registro de árbol</div>
@@ -296,6 +297,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-se
 
     <!-- COMB: BITTERLICH -->
     <div class="pg" id="pg-p1-comb">
+      <div style="text-align:right;margin-bottom:6px"><button onclick="cambiar()" style="background:none;border:1.5px solid #E5E5EA;border-radius:8px;padding:5px 12px;font-size:12px;color:#8E8E93;cursor:pointer;font-family:inherit">↔ Cambiar método</button></div>
       <div class="ibox ib-c"><strong>Bitterlich FAB=<span id="fab-c">1</span></strong> — Cuenta árboles → AB/ha = N × FAB</div>
       <div class="card">
         <div class="card-title"><span class="card-icon">📍</span>Punto de muestreo</div>
@@ -344,7 +346,20 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-se
 
     <!-- BITTERLICH RÁPIDO -->
     <div class="pg" id="pg-p1-bit">
-      <div class="ibox ib-m"><strong>Bitterlich rápido FAB=<span id="fab-b">1</span></strong> — Verificación AB/ha en recorrido</div>
+      <div style="text-align:right;margin-bottom:6px"><button onclick="cambiar()" style="background:none;border:1.5px solid #E5E5EA;border-radius:8px;padding:5px 12px;font-size:12px;color:#8E8E93;cursor:pointer;font-family:inherit">↔ Cambiar método</button></div>
+      <div class="ibox ib-m" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+        <div><strong>Bitterlich rápido</strong> — Verificación AB/ha en recorrido</div>
+        <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+          <span style="font-size:12px;font-weight:600">FAB</span>
+          <select style="padding:5px 10px;border:1.5px solid #8B5CF6;border-radius:8px;font-size:14px;font-weight:700;color:#5B21B6;background:#EDE9FE;cursor:pointer" onchange="cfg.fab=+this.value;syncFab();save()" id="fab-b-sel">
+            <option value="0.5">0.5</option>
+            <option value="1" selected>1</option>
+            <option value="2">2</option>
+            <option value="4">4</option>
+          </select>
+          <span id="fab-b" style="display:none">1</span>
+        </div>
+      </div>
       <div class="card">
         <div class="card-title"><span class="card-icon">📍</span>Punto de conteo</div>
         <div class="r2"><div><span class="lbl">N° punto</span><input class="inp" type="text" id="b-pid" placeholder="PT-01" autocomplete="off" autocapitalize="none"></div><div><span class="lbl">N° árboles</span><input class="inp" type="number" id="b-n" placeholder="22" step="1" min="0" inputmode="numeric" oninput="prevB()"></div></div>
@@ -538,6 +553,7 @@ function syncSup(){ fillSups(); }
 function syncFab(){
   ['fab-c','fab-b'].forEach(function(id){ var e=document.getElementById(id); if(e) e.textContent=cfg.fab; });
   var el=document.getElementById('cfg-fab'); if(el) el.value=cfg.fab;
+  var bs=document.getElementById('fab-b-sel'); if(bs) bs.value=cfg.fab;
 }
 function syncZona(){
   ['zona-t','zona-c','zona-b','zona-cp'].forEach(function(id){ var e=document.getElementById(id); if(e) e.textContent=cfg.zona; });
