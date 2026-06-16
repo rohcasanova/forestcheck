@@ -901,13 +901,23 @@ function showGPSBtn(eId, nId, accId){
 }
 
 // ═══ LOGIN ═══
-document.getElementById('btn-go').addEventListener('click', function(){
-  document.getElementById('s-welcome').classList.remove('active');
-  document.getElementById('s-login').classList.add('active');
-  setTimeout(function(){ document.getElementById('fu').focus(); }, 100);
-});
-document.getElementById('btn-do-login').addEventListener('click', doLogin);
-document.getElementById('fp').addEventListener('keydown', function(e){ if(e.key==='Enter') doLogin(); });
+function initListeners(){
+  var btnGo = document.getElementById('btn-go');
+  if(btnGo) btnGo.addEventListener('click', function(){
+    document.getElementById('s-welcome').classList.remove('active');
+    document.getElementById('s-login').classList.add('active');
+    setTimeout(function(){ var fu=document.getElementById('fu'); if(fu) fu.focus(); }, 100);
+  });
+  var btnLogin = document.getElementById('btn-do-login');
+  if(btnLogin) btnLogin.addEventListener('click', doLogin);
+  var fp = document.getElementById('fp');
+  if(fp) fp.addEventListener('keydown', function(e){ if(e.key==='Enter') doLogin(); });
+}
+if(document.readyState === 'loading'){
+  document.addEventListener('DOMContentLoaded', initListeners);
+} else {
+  initListeners();
+}
 
 function doLogin(){
   try{
