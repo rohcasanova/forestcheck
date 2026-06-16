@@ -161,6 +161,28 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-se
 .crow:last-child{border-bottom:none}
 .crow input{width:85px;text-align:center;padding:7px;border:1.5px solid #E5E5EA;border-radius:8px;font-size:14px}
 
+
+/* ══ ESTILOS IMPRESIÓN / PDF ══ */
+@media print{
+  body{max-width:100%;background:#fff;padding:0;font-family:Arial,sans-serif}
+  .topbar,.nav-bar,.btn,.btn-gps,.btn-login,.screen:not(#s-print){display:none!important}
+  #s-print{display:block!important}
+  .print-page{padding:20px;max-width:800px;margin:0 auto}
+  .print-header{border-bottom:3px solid #1A3D28;padding-bottom:12px;margin-bottom:20px}
+  .print-title{font-size:20px;font-weight:700;color:#1A3D28}
+  .print-sub{font-size:12px;color:#666;margin-top:4px}
+  .print-section{margin-bottom:16px}
+  .print-section-title{font-size:13px;font-weight:700;color:#1A3D28;border-bottom:1px solid #E5E5EA;padding-bottom:4px;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px}
+  .print-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+  .print-field{font-size:11px}<br>  .print-label{color:#666;display:block;margin-bottom:2px}
+  .print-value{font-weight:600;color:#1C1C1E}
+  .print-table{width:100%;border-collapse:collapse;font-size:11px;margin-top:8px}
+  .print-table th{background:#1A3D28;color:#fff;padding:5px 8px;text-align:center}
+  .print-table td{padding:4px 8px;border-bottom:1px solid #E5E5EA;text-align:center}
+  .print-table tr:nth-child(even) td{background:#F8F8F8}
+  .print-footer{margin-top:20px;padding-top:8px;border-top:1px solid #E5E5EA;font-size:10px;color:#999;text-align:center}
+}
+
 /* ══ RESPONSIVE — TABLET Y DESKTOP ══ */
 
 @media(min-width:768px){
@@ -617,6 +639,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-se
         <div id="res-content"><div class="empty"><i class="ti ti-database"></i>Ingresa datos para generar el informe</div></div>
       </div>
       <button class="btn btn-e" onclick="exportXLSX()"><i class="ti ti-file-spreadsheet"></i>Exportar Excel (.xlsx)</button>
+      <button class="btn btn-p" onclick="exportPDF()" style="margin-top:6px;background:#C62828;color:#fff;border-color:#C62828"><i class="ti ti-file-type-pdf"></i>Exportar PDF</button>
       <button class="btn" onclick="exportCSV()" style="margin-top:6px"><i class="ti ti-file-text"></i>Exportar CSV</button>
     </div>
 
@@ -790,6 +813,30 @@ function updateComunas(){
   saveAdmin();
 }
 
+
+
+// ═══ VIBRACIÓN Y SONIDO ═══
+function vibrar(){
+  try{
+    if(navigator.vibrate) navigator.vibrate(80);
+  }catch(e){}
+}
+function beep(){
+  try{
+    var ctx=new(window.AudioContext||window.webkitAudioContext)();
+    var o=ctx.createOscillator();
+    var g=ctx.createGain();
+    o.connect(g); g.connect(ctx.destination);
+    o.frequency.value=880; o.type='sine';
+    g.gain.setValueAtTime(0.3,ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.15);
+    o.start(ctx.currentTime); o.stop(ctx.currentTime+0.15);
+  }catch(e){}
+}
+function feedbackArbol(){
+  vibrar();
+  beep();
+}
 
 // ═══ GPS ═══
 function getGPS(cb){
@@ -1071,6 +1118,7 @@ function addArb(t){
   }
   document.getElementById(dap_).value='';
   document.getElementById(dap_).focus();
+  feedbackArbol(); // vibración + beep al agregar árbol
 }
 function renderArb(t){
   var arb=t==='t'?arb_t:arb_c;
@@ -1115,10 +1163,46 @@ function saveParc(t){
 function renderLT(){
   var c=document.getElementById('lst-t');
   if(!parc_t.length){c.innerHTML='<div class="empty"><i class="ti ti-inbox"></i>Sin parcelas aún</div>';return;}
-  c.innerHTML=parc_t.map(function(p,i){ return '<div class="chip"><div><span style="font-weight:700">'+p.id+'</span><span style="color:#8E8E93;font-size:12px;margin-left:6px">'+p.n+' árb</span></div><div style="display:flex;gap:4px;align-items:center"><span class="tag tg-v">'+p.nha.toLocaleString()+' N/ha</span><span class="tag tg-v">'+p.abha.toFixed(1)+' m²/ha</span>'+(p.volha?'<span class="tag tg-c">'+p.volha.toFixed(0)+' m³</span>':'')+'<button style="background:none;border:none;cursor:pointer;color:#C7C7CC;font-size:18px;padding:4px" onclick="delP(\'t\','+i+')">×</button></div></div>'; }).join('');
+  c.innerHTML=parc_t.map(function(p,i){
+    var arboles=p.arboles.map(function(a){
+      return '<div style="display:flex;gap:8px;padding:5px 10px;border-bottom:1px solid #F2F2F7;font-size:12px">'
+        +'<span style="color:#8E8E93;min-width:20px">'+a.id+'</span>'
+        +'<span style="font-weight:600;min-width:55px">'+a.dap.toFixed(1)+' cm</span>'
+        +'<span style="color:#2D6A4F">'+a.sp+'</span>'
+        +(a.alt?'<span style="color:#1D4ED8;margin-left:auto">'+a.alt+'m</span>':'')
+        +'</div>';
+    }).join('');
+    return '<div class="chip" style="flex-direction:column;align-items:stretch;cursor:pointer" onclick="toggleParc('t','+i+')">'
+      +'<div style="display:flex;justify-content:space-between;align-items:center">'
+      +'<div><span style="font-weight:700">'+p.id+'</span>'
+      +'<span style="color:#8E8E93;font-size:12px;margin-left:6px">'+p.n+' árb · '+p.sup+'m² ▾</span></div>'
+      +'<div style="display:flex;gap:4px;align-items:center">'
+      +'<span class="tag tg-v">'+p.nha.toLocaleString()+' N/ha</span>'
+      +'<span class="tag tg-v">'+p.abha.toFixed(1)+' m²/ha</span>'
+      +(p.volha?'<span class="tag tg-c">'+p.volha.toFixed(0)+' m³</span>':'')
+      +'<button style="background:none;border:none;cursor:pointer;color:#C7C7CC;font-size:18px;padding:4px" '
+      +'onclick="event.stopPropagation();delP('t','+i+')">×</button>'
+      +'</div></div>'
+      +'<div id="det-t-'+i+'" style="display:none;border-top:1px solid #F2F2F7;padding-top:8px;margin-top:4px">'
+      +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px">'
+      +'<div style="background:#F0F7F0;border-radius:8px;padding:8px">'
+      +'<div style="color:#8E8E93;font-size:10px;font-weight:600">DAP MEDIO</div>'
+      +'<div style="font-weight:700;font-size:15px;color:#1A3D28">'+p.dapM.toFixed(1)+' cm</div></div>'
+      +'<div style="background:#F0F7F0;border-radius:8px;padding:8px">'
+      +'<div style="color:#8E8E93;font-size:10px;font-weight:600">Dg CUADRÁTICO</div>'
+      +'<div style="font-weight:700;font-size:15px;color:#1A3D28">'+p.dg.toFixed(1)+' cm</div></div>'
+      +(p.volha?'<div style="background:#FEF3C7;border-radius:8px;padding:8px">'
+        +'<div style="color:#8E8E93;font-size:10px;font-weight:600">VOL/ha</div>'
+        +'<div style="font-weight:700;font-size:15px;color:#92400E">'+p.volha.toFixed(1)+' m³/ha</div></div>':'')
+      +(p.coordE?'<div style="background:#EFF6FF;border-radius:8px;padding:8px;grid-column:1/-1">'
+        +'<div style="color:#8E8E93;font-size:10px;font-weight:600">COORDENADAS UTM</div>'
+        +'<div style="font-size:12px;color:#1D4ED8">E: '+p.coordE+' · N: '+p.coordN+'</div></div>':'')
+      +'</div>'
+      +'<div style="font-size:10px;font-weight:700;color:#8E8E93;margin-bottom:4px">ÁRBOLES MEDIDOS</div>'
+      +'<div style="max-height:130px;overflow-y:auto;border:1px solid #E5E5EA;border-radius:8px">'+arboles+'</div>'
+      +'</div></div>';
+  }).join('');
 }
-
-// ═══ COMBINADO ═══
 function prevC(){ var n=parseFloat(document.getElementById('c-n').value)||0; if(n>0){document.getElementById('c-abha-p').textContent=(n*cfg.fab).toFixed(2);document.getElementById('c-prev').style.display='block';}else document.getElementById('c-prev').style.display='none'; }
 function savePunto(){
   var id=document.getElementById('c-pid').value.trim(), n=parseFloat(document.getElementById('c-n').value);
@@ -1128,6 +1212,12 @@ function savePunto(){
   document.getElementById('c-pid').value=''; document.getElementById('c-n').value=''; document.getElementById('c-prev').style.display='none';
   renderLCBit(); updateTop(); save();
 }
+function toggleParc(tipo,i){
+  var id='det-'+tipo+'-'+i;
+  var el=document.getElementById(id);
+  if(el) el.style.display=el.style.display==='none'?'block':'none';
+}
+
 function renderLCBit(){
   var c=document.getElementById('lst-c-bit');
   if(!punt_c.length){c.innerHTML='<div class="empty"><i class="ti ti-inbox"></i>Sin puntos aún</div>';return;}
@@ -1329,6 +1419,107 @@ function adjFAB(delta){
 
 // ═══ LIMPIAR / EXPORT ═══
 function limpiar(){ parc_t=[];arb_t=[];pid_t='';parc_c=[];arb_c=[];pid_c='';punt_c=[];punt_b=[]; ['card-t','card-c','bit-live'].forEach(function(id){var e=document.getElementById(id);if(e)e.style.display='none';}); renderLists(); updateTop(); save(); }
+
+// ═══ EXPORTAR PDF ═══
+function exportPDF(){
+  var parc=metodo==='trad'?parc_t:parc_c;
+  var punts=metodo==='comb'?punt_c:punt_b;
+  var allA=parc.reduce(function(a,p){return a.concat(p.arboles);},[]);
+  var mNha=parc.length?avg(parc.map(function(p){return p.nha;})):null;
+  var mABha=metodo==='comb'&&punts.length?avg(punts.map(function(p){return p.abha;})):
+            parc.length?avg(parc.map(function(p){return p.abha;})):
+            punts.length?avg(punts.map(function(p){return p.abha;})):null;
+  var dapM=allA.length?avg(allA.map(function(a){return a.dap;})):null;
+  var absArr=allA.map(function(a){return ga(a.dap);});
+  var dg=absArr.length?2*100*Math.sqrt(avg(absArr)/Math.PI):null;
+  var vols_=parc.filter(function(p){return p.volha;}).map(function(p){return p.volha;});
+  var mVol=vols_.length?avg(vols_):null;
+  var metNom=metodo==='trad'?'Tradicional (Forcípula)':metodo==='comb'?'Combinado (Bitterlich + Parcela fija)':'Bitterlich rápido';
+
+  var html='<div class="print-page">'
+    +'<div class="print-header">'
+    +'<div class="print-title">🌲 ForestCheck — Informe de Verificación Dasométrica</div>'
+    +'<div class="print-sub">'+new Date().toLocaleDateString('es-CL')+' · '+metNom+' · '+(CU?CU.name:'')+'</div>'
+    +'</div>'
+
+    +'<div class="print-section"><div class="print-section-title">Datos del Predio</div>'
+    +'<div class="print-grid">'
+    +(adm.pmbn?'<div class="print-field"><span class="print-label">PMBN / Expediente</span><span class="print-value">'+adm.pmbn+'</span></div>':'')
+    +(adm.fecha?'<div class="print-field"><span class="print-label">Fecha verificación</span><span class="print-value">'+adm.fecha+'</span></div>':'')
+    +(adm.prop?'<div class="print-field"><span class="print-label">Propietario</span><span class="print-value">'+adm.prop+'</span></div>':'')
+    +(adm.predio?'<div class="print-field"><span class="print-label">Predio</span><span class="print-value">'+adm.predio+'</span></div>':'')
+    +(adm.rol?'<div class="print-field"><span class="print-label">Rol / Folio</span><span class="print-value">'+adm.rol+'</span></div>':'')
+    +(adm.comuna?'<div class="print-field"><span class="print-label">Comuna</span><span class="print-value">'+adm.comuna+'</span></div>':'')
+    +(adm.region?'<div class="print-field"><span class="print-label">Región</span><span class="print-value">'+adm.region+'</span></div>':'')
+    +(adm.prof?'<div class="print-field"><span class="print-label">Profesional</span><span class="print-value">'+adm.prof+'</span></div>':'')
+    +'</div></div>'
+
+    +'<div class="print-section"><div class="print-section-title">Estadígrafos del Rodal</div>'
+    +'<div class="print-grid">'
+    +(mNha?'<div class="print-field"><span class="print-label">N/ha media</span><span class="print-value">'+Math.round(mNha).toLocaleString()+' árb/ha</span></div>':'')
+    +(mABha?'<div class="print-field"><span class="print-label">AB/ha media</span><span class="print-value">'+mABha.toFixed(2)+' m²/ha</span></div>':'')
+    +(dapM?'<div class="print-field"><span class="print-label">DAP medio</span><span class="print-value">'+dapM.toFixed(1)+' cm</span></div>':'')
+    +(dg?'<div class="print-field"><span class="print-label">Dg cuadrático</span><span class="print-value">'+dg.toFixed(1)+' cm</span></div>':'')
+    +(mVol?'<div class="print-field"><span class="print-label">VOL/ha estimado</span><span class="print-value">'+mVol.toFixed(1)+' m³/ha</span></div>':'')
+    +'<div class="print-field"><span class="print-label">Método</span><span class="print-value">'+metNom+'</span></div>'
+    +'<div class="print-field"><span class="print-label">N° parcelas/puntos</span><span class="print-value">'+(parc.length||punts.length)+'</span></div>'
+    +'<div class="print-field"><span class="print-label">Sup. parcela</span><span class="print-value">'+cfg.sup+' m²</span></div>'
+    +'</div></div>';
+
+  // Tabla de parcelas
+  if(parc.length){
+    html+='<div class="print-section"><div class="print-section-title">Resumen de Parcelas</div>'
+    +'<table class="print-table"><thead><tr><th>Parcela</th><th>N árb.</th><th>N/ha</th><th>AB/ha (m²/ha)</th><th>DAP med. (cm)</th><th>Dg (cm)</th><th>VOL/ha (m³)</th><th>Coord. E</th><th>Coord. N</th></tr></thead><tbody>'
+    +parc.map(function(p){return '<tr><td>'+p.id+'</td><td>'+p.n+'</td><td>'+p.nha.toLocaleString()+'</td><td>'+p.abha.toFixed(2)+'</td><td>'+p.dapM.toFixed(1)+'</td><td>'+p.dg.toFixed(1)+'</td><td>'+(p.volha?p.volha.toFixed(1):'-')+'</td><td>'+(p.coordE||'-')+'</td><td>'+(p.coordN||'-')+'</td></tr>';}).join('')
+    +'</tbody></table></div>';
+  }
+
+  // Tabla Bitterlich
+  if(punts.length){
+    html+='<div class="print-section"><div class="print-section-title">Puntos Bitterlich</div>'
+    +'<table class="print-table"><thead><tr><th>N° Punto</th><th>N árb.</th><th>FAB</th><th>AB/ha (m²/ha)</th><th>Coord. E</th><th>Coord. N</th></tr></thead><tbody>'
+    +punts.map(function(p){return '<tr><td>'+p.id+'</td><td>'+p.n+'</td><td>'+p.fab+'</td><td>'+p.abha.toFixed(2)+'</td><td>'+(p.e||'-')+'</td><td>'+(p.norte||'-')+'</td></tr>';}).join('')
+    +'</tbody></table></div>';
+  }
+
+  // Comparación plan de manejo
+  if(cfg.etN||cfg.etAB){
+    html+='<div class="print-section"><div class="print-section-title">Comparación con Plan de Manejo</div>'
+    +'<table class="print-table"><thead><tr><th>Parámetro</th><th>Plan de Manejo</th><th>Terreno</th><th>Diferencia %</th><th>Estado</th></tr></thead><tbody>';
+    if(cfg.etN&&mNha){var d=Math.abs(cfg.etN-mNha)/cfg.etN*100;html+='<tr><td>N/ha</td><td>'+Math.round(cfg.etN)+'</td><td>'+Math.round(mNha)+'</td><td>'+d.toFixed(1)+'%</td><td>'+(d<=20?'✓ OK':'✗ Revisar')+'</td></tr>';}
+    if(cfg.etAB&&mABha){var d2=Math.abs(cfg.etAB-mABha)/cfg.etAB*100;html+='<tr><td>AB/ha (m²/ha)</td><td>'+cfg.etAB.toFixed(2)+'</td><td>'+mABha.toFixed(2)+'</td><td>'+d2.toFixed(1)+'%</td><td>'+(d2<=20?'✓ OK':'✗ Revisar')+'</td></tr>';}
+    if(cfg.etVol&&mVol){var d3=Math.abs(cfg.etVol-mVol)/cfg.etVol*100;html+='<tr><td>VOL/ha (m³/ha)</td><td>'+cfg.etVol.toFixed(0)+'</td><td>'+mVol.toFixed(1)+'</td><td>'+d3.toFixed(1)+'%</td><td>'+(d3<=20?'✓ OK':'✗ Revisar')+'</td></tr>';}
+    html+='</tbody></table></div>';
+  }
+
+  html+='<div class="print-footer">ForestCheck — Sistema de Inventario Forestal Dasométrico · '+new Date().toLocaleDateString('es-CL')+'</div>'
+  +'</div>';
+
+  // Abrir ventana de impresión
+  var w=window.open('','_blank');
+  w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>ForestCheck - Informe</title>'
+    +'<style>body{font-family:Arial,sans-serif;margin:0;padding:20px;color:#1C1C1E}'
+    +'.print-page{max-width:800px;margin:0 auto}'
+    +'.print-header{border-bottom:3px solid #1A3D28;padding-bottom:12px;margin-bottom:20px}'
+    +'.print-title{font-size:22px;font-weight:700;color:#1A3D28}'
+    +'.print-sub{font-size:12px;color:#666;margin-top:4px}'
+    +'.print-section{margin-bottom:20px}'
+    +'.print-section-title{font-size:12px;font-weight:700;color:#1A3D28;border-bottom:1px solid #E5E5EA;padding-bottom:4px;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px}'
+    +'.print-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}'
+    +'.print-field{font-size:12px}'
+    +'.print-label{color:#666;display:block;margin-bottom:2px;font-size:11px}'
+    +'.print-value{font-weight:600;color:#1C1C1E}'
+    +'.print-table{width:100%;border-collapse:collapse;font-size:11px;margin-top:8px}'
+    +'.print-table th{background:#1A3D28;color:#fff;padding:6px 8px;text-align:center}'
+    +'.print-table td{padding:5px 8px;border-bottom:1px solid #E5E5EA;text-align:center}'
+    +'.print-table tr:nth-child(even) td{background:#F8F8F8}'
+    +'.print-footer{margin-top:24px;padding-top:8px;border-top:1px solid #E5E5EA;font-size:10px;color:#999;text-align:center}'
+    +'@media print{body{padding:0}}'
+    +'</style></head><body>'+html+'</body></html>');
+  w.document.close();
+  setTimeout(function(){ w.print(); }, 500);
+}
+
 function exportXLSX(){
   var parc=metodo==='trad'?parc_t:parc_c, punts=metodo==='comb'?punt_c:punt_b;
   if(!parc.length&&!punts.length){alert('Sin datos');return;}
