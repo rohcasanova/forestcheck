@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>ForestCheck — Inventario Forestal de Terreno</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.10.0/dist/tabler-icons.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --v1:#1A3D28; --v2:#2D6A4F; --v3:#52B788; --v4:#D8F3DC;
+  --c1:#6B3A2A; --c2:#A0522D; --c3:#D4A276; --c4:#FDF0E6;
+  --g1:#1C1C1E; --g2:#3A3A3C; --g3:#636366; --g4:#F2F2F7;
+  --blanco:#FFFFFF; --borde:#E5E7EB;
+  --sombra:0 2px 12px rgba(0,0,0,.08);
+  --sombra-lg:0 8px 32px rgba(0,0,0,.12);
+  --radio:14px; --radio-sm:10px; --radio-lg:20px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Inter',sans-serif;background:var(--g4);color:var(--g1);font-size:14px;max-width:480px;margin:0 auto;min-height:100vh}
+
+/* ── PANTALLA BIENVENIDA ── */
+#screen-welcome{
+  min-height:100vh;background:linear-gradient(160deg,var(--v1) 0%,var(--v2) 50%,var(--c1) 100%);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;
+}
+.welcome-logo{margin-bottom:24px;text-align:center}
+.welcome-logo svg{filter:drop-shadow(0 4px 12px rgba(0,0,0,.3))}
+.welcome-title{font-size:32px;font-weight:800;color:#fff;letter-spacing:-1px;text-align:center;margin-bottom:6px}
+.welcome-sub{font-size:13px;color:rgba(255,255,255,.7);text-align:center;margin-bottom:8px;letter-spacing:.5px;text-transform:uppercase}
+.welcome-desc{font-size:13px;color:rgba(255,255,255,.85);text-align:center;line-height:1.7;margin-bottom:36px;max-width:300px}
+.welcome-features{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;margin-bottom:36px}
+.wf{background:rgba(255,255,255,.1);border-radius:var(--radio-sm);padding:12px 10px;text-align:center;backdrop-filter:blur(8px)}
+.wf i{font-size:22px;color:var(--v3);display:block;margin-bottom:5px}
+.wf span{font-size:11px;color:rgba(255,255,255,.85);font-weight:500;line-height:1.3}
+.btn-welcome{width:100%;padding:16px;background:#fff;color:var(--v1);border:none;border-radius:var(--radio);font-size:15px;font-weight:700;cursor:pointer;letter-spacing:-.2px;box-shadow:0 4px 20px rgba(0,0,0,.2);transition:transform .15s,box-shadow .15s}
+.btn-welcome:active{transform:scale(.97)}
+.welcome-version{font-size:11px;color:rgba(255,255,255,.4);margin-top:20px}
+
+/* ── LOGIN ── */
+#screen-login{
+  min-height:100vh;background:linear-gradient(160deg,var(--v1) 0%,var(--v2) 60%,var(--c1) 100%);
+  display:none;flex-direction:column;align-items:center;justify-content:center;padding:24px;
+}
+.login-box{background:#fff;border-radius:var(--radio-lg);padding:28px 24px;width:100%;box-shadow:var(--sombra-lg)}
+.login-logo{text-align:center;margin-bottom:20px}
+.login-title{font-size:20px;font-weight:700;color:var(--v1);text-align:center;margin-bottom:4px}
+.login-sub{font-size:12px;color:var(--g3);text-align:center;margin-bottom:24px}
+.input-group{margin-bottom:14px}
+.input-group label{font-size:12px;font-weight:600;color:var(--g2);display:block;margin-bottom:5px}
+.input-group input{width:100%;padding:12px 14px;border:1.5px solid var(--borde);border-radius:var(--radio-sm);font-size:14px;font-family:'Inter',sans-serif;color:var(--g1);transition:border-color .2s}
+.input-group input:focus{outline:none;border-color:var(--v2)}
+.btn-login{width:100%;padding:14px;background:linear-gradient(135deg,var(--v2),var(--v1));color:#fff;border:none;border-radius:var(--radio-sm);font-size:15px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;margin-top:6px;transition:opacity .15s}
+.btn-login:active{opacity:.85}
+.login-error{background:#FEE2E2;color:#991B1B;padding:10px 12px;border-radius:var(--radio-sm);font-size:12px;text-align:center;margin-top:10px;display:none}
+
+/* ── TOPBAR ── */
+.topbar{background:linear-gradient(135deg,var(--v1),var(--v2));padding:14px 16px 12px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.15)}
+.topbar-left{display:flex;align-items:center;gap:10px}
+.topbar-icon{width:32px;height:32px;background:rgba(255,255,255,.15);border-radius:8px;display:flex;align-items:center;justify-content:center}
+.topbar-icon svg{width:18px;height:18px}
+.topbar-title{color:#fff;font-size:15px;font-weight:700;letter-spacing:-.3px}
+.topbar-sub{color:rgba(255,255,255,.7);font-size:10px;margin-top:1px}
+.topbar-user{display:flex;align-items:center;gap:6px;cursor:pointer}
+.user-avatar{width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff}
+.user-name{color:rgba(255,255,255,.85);font-size:11px;font-weight:500}
+
+/* ── NAV ── */
+.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:#fff;border-top:1px solid var(--borde);display:none;grid-template-columns:repeat(5,1fr);z-index:100;box-shadow:0 -4px 20px rgba(0,0,0,.08)}
+.nav.show{display:grid}
+.nb{padding:10px 4px 8px;border:none;background:none;color:var(--g3);font-size:10px;cursor:pointer;text-align:center;display:flex;flex-direction:column;align-items:center;gap:2px;font-family:'Inter',sans-serif;transition:color .15s}
+.nb i{font-size:20px}
+.nb.active{color:var(--v2);font-weight:600}
+
+/* ── CONTENT ── */
+.content{padding:12px 12px 0}
+
+/* ── CARDS ── */
+.card{background:#fff;border:1px solid var(--borde);border-radius:var(--radio);padding:16px;margin-bottom:10px;box-shadow:var(--sombra)}
+.card-title{font-size:13px;font-weight:600;color:var(--g1);margin-bottom:12px;display:flex;align-items:center;gap:7px}
+.card-title i{font-size:16px;color:var(--v2)}
+
+/* ── FORMS ── */
+label{font-size:12px;color:var(--g3);display:block;margin-bottom:4px;margin-top:10px;font-weight:500}
+label:first-child{margin-top:0}
+input,select,textarea{width:100%;padding:10px 12px;border:1.5px solid var(--borde);border-radius:var(--radio-sm);font-size:14px;background:#fff;color:var(--g1);font-family:'Inter',sans-serif;appearance:none;-webkit-appearance:none;transition:border-color .15s}
+input:focus,select:focus{outline:none;border-color:var(--v2)}
+textarea{resize:vertical;min-height:56px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+/* ── BOTONES ── */
+.btn{width:100%;padding:12px;border:1.5px solid var(--borde);border-radius:var(--radio-sm);background:#fff;color:var(--g1);font-size:13px;font-weight:600;cursor:pointer;margin-top:8px;display:flex;align-items:center;justify-content:center;gap:7px;font-family:'Inter',sans-serif;transition:all .15s}
+.btn:active{opacity:.8;transform:scale(.98)}
+.btn-primary{background:linear-gradient(135deg,var(--v2),var(--v1));color:#fff;border:none;box-shadow:0 2px 8px rgba(45,106,79,.3)}
+.btn-earth{background:linear-gradient(135deg,var(--c2),var(--c1));color:#fff;border:none}
+.btn-outline-v{background:var(--v4);color:var(--v1);border-color:var(--v3)}
+.btn-outline-c{background:var(--c4);color:var(--c1);border-color:var(--c3)}
+.btn-danger{background:#FEE2E2;color:#991B1B;border-color:#FCA5A5}
+.btn-ghost{background:transparent;color:var(--g3);border-color:transparent}
+
+/* ── MÉTRICAS ── */
+.metrics{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.metric{background:var(--g4);border-radius:var(--radio-sm);padding:10px 12px;border:1px solid var(--borde)}
+.metric .lbl{font-size:10px;color:var(--g3);margin-bottom:2px;font-weight:500;text-transform:uppercase;letter-spacing:.3px}
+.metric .val{font-size:20px;font-weight:700;color:var(--g1);line-height:1.1}
+.metric .unit{font-size:10px;color:var(--g3);margin-top:1px}
+.metric.accent{background:var(--v4);border-color:var(--v3)}
+.metric.accent .val{color:var(--v1)}
+.metric.earth{background:var(--c4);border-color:var(--c3)}
+.metric.earth .val{color:var(--c1)}
+
+/* ── LISTAS ── */
+.tree-list{border:1px solid var(--borde);border-radius:var(--radio-sm);max-height:170px;overflow-y:auto;margin-top:8px}
+.tree-row{display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid var(--borde);font-size:13px}
+.tree-row:last-child{border-bottom:none}
+.tn{width:24px;height:24px;border-radius:50%;background:var(--v4);color:var(--v2);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.chip{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border:1px solid var(--borde);border-radius:var(--radio-sm);margin-bottom:6px;font-size:13px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+
+/* ── TAGS ── */
+.tag{font-size:11px;padding:3px 8px;border-radius:6px;font-weight:600}
+.tag-v{background:var(--v4);color:var(--v2)}
+.tag-c{background:var(--c4);color:var(--c1)}
+.tag-b{background:#EFF6FF;color:#1D4ED8}
+.tag-m{background:#F5F3FF;color:#5B21B6}
+
+/* ── ESTADÍGRAFOS ── */
+.est-row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--borde);font-size:13px}
+.est-row:last-child{border-bottom:none}
+.est-lbl{color:var(--g3);font-size:12px}
+.est-val{font-weight:600}
+.ok{color:#059669}.warn{color:#D97706}.bad{color:#DC2626}
+
+/* ── SECTION HEADERS ── */
+.shdr{font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;padding:5px 10px;border-radius:7px;margin-bottom:8px;margin-top:4px}
+.shdr-v{background:var(--v4);color:var(--v2)}
+.shdr-c{background:var(--c4);color:var(--c1)}
+.shdr-b{background:#EFF6FF;color:#1D4ED8}
+.shdr-m{background:#F5F3FF;color:#5B21B6}
+.shdr-g{background:var(--g4);color:var(--g2)}
+
+/* ── INFO BOXES ── */
+.ibox{border-radius:var(--radio-sm);padding:10px 12px;font-size:12px;margin-bottom:12px;line-height:1.5;border-left:3px solid}
+.ibox-v{background:var(--v4);border-color:var(--v3);color:#1A4731}
+.ibox-c{background:var(--c4);border-color:var(--c3);color:#5C2D1A}
+.ibox-m{background:#F5F3FF;border-color:#8B5CF6;color:#4C1D95}
+
+/* ── SELECTOR MÉTODO ── */
+.msel{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.mcard{border:2px solid var(--borde);border-radius:var(--radio);padding:16px 10px;text-align:center;cursor:pointer;background:#fff;transition:all .2s;box-shadow:var(--sombra)}
+.mcard:active{transform:scale(.97)}
+.mcard-bit{grid-column:1/-1}
+.mcard i{font-size:28px;display:block;margin-bottom:8px}
+.mcard .mt{font-size:13px;font-weight:700;color:var(--g1)}
+.mcard .ms{font-size:11px;color:var(--g3);margin-top:4px;line-height:1.4}
+.mcard.sel-v{border-color:var(--v2);background:var(--v4)}
+.mcard.sel-c{border-color:var(--c2);background:var(--c4)}
+.mcard.sel-m{border-color:#7C3AED;background:#F5F3FF}
+
+/* ── CHARTS ── */
+.chart-wrap{position:relative;width:100%;height:190px;margin:8px 0 4px}
+
+/* ── CONFIG ROWS ── */
+.cfg-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--borde);font-size:13px}
+.cfg-row:last-child{border-bottom:none}
+.cfg-row input{width:85px;text-align:center}
+
+/* ── ADMIN PANEL ── */
+.admin-badge{background:linear-gradient(135deg,var(--c2),var(--c1));color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;letter-spacing:.5px}
+.user-row{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border:1px solid var(--borde);border-radius:var(--radio-sm);margin-bottom:6px;background:#fff}
+.user-info{display:flex;align-items:center;gap:10px}
+.ua{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff}
+
+/* ── BIENVENIDA INFO ── */
+.adm-row{display:flex;justify-content:space-between;align-items:flex-start;padding:7px 0;border-bottom:1px solid var(--borde);gap:8px;font-size:13px}
+.adm-row:last-child{border-bottom:none}
+.adm-lbl{color:var(--g3);font-size:12px;min-width:110px}
+.adm-val{font-weight:600;text-align:right;font-size:12px;word-break:break-word}
+.ver-ok{background:#D1FAE5;color:#065F46;padding:3px 10px;border-radius:6px;font-size:11px;font-weight:700}
+.ver-bad{background:#FEE2E2;color:#991B1B;padding:3px 10px;border-radius:6px;font-size:11px;font-weight:700}
+
+/* ── EMPTY / LOADING ── */
+.empty{text-align:center;padding:24px;color:var(--g3);font-size:13px}
+.empty i{font-size:32px;display:block;margin-bottom:8px;color:var(--borde)}
+.page{display:none;animation:fadeIn .2s ease}
+.page.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── BITTERLICH PREVIEW ── */
+.bit-big{font-size:48px;font-weight:800;color:#5B21B6;text-align:center;padding:16px 0 2px;line-height:1}
+.bit-unit{font-size:12px;color:var(--g3);text-align:center;margin-bottom:10px}
+
+/* ── SCROLL ── */
+body{padding-bottom:80px}
+</style>
+</head>
+<body>
+
+<!-- ══ PANTALLA BIENVENIDA ══ -->
+<div id="screen-welcome">
+  <div class="welcome-logo">
+    <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+      <circle cx="40" cy="40" r="40" fill="rgba(255,255,255,0.15)"/>
+      <circle cx="40" cy="40" r="32" fill="rgba(255,255,255,0.1)"/>
+      <!-- Árbol estilizado -->
+      <path d="M40 15 L52 35 H44 L54 52 H46 L56 68 H24 L34 52 H26 L36 35 H28 Z" fill="rgba(255,255,255,0.9)"/>
+      <rect x="37" y="62" width="6" height="8" rx="2" fill="rgba(255,255,255,0.7)"/>
+    </svg>
+  </div>
+  <div class="welcome-title">ForestCheck</div>
+  <div class="welcome-sub">Sistema de Inventario Forestal</div>
+  <div class="welcome-desc">Herramienta profesional para la captura y análisis de datos dasométricos en terreno y gabinete</div>
+  <div class="welcome-features">
+    <div class="wf"><i class="ti ti-ruler-2"></i><span>Parcelas tradicionales con forcípula</span></div>
+    <div class="wf"><i class="ti ti-circle-dotted"></i><span>Muestreo Bitterlich FAB=1</span></div>
+    <div class="wf"><i class="ti ti-chart-histogram"></i><span>Estadígrafos y distribución diamétrica</span></div>
+    <div class="wf"><i class="ti ti-file-spreadsheet"></i><span>Exportación directa a Excel</span></div>
+  </div>
+  <button class="btn-welcome" onclick="showLogin()">
+    <i class="ti ti-login" style="font-size:18px;margin-right:8px"></i>Ingresar al sistema
+  </button>
+  <div class="welcome-version">v2.0 · Bosque nativo · Chile</div>
+</div>
+
+<!-- ══ PANTALLA LOGIN ══ -->
+<div id="screen-login">
+  <div class="login-box">
+    <div class="login-logo">
+      <svg width="48" height="48" viewBox="0 0 80 80" fill="none">
+        <circle cx="40" cy="40" r="36" fill="#2D6A4F"/>
+        <path d="M40 15 L52 35 H44 L54 52 H46 L56 68 H24 L34 52 H26 L36 35 H28 Z" fill="white"/>
+      </svg>
+    </div>
+    <div class="login-title">ForestCheck</div>
+    <div class="login-sub">Ingresa tus credenciales para continuar</div>
+    <div class="input-group">
+      <label>Usuario</label>
+      <input type="text" id="inp-user" placeholder="nombre de usuario" autocomplete="username" autocapitalize="none">
+    </div>
+    <div class="input-group">
+      <label>Contraseña</label>
+      <input type="password" id="inp-pass" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <button class="btn-login" onclick="doLogin()">Ingresar</button>
+    <div class="login-error" id="login-error">Usuario o contraseña incorrectos</div>
+  </div>
+</div>
+
+<!-- ══ APP PRINCIPAL ══ -->
+<div id="screen-app" style="display:none">
+
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="topbar-icon">
+      <svg viewBox="0 0 80 80" fill="none">
+        <path d="M40 8 L55 32 H46 L58 52 H49 L62 72 H18 L31 52 H22 L34 32 H25 Z" fill="white" opacity=".9"/>
+      </svg>
+    </div>
+    <div>
+      <div class="topbar-title">ForestCheck</div>
+      <div class="topbar-sub" id="top-sub">Listo</div>
+    </div>
+  </div>
+  <div class="topbar-user" onclick="showUserMenu()">
+    <div>
+      <div class="user-name" id="top-username">—</div>
+      <div style="color:rgba(255,255,255,.5);font-size:10px;text-align:right" id="top-role">—</div>
+    </div>
+    <div class="user-avatar" id="top-avatar">?</div>
+  </div>
+</div>
+
+<nav class="nav" id="main-nav">
+  <button class="nb" onclick="goPage('p1')" id="nav-p1"><i class="ti ti-circle-dotted"></i><span id="nav-p1-lbl">Método</span></button>
+  <button class="nb" onclick="goPage('p2')" id="nav-p2" style="display:none"><i class="ti ti-ruler-2"></i><span>Diámetros</span></button>
+  <button class="nb" onclick="goPage('est')" id="nav-est"><i class="ti ti-chart-bar"></i><span>Estadíg.</span></button>
+  <button class="nb" onclick="goPage('res')" id="nav-res"><i class="ti ti-file-description"></i><span>Resumen</span></button>
+  <button class="nb" onclick="goPage('cfg')" id="nav-cfg"><i class="ti ti-settings"></i><span>Config</span></button>
+</nav>
+
+<div class="content">
+
+<!-- SELECTOR MÉTODO -->
+<div id="page-selector">
+  <div class="card" style="margin-top:8px">
+    <div class="card-title"><i class="ti ti-list-check"></i>Método de muestreo</div>
+    <div class="msel">
+      <div class="mcard" id="mc-trad" onclick="selMet('trad')">
+        <i class="ti ti-ruler-2" style="color:var(--v2)"></i>
+        <div class="mt">Tradicional</div>
+        <div class="ms">Forcípula · DAP + altura → N/ha · AB/ha · VOL</div>
+      </div>
+      <div class="mcard" id="mc-comb" onclick="selMet('comb')">
+        <i class="ti ti-circle-dotted" style="color:#1D4ED8"></i>
+        <div class="mt">Combinado</div>
+        <div class="ms">Bitterlich → AB/ha Parcela → N/ha</div>
+      </div>
+      <div class="mcard mcard-bit" id="mc-bit" onclick="selMet('bit')">
+        <i class="ti ti-bolt" style="color:#7C3AED"></i>
+        <div class="mt">Bitterlich rápido</div>
+        <div class="ms">Solo relascopio en recorrido · Verificación rápida de AB/ha sin parcelas fijas</div>
+      </div>
+    </div>
+    <button class="btn btn-primary" id="btn-ini" onclick="iniciar()" style="display:none"><i class="ti ti-arrow-right"></i>Iniciar con este método</button>
+  </div>
+</div>
+
+<!-- TRAD: PARCELAS -->
+<div class="page" id="page-p1-trad">
+  <div class="ibox ibox-v"><strong>Forcípula</strong> — DAP + altura opcional → N/ha · AB/ha · VOL</div>
+  <div class="card">
+    <div class="card-title"><i class="ti ti-map-pin"></i>Registro de árbol</div>
+    <div class="row2"><div><label>N° parcela</label><input type="text" id="t-pid" placeholder="P-01" autocomplete="off"></div><div><label>Sup. (m²)</label><input type="number" id="t-sup" value="100" min="1" onchange="cfg.sup=+this.value;syncSup()"></div></div>
+    <div class="row2"><div><label>DAP (cm)</label><input type="number" id="t-dap" placeholder="18.5" step="0.1" min="0" inputmode="decimal"></div><div><label>Especie</label><select id="t-sp"></select></div></div>
+    <div class="row2"><div><label>Altura (m) <span style="color:var(--g3)">(opc.)</span></label><input type="number" id="t-alt" placeholder="14.0" step="0.1" min="0" inputmode="decimal"></div><div><label>Obs.</label><input type="text" id="t-obs" placeholder="..."></div></div>
+    <button class="btn btn-primary" onclick="addArbol('t')"><i class="ti ti-plus"></i>Agregar árbol</button>
+  </div>
+  <div class="card" id="card-t" style="display:none">
+    <div class="card-title"><i class="ti ti-list"></i>Parcela: <span id="lbl-t" style="color:var(--v2);margin-left:4px"></span></div>
+    <div class="metrics">
+      <div class="metric accent"><div class="lbl">N árboles</div><div class="val" id="mn-t">0</div></div>
+      <div class="metric accent"><div class="lbl">N/ha</div><div class="val" id="mnha-t">—</div></div>
+      <div class="metric"><div class="lbl">AB/ha</div><div class="val" id="mab-t">—</div><div class="unit">m²/ha</div></div>
+      <div class="metric"><div class="lbl">DAP medio</div><div class="val" id="mdap-t">—</div><div class="unit">cm</div></div>
+    </div>
+    <div class="tree-list" id="tl-t"></div>
+    <button class="btn btn-primary" onclick="saveParcela('t')" style="margin-top:8px"><i class="ti ti-device-floppy"></i>Guardar parcela</button>
+  </div>
+  <div class="shdr shdr-v">Parcelas guardadas</div>
+  <div id="list-t"><div class="empty"><i class="ti ti-inbox"></i>Sin parcelas aún</div></div>
+</div>
+
+<!-- COMB: BITTERLICH -->
+<div class="page" id="page-p1-comb">
+  <div class="ibox ibox-c"><strong>Bitterlich FAB=<span id="fab-lbl-c">1</span></strong> — Cuenta árboles con mira → AB/ha = N × FAB</div>
+  <div class="card">
+    <div class="card-title"><i class="ti ti-map-pin"></i>Punto de muestreo</div>
+    <div class="row2"><div><label>N° punto</label><input type="text" id="c-pid" placeholder="PT-01" autocomplete="off"></div><div><label>N° árboles contados</label><input type="number" id="c-n" placeholder="22" step="1" min="0" inputmode="numeric" oninput="prevComb()"></div></div>
+    <div class="row2"><div><label>Coord. E</label><input type="number" id="c-e" placeholder="UTM E"></div><div><label>Coord. N</label><input type="number" id="c-norte" placeholder="UTM N"></div></div>
+    <div id="c-prev" style="display:none;margin-top:10px;padding:14px;background:var(--c4);border-radius:var(--radio-sm);text-align:center;border:1px solid var(--c3)">
+      <div style="font-size:11px;color:var(--c1);font-weight:600;margin-bottom:2px;text-transform:uppercase;letter-spacing:.5px">AB/ha calculada</div>
+      <div style="font-size:38px;font-weight:800;color:var(--c1)" id="c-abha-p">—</div>
+      <div style="font-size:11px;color:var(--c2)">m²/ha</div>
+    </div>
+    <button class="btn btn-primary" onclick="savePunto()"><i class="ti ti-device-floppy"></i>Guardar punto</button>
+  </div>
+  <div class="shdr shdr-b">Puntos guardados</div>
+  <div id="list-c-bit"><div class="empty"><i class="ti ti-inbox"></i>Sin puntos aún</div></div>
+</div>
+
+<!-- COMB: DIÁMETROS -->
+<div class="page" id="page-p2-comb">
+  <div class="ibox ibox-v"><strong>Parcela fija</strong> — Mide DAP → N/ha + distribución diamétrica</div>
+  <div class="card">
+    <div class="card-title"><i class="ti ti-map-pin"></i>Registro de diámetros</div>
+    <div class="row2"><div><label>N° parcela</label><input type="text" id="cp-pid" placeholder="P-01" autocomplete="off"></div><div><label>Sup. (m²)</label><input type="number" id="cp-sup" value="100" min="1" onchange="cfg.sup=+this.value;syncSup()"></div></div>
+    <div class="row2"><div><label>DAP (cm)</label><input type="number" id="cp-dap" placeholder="18.5" step="0.1" min="0" inputmode="decimal"></div><div><label>Especie</label><select id="cp-sp"></select></div></div>
+    <button class="btn btn-primary" onclick="addArbol('c')"><i class="ti ti-plus"></i>Agregar árbol</button>
+  </div>
+  <div class="card" id="card-c" style="display:none">
+    <div class="card-title"><i class="ti ti-list"></i>Parcela: <span id="lbl-c" style="color:var(--v2);margin-left:4px"></span></div>
+    <div class="metrics">
+      <div class="metric accent"><div class="lbl">N árboles</div><div class="val" id="mn-c">0</div></div>
+      <div class="metric accent"><div class="lbl">N/ha</div><div class="val" id="mnha-c">—</div></div>
+      <div class="metric"><div class="lbl">DAP medio</div><div class="val" id="mdap-c">—</div><div class="unit">cm</div></div>
+      <div class="metric"><div class="lbl">Dg</div><div class="val" id="mdg-c">—</div><div class="unit">cm</div></div>
+    </div>
+    <div class="tree-list" id="tl-c"></div>
+    <button class="btn btn-primary" onclick="saveParcela('c')" style="margin-top:8px"><i class="ti ti-device-floppy"></i>Guardar parcela</button>
+  </div>
+  <div class="shdr shdr-v">Parcelas guardadas</div>
+  <div id="list-c-pf"><div class="empty"><i class="ti ti-inbox"></i>Sin parcelas aún</div></div>
+</div>
+
+<!-- BITTERLICH RÁPIDO -->
+<div class="page" id="page-p1-bit">
+  <div class="ibox ibox-m"><strong>Bitterlich rápido FAB=<span id="fab-lbl-b">1</span></strong> — Recorrido del rodal · Verificación inmediata de AB/ha</div>
+  <div class="card">
+    <div class="card-title"><i class="ti ti-map-pin"></i>Punto de conteo</div>
+    <div class="row2"><div><label>N° punto</label><input type="text" id="b-pid" placeholder="PT-01" autocomplete="off"></div><div><label>N° árboles contados</label><input type="number" id="b-n" placeholder="22" step="1" min="0" inputmode="numeric" oninput="prevBit()"></div></div>
+    <div class="row2"><div><label>Coord. E</label><input type="number" id="b-e" placeholder="UTM E"></div><div><label>Coord. N</label><input type="number" id="b-norte" placeholder="UTM N"></div></div>
+    <div id="b-prev" style="display:none;margin-top:12px;padding:16px 12px;background:#F5F3FF;border-radius:var(--radio-sm);border:1px solid #DDD6FE">
+      <div style="font-size:10px;color:#5B21B6;text-align:center;font-weight:700;margin-bottom:2px;text-transform:uppercase;letter-spacing:.5px">AB/ha calculada</div>
+      <div class="bit-big" id="b-abha-p">—</div>
+      <div class="bit-unit">m²/ha</div>
+    </div>
+    <button class="btn btn-primary" onclick="savePuntoBit()"><i class="ti ti-device-floppy"></i>Guardar punto</button>
+  </div>
+  <div class="card" id="bit-live" style="display:none;border-color:#DDD6FE">
+    <div class="card-title" style="color:#5B21B6"><i class="ti ti-chart-bar" style="color:#7C3AED"></i>Estadígrafos en tiempo real</div>
+    <div class="metrics">
+      <div class="metric" style="background:#F5F3FF;border-color:#DDD6FE"><div class="lbl">AB/ha media</div><div class="val" id="bl-abha" style="color:#5B21B6">—</div><div class="unit">m²/ha</div></div>
+      <div class="metric" style="background:#F5F3FF;border-color:#DDD6FE"><div class="lbl">N° puntos</div><div class="val" id="bl-n" style="color:#5B21B6">—</div></div>
+      <div class="metric" style="background:#F5F3FF;border-color:#DDD6FE"><div class="lbl">CV%</div><div class="val" id="bl-cv">—</div></div>
+      <div class="metric" style="background:#F5F3FF;border-color:#DDD6FE"><div class="lbl">Error muest.</div><div class="val" id="bl-em">—</div><div class="unit">%</div></div>
+    </div>
+    <div id="bit-live-rows"></div>
+    <div id="bit-ver" style="display:none;margin-top:10px;padding:10px 12px;background:var(--g4);border-radius:var(--radio-sm)">
+      <div style="font-size:10px;color:var(--g3);margin-bottom:5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px">vs. Plan de manejo</div>
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span id="bit-ver-txt" style="color:var(--g3);font-size:12px">—</span>
+        <span id="bit-ver-badge">—</span>
+      </div>
+    </div>
+  </div>
+  <div class="shdr shdr-m">Puntos guardados</div>
+  <div id="list-b"><div class="empty"><i class="ti ti-inbox"></i>Sin puntos aún</div></div>
+</div>
+
+<!-- ESTADÍGRAFOS -->
+<div class="page" id="page-est">
+  <div class="card">
+    <div class="card-title"><i class="ti ti-chart-histogram"></i>Distribución diamétrica</div>
+    <div class="chart-wrap"><canvas id="chart-distrib"></canvas></div>
+    <div style="font-size:11px;color:var(--g3);text-align:center">Clase DAP (cm) — N/ha por clase</div>
+  </div>
+  <div class="card">
+    <div class="card-title"><i class="ti ti-chart-bar"></i>AB/ha por especie</div>
+    <div class="chart-wrap"><canvas id="chart-esp"></canvas></div>
+    <div style="font-size:11px;color:var(--g3);text-align:center" id="esp-sub"></div>
+  </div>
+  <div class="card">
+    <div class="card-title"><i class="ti ti-table"></i>Resumen rodal</div>
+    <div class="metrics">
+      <div class="metric accent"><div class="lbl">N/ha</div><div class="val" id="e-nha">—</div></div>
+      <div class="metric earth"><div class="lbl">AB/ha</div><div class="val" id="e-abha">—</div><div class="unit">m²/ha</div></div>
+      <div class="metric"><div class="lbl">DAP medio</div><div class="val" id="e-dap">—</div><div class="unit">cm</div></div>
+      <div class="metric"><div class="lbl">Dg</div><div class="val" id="e-dg">—</div><div class="unit">cm</div></div>
+    </div>
+    <div id="e-vol-row" style="display:none" class="metrics">
+      <div class="metric earth"><div class="lbl">VOL/ha</div><div class="val" id="e-vol">—</div><div class="unit">m³/ha</div></div>
+      <div class="metric"><div class="lbl">Árb. c/altura</div><div class="val" id="e-nalt">—</div></div>
+    </div>
+    <div id="est-rows"></div>
+  </div>
+  <div id="est-bit-card" style="display:none" class="card">
+    <div class="card-title" style="color:#1D4ED8"><i class="ti ti-circle-dotted" style="color:#1D4ED8"></i>Bitterlich — AB/ha</div>
+    <div id="est-bit-rows"></div>
+  </div>
+</div>
+
+<!-- RESUMEN -->
+<div class="page" id="page-res">
+  <div class="card">
+    <div class="card-title"><i class="ti ti-building"></i>Datos del predio</div>
+    <div class="row2"><div><label>PMBN / Expediente</label><input type="text" id="r-pmbn" placeholder="PMBN-XXXX" oninput="saveAdmin()"></div><div><label>Fecha verificación</label><input type="date" id="r-fecha" oninput="saveAdmin()"></div></div>
+    <label>Propietario</label><input type="text" id="r-prop" placeholder="Nombre propietario" oninput="saveAdmin()">
+    <label>Predio</label><input type="text" id="r-predio" placeholder="Nombre del predio" oninput="saveAdmin()">
+    <div class="row2"><div><label>Rol / Folio</label><input type="text" id="r-rol" placeholder="XX-YY" oninput="saveAdmin()"></div><div><label>Comuna</label><input type="text" id="r-comuna" placeholder="Comuna" oninput="saveAdmin()"></div></div>
+    <div class="row2"><div><label>Región</label><input type="text" id="r-region" placeholder="Región" oninput="saveAdmin()"></div><div><label>Profesional</label><input type="text" id="r-prof" placeholder="Nombre" oninput="saveAdmin()"></div></div>
+  </div>
+  <div class="card">
+    <div class="card-title"><i class="ti ti-file-check"></i>Plan de manejo (referencia)</div>
+    <div class="row2"><div><label>N/ha</label><input type="number" id="r-etn" placeholder="1840" inputmode="numeric" oninput="cfg.etN=+this.value||null;saveState()"></div><div><label>AB/ha (m²/ha)</label><input type="number" id="r-etab" placeholder="27.0" step="0.1" oninput="cfg.etAB=+this.value||null;saveState()"></div></div>
+    <div class="row2"><div><label>VOL/ha (m³/ha)</label><input type="number" id="r-etvol" placeholder="180" oninput="cfg.etVol=+this.value||null;saveState()"></div><div><label>N° parcelas orig.</label><input type="number" id="r-etnp" placeholder="5" oninput="cfg.etNp=+this.value||null;saveState()"></div></div>
+  </div>
+  <div class="card" id="res-card">
+    <div class="card-title"><i class="ti ti-report-analytics"></i>Informe de verificación</div>
+    <div id="res-content"><div class="empty"><i class="ti ti-database"></i>Ingresa datos y parcelas para generar el informe</div></div>
+  </div>
+  <button class="btn btn-earth" onclick="exportXLSX()"><i class="ti ti-file-spreadsheet"></i>Exportar Excel (.xlsx)</button>
+  <button class="btn btn-ghost" onclick="exportCSV()" style="margin-top:4px"><i class="ti ti-file-text"></i>Exportar CSV respaldo</button>
+</div>
+
+<!-- CONFIGURACIÓN -->
+<div class="page" id="page-cfg">
+  <div class="card">
+    <div class="card-title"><i class="ti ti-refresh"></i>Método activo</div>
+    <div style="font-size:13px;color:var(--g3);margin-bottom:10px">Método: <strong id="cfg-met-lbl" style="color:var(--v2)">—</strong></div>
+    <button class="btn" onclick="cambiarMet()"><i class="ti ti-arrows-exchange"></i>Cambiar método</button>
+  </div>
+  <div class="card">
+    <div class="card-title"><i class="ti ti-adjustments"></i>Parámetros</div>
+    <div class="cfg-row"><span style="color:var(--g3)">Superficie parcela (m²)</span><input type="number" id="cfg-sup" value="100" min="1" onchange="cfg.sup=+this.value;syncSup();saveState()"></div>
+    <div class="cfg-row" id="cfg-fab-row"><span style="color:var(--g3)">FAB Bitterlich</span><input type="number" id="cfg-fab" value="1" min="0.5" step="0.5" onchange="cfg.fab=+this.value;syncFab();saveState()"></div>
+    <div class="cfg-row"><span style="color:var(--g3)">DAP mínimo (cm)</span><input type="number" id="cfg-dmin" value="5" min="1" onchange="cfg.dmin=+this.value;saveState()"></div>
+    <div class="cfg-row"><span style="color:var(--g3)">Nivel confianza (%)</span><input type="number" id="cfg-nc" value="95" min="90" max="99" onchange="cfg.nc=+this.value;saveState()"></div>
+  </div>
+  <div class="card">
+    <div class="card-title"><i class="ti ti-leaf"></i>Especies</div>
+    <div id="esp-cfg"></div>
+    <button class="btn" onclick="addEsp()" style="margin-top:8px"><i class="ti ti-plus"></i>Agregar especie</button>
+  </div>
+  <!-- Panel admin -->
+  <div class="card" id="admin-panel" style="display:none">
+    <div class="card-title"><i class="ti ti-shield"></i>Panel administrador <span class="admin-badge">ADMIN</span></div>
+    <div class="shdr shdr-g">Usuarios registrados</div>
+    <div id="admin-users"></div>
+    <button class="btn btn-outline-v" onclick="addUser()" style="margin-top:8px"><i class="ti ti-user-plus"></i>Agregar usuario</button>
+    <div class="shdr shdr-g" style="margin-top:14px">Datos de todos los usuarios</div>
+    <div id="admin-data-summary"></div>
+  </div>
+  <div class="card">
+    <div class="card-title"><i class="ti ti-database"></i>Mis datos</div>
+    <div id="storage-info" style="font-size:13px;color:var(--g3);margin-bottom:10px"></div>
+    <button class="btn btn-danger" onclick="if(confirm('¿Borrar tus datos? Esta acción no se puede deshacer.'))limpiar()"><i class="ti ti-trash"></i>Borrar mis datos</button>
+  </div>
+  <button class="btn btn-ghost" onclick="doLogout()" style="margin-top:4px"><i class="ti ti-logout"></i>Cerrar sesión</button>
+</div>
+
+</div><!-- /content -->
+</div><!-- /screen-app -->
+
+<script>
+// ═══ USUARIOS (almacenados en localStorage del dispositivo host/admin) ═══
+// En producción real esto iría en un backend. Aquí usamos localStorage
+// con prefijo por usuario para separar datos.
+
+const USERS_KEY = 'daso-users';
+const SESSION_KEY = 'daso-session';
+
+function getUsers(){
+  try{ return JSON.parse(localStorage.getItem(USERS_KEY))||[]; }catch(e){ return []; }
+}
+function saveUsers(users){ localStorage.setItem(USERS_KEY, JSON.stringify(users)); }
+
+function initDefaultUsers(){
+  if(!getUsers().length){
+    saveUsers([
+      {id:'admin',       name:'Administrador', pass:'admin123',   role:'admin', color:'#1A3D28'},
+      {id:'epv',         name:'EPV',           pass:'epv123',     role:'user',  color:'#2E7D32'},
+      {id:'mcc',         name:'MCC',           pass:'mcc1055',    role:'user',  color:'#1565C0'},
+      {id:'rmz',         name:'RMZ',           pass:'rmz1055',    role:'user',  color:'#6A1B9A'},
+      {id:'hsv',         name:'HSV',           pass:'hsv1055',    role:'user',  color:'#BF360C'},
+      {id:'forestprueba',name:'Forest Prueba', pass:'prueba1055', role:'user',  color:'#00695C'},
+    ]);
+  }
+}
+
+let currentUser = null;
+
+function showLogin(){
+  try{
+    var sw = document.getElementById('screen-welcome');
+    var sl = document.getElementById('screen-login');
+    if(sw) sw.style.display='none';
+    if(sl){ sl.style.display='flex'; sl.style.flexDirection='column'; }
+    setTimeout(function(){ 
+      var inp = document.getElementById('inp-user'); 
+      if(inp) inp.focus(); 
+    }, 100);
+  } catch(e){ alert('Error: '+e.message); }
+}
+
+function doLogin(){
+  try{
+  const user = document.getElementById('inp-user').value.trim().toLowerCase();
+  const pass = document.getElementById('inp-pass').value;
+  const users = getUsers();
+  const found = users.find(u => u.id.toLowerCase()===user && u.pass===pass);
+  if(found){
+    currentUser = found;
+    localStorage.setItem(SESSION_KEY, JSON.stringify({id:found.id, ts:Date.now()}));
+    document.getElementById('login-error').style.display='none';
+    document.getElementById('inp-pass').value='';
+    startApp();
+  } else {
+    document.getElementById('login-error').style.display='block';
+    document.getElementById('inp-pass').value='';
+    document.getElementById('inp-pass').focus();
+  }
+  } catch(e){ alert('Error login: '+e.message); }
+}
+
+function doLogout(){
+  if(!confirm('¿Cerrar sesión?')) return;
+  currentUser = null;
+  localStorage.removeItem(SESSION_KEY);
+  metodo=null;
+  document.getElementById('screen-app').style.display='none';
+  document.getElementById('screen-welcome').style.display='flex';
+  document.getElementById('inp-user').value='';
+}
+
+function checkSession(){
+  try{
+    const s = JSON.parse(localStorage.getItem(SESSION_KEY));
+    if(!s) return false;
+    if(Date.now()-s.ts > 8*60*60*1000){ localStorage.removeItem(SESSION_KEY); return false; }
+    const users = getUsers();
+    const found = users.find(u=>u.id===s.id);
+    if(found){ currentUser=found; return true; }
+  }catch(e){}
+  return false;
+}
+
+function startApp(){
+  document.getElementById('screen-login').style.display='none';
+  document.getElementById('screen-app').style.display='block';
+  document.getElementById('top-username').textContent = currentUser.name;
+  document.getElementById('top-role').textContent = currentUser.role==='admin'?'Administrador':'Profesional';
+  document.getElementById('top-avatar').textContent = currentUser.name.charAt(0).toUpperCase();
+  document.getElementById('top-avatar').style.background = currentUser.color||'#2D6A4F';
+  document.getElementById('admin-panel').style.display = currentUser.role==='admin'?'block':'none';
+  loadState();
+  if(currentUser.role==='admin') loadAdminPanel();
+}
+
+function showUserMenu(){
+  if(currentUser.role==='admin'){
+    goPage('cfg');
+  } else {
+    if(confirm('¿Cerrar sesión?')) doLogout();
+  }
+}
+
+function addUser(){
+  const id=prompt('ID de usuario (sin espacios):');if(!id)return;
+  const name=prompt('Nombre completo:');if(!name)return;
+  const pass=prompt('Contraseña:');if(!pass)return;
+  const role=confirm('¿Es administrador?')?'admin':'user';
+  const colors=['#2D6A4F','#6B3A2A','#1D4ED8','#7C3AED','#B45309','#0E7490'];
+  const color=colors[getUsers().length%colors.length];
+  const users=getUsers();
+  if(users.find(u=>u.id.toLowerCase()===id.toLowerCase())){alert('Ese ID ya existe');return;}
+  users.push({id:id.trim(),name:name.trim(),pass:pass,role,color});
+  saveUsers(users);loadAdminPanel();alert('Usuario creado correctamente');
+}
+
+function deleteUser(id){
+  if(id===currentUser.id){alert('No puedes eliminar tu propio usuario');return;}
+  if(!confirm('¿Eliminar usuario '+id+'?'))return;
+  saveUsers(getUsers().filter(u=>u.id!==id));
+  loadAdminPanel();
+}
+
+function loadAdminPanel(){
+  const users=getUsers();
+  document.getElementById('admin-users').innerHTML=users.map(u=>`
+    <div class="user-row">
+      <div class="user-info">
+        <div class="ua" style="background:${u.color||'#2D6A4F'}">${u.name.charAt(0)}</div>
+        <div>
+          <div style="font-weight:600;font-size:13px">${u.name}</div>
+          <div style="font-size:11px;color:var(--g3)">${u.id} · ${u.role==='admin'?'Admin':'Profesional'}</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:6px;align-items:center">
+        ${u.role==='admin'?'<span class="admin-badge">ADMIN</span>':''}
+        ${u.id!==currentUser.id?`<button style="background:none;border:none;cursor:pointer;color:#DC2626" onclick="deleteUser('${u.id}')"><i class="ti ti-trash"></i></button>`:''}
+      </div>
+    </div>`).join('');
+
+  // Resumen datos de todos los usuarios
+  let summary = '';
+  users.forEach(u=>{
+    try{
+      const pt = JSON.parse(localStorage.getItem(`dm-pt-${u.id}`))||[];
+      const pc = JSON.parse(localStorage.getItem(`dm-pc-${u.id}`))||[];
+      const bc = JSON.parse(localStorage.getItem(`dm-bc-${u.id}`))||[];
+      const bb = JSON.parse(localStorage.getItem(`dm-bb-${u.id}`))||[];
+      const met = localStorage.getItem(`dm-met-${u.id}`)||'—';
+      const total=pt.length+pc.length+bc.length+bb.length;
+      if(total>0){
+        summary+=`<div class="user-row"><div class="user-info">
+          <div class="ua" style="background:${u.color||'#2D6A4F'};width:28px;height:28px;font-size:11px">${u.name.charAt(0)}</div>
+          <div><div style="font-weight:600;font-size:12px">${u.name}</div>
+          <div style="font-size:11px;color:var(--g3)">${met} · ${pt.length+pc.length} parcelas · ${bc.length+bb.length} puntos</div></div>
+        </div></div>`;
+      }
+    }catch(e){}
+  });
+  document.getElementById('admin-data-summary').innerHTML=summary||'<div class="empty" style="padding:10px"><i class="ti ti-database"></i>Sin datos registrados aún</div>';
+}
+
+// ═══ PREFIJO DE USUARIO PARA DATOS ═══
+function uKey(k){ return currentUser?`${k}-${currentUser.id}`:k; }
+
+// ═══ ESTADO ═══
+let metodo=null;
+let cfg={sup:100,fab:1,dmin:5,nc:95,etN:null,etAB:null,etVol:null,etNp:null};
+let admin={pmbn:'',fecha:'',prop:'',predio:'',rol:'',comuna:'',region:'',prof:''};
+let especies=[{cod:'Ro',nom:'Roble'},{cod:'Ra',nom:'Raulí'},{cod:'Co',nom:'Coigüe'},{cod:'La',nom:'Laurel'},{cod:'Li',nom:'Lingue'},{cod:'Te',nom:'Tepa'},{cod:'Ti',nom:'Tineo'},{cod:'Ol',nom:'Olivillo'},{cod:'Ul',nom:'Ulmo'},{cod:'Ot',nom:'Otras'}];
+let arb_t=[],pid_t='',parc_t=[];
+let arb_c=[],pid_c='',parc_c=[],punt_c=[];
+let punt_b=[];
+let chartD=null,chartE=null;
+
+function saveState(){
+  try{
+    localStorage.setItem(uKey('dm-met'),metodo||'');
+    localStorage.setItem(uKey('dm-cfg'),JSON.stringify(cfg));
+    localStorage.setItem(uKey('dm-adm'),JSON.stringify(admin));
+    localStorage.setItem(uKey('dm-esp'),JSON.stringify(especies));
+    localStorage.setItem(uKey('dm-pt'),JSON.stringify(parc_t));
+    localStorage.setItem(uKey('dm-pc'),JSON.stringify(parc_c));
+    localStorage.setItem(uKey('dm-bc'),JSON.stringify(punt_c));
+    localStorage.setItem(uKey('dm-bb'),JSON.stringify(punt_b));
+    updateStorageInfo();
+    if(currentUser?.role==='admin') loadAdminPanel();
+  }catch(e){console.warn(e)}
+}
+function saveAdmin(){
+  ['pmbn','fecha','prop','predio','rol','comuna','region','prof'].forEach(k=>{const el=document.getElementById('r-'+k);if(el)admin[k]=el.value;});
+  saveState();renderResumen();
+}
+function loadState(){
+  try{
+    const m=localStorage.getItem(uKey('dm-met'));if(m)metodo=m;
+    const c=localStorage.getItem(uKey('dm-cfg'));if(c)cfg=JSON.parse(c);
+    const a=localStorage.getItem(uKey('dm-adm'));if(a)admin=JSON.parse(a);
+    const e=localStorage.getItem(uKey('dm-esp'));if(e)especies=JSON.parse(e);
+    const pt=localStorage.getItem(uKey('dm-pt'));if(pt)parc_t=JSON.parse(pt);
+    const pc=localStorage.getItem(uKey('dm-pc'));if(pc)parc_c=JSON.parse(pc);
+    const bc=localStorage.getItem(uKey('dm-bc'));if(bc)punt_c=JSON.parse(bc);
+    const bb=localStorage.getItem(uKey('dm-bb'));if(bb)punt_b=JSON.parse(bb);
+  }catch(e){}
+  renderEspSel();applyConfig();
+  if(metodo)iniciarUI();else showSelector();
+  updateStorageInfo();
+}
+function updateStorageInfo(){
+  const el=document.getElementById('storage-info');
+  const tot=(metodo==='trad'?parc_t.length:metodo==='comb'?(parc_c.length+punt_c.length):punt_b.length);
+  if(el)el.innerHTML=`<span style="width:8px;height:8px;border-radius:50%;background:var(--v3);display:inline-block;margin-right:5px"></span>Guardado · Usuario: ${currentUser?.name||'—'} · ${metodo||'sin método'} · ${tot} registros`;
+}
+
+// ═══ NAVEGACIÓN ═══
+function showSelector(){
+  document.getElementById('page-selector').style.display='block';
+  document.getElementById('main-nav').classList.remove('show');
+}
+function selMet(m){
+  metodo=m;
+  document.querySelectorAll('.mcard').forEach(c=>c.classList.remove('sel-v','sel-c','sel-m'));
+  document.getElementById('mc-'+m).classList.add(m==='trad'?'sel-v':m==='comb'?'sel-c':'sel-m');
+  document.getElementById('btn-ini').style.display='flex';
+}
+function iniciar(){if(!metodo)return;saveState();iniciarUI();}
+function iniciarUI(){
+  document.getElementById('page-selector').style.display='none';
+  document.getElementById('main-nav').classList.add('show');
+  const n1=document.getElementById('nav-p1'),n2=document.getElementById('nav-p2');
+  if(metodo==='trad'){n1.innerHTML='<i class="ti ti-ruler-2"></i><span>Parcelas</span>';n2.style.display='none';}
+  else if(metodo==='comb'){n1.innerHTML='<i class="ti ti-circle-dotted"></i><span>Bitterlich</span>';n2.style.display='flex';}
+  else{n1.innerHTML='<i class="ti ti-bolt" style="color:#A78BFA"></i><span>Bitterlich</span>';n2.style.display='none';}
+  document.getElementById('cfg-met-lbl').textContent=metodo==='trad'?'Tradicional':metodo==='comb'?'Combinado':'Bitterlich rápido';
+  document.getElementById('cfg-fab-row').style.display=metodo==='trad'?'none':'flex';
+  applyConfig();renderEspSel();renderListT();renderListCBit();renderListCPF();renderListB();loadAdminForm();updateTopbar();
+  goPage('p1');
+}
+function cambiarMet(){metodo=null;document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));showSelector();document.querySelectorAll('.mcard').forEach(c=>c.classList.remove('sel-v','sel-c','sel-m'));document.getElementById('btn-ini').style.display='none';}
+function goPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('active'));
+  const special=id==='est'||id==='res'||id==='cfg';
+  const pid=special?'page-'+id:'page-'+id+'-'+metodo;
+  const el=document.getElementById(pid);if(el)el.classList.add('active');
+  const nb=document.getElementById('nav-'+id);if(nb)nb.classList.add('active');
+  if(id==='est'){calcEst();renderCharts();}
+  if(id==='res'){renderResumen();}
+  if(id==='cfg'){renderEspCfg();}
+  window.scrollTo(0,0);
+}
+
+// ═══ HELPERS ═══
+function claseDap(d){return d<5?'<5':Math.ceil(d/5)*5;}
+function gArea(d){return Math.PI*Math.pow(d/200,2);}
+function mean(a){return a.length?a.reduce((s,v)=>s+v,0)/a.length:0;}
+function sd(a){if(a.length<2)return 0;const m=mean(a);return Math.sqrt(a.reduce((s,v)=>s+(v-m)**2,0)/(a.length-1));}
+function tVal(n){const t={2:12.706,3:4.303,4:3.182,5:2.776,6:2.571,7:2.447,8:2.365,9:2.306,10:2.262,15:2.131,20:2.086,30:2.042};const ks=Object.keys(t).map(Number).sort((a,b)=>a-b);for(let k of ks)if(n-1<=k)return t[k];return 2.0;}
+function cEM(v){return v<15?'ok':v<25?'warn':'bad';}
+function vol(d,h){return Math.PI*Math.pow(d/200,2)*h*0.65;}
+function syncSup(){['t-sup','cp-sup','cfg-sup'].forEach(id=>{const e=document.getElementById(id);if(e)e.value=cfg.sup;});}
+function syncFab(){['fab-lbl-c','fab-lbl-b','cfg-fab'].forEach(id=>{const e=document.getElementById(id);if(e)e.value!==undefined?e.value=cfg.fab:e.textContent=cfg.fab;});}
+function applyConfig(){
+  syncSup();
+  document.getElementById('fab-lbl-c').textContent=cfg.fab;
+  document.getElementById('fab-lbl-b').textContent=cfg.fab;
+  document.getElementById('cfg-fab').value=cfg.fab;
+  document.getElementById('cfg-dmin').value=cfg.dmin;
+  document.getElementById('cfg-nc').value=cfg.nc;
+  if(cfg.etN){const e=document.getElementById('r-etn');if(e)e.value=cfg.etN;}
+  if(cfg.etAB){const e=document.getElementById('r-etab');if(e)e.value=cfg.etAB;}
+  if(cfg.etVol){const e=document.getElementById('r-etvol');if(e)e.value=cfg.etVol;}
+  if(cfg.etNp){const e=document.getElementById('r-etnp');if(e)e.value=cfg.etNp;}
+}
+function loadAdminForm(){Object.keys(admin).forEach(k=>{const e=document.getElementById('r-'+k);if(e)e.value=admin[k]||'';});}
+function renderEspSel(){['t-sp','cp-sp'].forEach(id=>{const s=document.getElementById(id);if(s)s.innerHTML=especies.map(e=>`<option value="${e.cod}">${e.cod} — ${e.nom}</option>`).join('');});}
+function updateTopbar(){
+  if(!metodo){document.getElementById('top-sub').textContent='Selecciona un método';return;}
+  let sub='';
+  if(metodo==='trad'){if(parc_t.length){const m=mean(parc_t.map(p=>p.nha));sub=parc_t.length+' parc · N/ha='+Math.round(m).toLocaleString();}else sub='Método tradicional';}
+  else if(metodo==='comb'){if(punt_c.length){sub=punt_c.length+' pts · AB/ha='+mean(punt_c.map(p=>p.abha)).toFixed(1)+' m²/ha';}else sub='Método combinado';}
+  else{if(punt_b.length){sub=punt_b.length+' pts · AB/ha='+mean(punt_b.map(p=>p.abha)).toFixed(2)+' m²/ha';}else sub='Bitterlich rápido';}
+  document.getElementById('top-sub').textContent=sub;
+}
+
+// ═══ ÁRBOLES ═══
+function addArbol(tipo){
+  const pid_=tipo==='t'?'t-pid':'cp-pid',dap_=tipo==='t'?'t-dap':'cp-dap',sp_=tipo==='t'?'t-sp':'cp-sp';
+  const id=document.getElementById(pid_).value.trim(),dap=parseFloat(document.getElementById(dap_).value),sp=document.getElementById(sp_).value;
+  if(!id){alert('Indica el N° de parcela');return;}if(!dap||dap<=0){alert('DAP inválido');return;}
+  if(tipo==='t'){
+    const alt=parseFloat(document.getElementById('t-alt').value)||null,obs=document.getElementById('t-obs').value.trim();
+    if(pid_t&&pid_t!==id){if(!confirm('¿Cambiar a parcela '+id+'?'))return;arb_t=[];}
+    pid_t=id;arb_t.push({dap,sp,alt,obs,id:arb_t.length+1});
+    document.getElementById('t-alt').value='';document.getElementById('t-obs').value='';
+    renderArb('t');updateMini('t');document.getElementById('card-t').style.display='block';document.getElementById('lbl-t').textContent=id;
+  }else{
+    if(pid_c&&pid_c!==id){if(!confirm('¿Cambiar a parcela '+id+'?'))return;arb_c=[];}
+    pid_c=id;arb_c.push({dap,sp,id:arb_c.length+1});
+    renderArb('c');updateMini('c');document.getElementById('card-c').style.display='block';document.getElementById('lbl-c').textContent=id;
+  }
+  document.getElementById(dap_).value='';document.getElementById(dap_).focus();
+}
+function renderArb(tipo){
+  const arb=tipo==='t'?arb_t:arb_c,c=document.getElementById('tl-'+tipo);
+  c.innerHTML=arb.map((a,i)=>`<div class="tree-row"><div class="tn">${a.id}</div><span style="font-weight:600;min-width:52px">${a.dap.toFixed(1)}cm</span><span style="color:var(--g3);font-size:12px;flex:1">${a.sp}</span><span style="font-size:11px;color:var(--g3)">cl.${claseDap(a.dap)}</span>${tipo==='t'&&a.alt?`<span style="font-size:11px;color:#1D4ED8">${a.alt}m</span>`:''}<button style="background:none;border:none;cursor:pointer;color:var(--g3);padding:4px" onclick="delArb('${tipo}',${i})"><i class="ti ti-x"></i></button></div>`).join('');
+}
+function delArb(tipo,i){const a=tipo==='t'?arb_t:arb_c;a.splice(i,1);a.forEach((x,j)=>x.id=j+1);renderArb(tipo);updateMini(tipo);}
+function updateMini(tipo){
+  const arb=tipo==='t'?arb_t:arb_c,n=arb.length;
+  const nha=n?Math.round(n*10000/cfg.sup):'—';
+  const daps=arb.map(a=>a.dap),abs=arb.map(a=>gArea(a.dap));
+  document.getElementById('mn-'+tipo).textContent=n;
+  document.getElementById('mnha-'+tipo).textContent=n?nha.toLocaleString():'—';
+  if(tipo==='t'){document.getElementById('mab-t').textContent=n?(abs.reduce((s,v)=>s+v,0)*10000/cfg.sup).toFixed(2):'—';document.getElementById('mdap-t').textContent=n?mean(daps).toFixed(1):'—';}
+  else{document.getElementById('mdap-c').textContent=n?mean(daps).toFixed(1):'—';document.getElementById('mdg-c').textContent=n?(2*100*Math.sqrt(mean(abs)/Math.PI)).toFixed(1):'—';}
+}
+function saveParcela(tipo){
+  const arb=tipo==='t'?arb_t:arb_c,pid=tipo==='t'?pid_t:pid_c;
+  if(!pid||!arb.length){alert('Agrega árboles primero');return;}
+  const n=arb.length,nha=Math.round(n*10000/cfg.sup),abs=arb.map(a=>gArea(a.dap));
+  const abha=abs.reduce((s,v)=>s+v,0)*10000/cfg.sup,dapM=mean(arb.map(a=>a.dap)),dg=2*100*Math.sqrt(mean(abs)/Math.PI);
+  const vols=arb.filter(a=>a.alt).map(a=>vol(a.dap,a.alt)*10000/cfg.sup);
+  const volha=vols.length?mean(vols)*n/vols.length:null;
+  const p={id:pid,n,nha,abha,dapM,dg,volha,sup:cfg.sup,arboles:[...arb]};
+  if(tipo==='t'){const i=parc_t.findIndex(x=>x.id===pid);if(i>=0)parc_t[i]=p;else parc_t.push(p);arb_t=[];pid_t='';document.getElementById('t-pid').value='';document.getElementById('card-t').style.display='none';renderArb('t');renderListT();}
+  else{const i=parc_c.findIndex(x=>x.id===pid);if(i>=0)parc_c[i]=p;else parc_c.push(p);arb_c=[];pid_c='';document.getElementById('cp-pid').value='';document.getElementById('card-c').style.display='none';renderArb('c');renderListCPF();}
+  updateTopbar();saveState();
+}
+function renderListT(){
+  const c=document.getElementById('list-t');
+  if(!parc_t.length){c.innerHTML='<div class="empty"><i class="ti ti-inbox"></i>Sin parcelas aún</div>';return;}
+  c.innerHTML=parc_t.map((p,i)=>`<div class="chip"><div><span style="font-weight:700">${p.id}</span><span style="color:var(--g3);font-size:12px;margin-left:6px">${p.n} árb · ${p.sup}m²</span></div><div style="display:flex;gap:4px;align-items:center"><span class="tag tag-v">${p.nha.toLocaleString()} N/ha</span><span class="tag tag-v">${p.abha.toFixed(1)} m²/ha</span>${p.volha?'<span class="tag" style="background:var(--c4);color:var(--c1)">'+p.volha.toFixed(0)+' m³</span>':''}<button style="background:none;border:none;cursor:pointer;color:var(--g3);padding:4px" onclick="delP('t',${i})"><i class="ti ti-trash"></i></button></div></div>`).join('');
+}
+
+// ═══ COMBINADO ═══
+function prevComb(){const n=parseFloat(document.getElementById('c-n').value)||0;if(n>0){document.getElementById('c-abha-p').textContent=(n*cfg.fab).toFixed(2);document.getElementById('c-prev').style.display='block';}else document.getElementById('c-prev').style.display='none';}
+function savePunto(){
+  const id=document.getElementById('c-pid').value.trim(),n=parseFloat(document.getElementById('c-n').value);
+  if(!id){alert('Indica el N° de punto');return;}if(!n||n<=0){alert('Ingresa N° árboles');return;}
+  const abha=n*cfg.fab,pt={id,n,abha,fab:cfg.fab,e:parseFloat(document.getElementById('c-e').value)||null,norte:parseFloat(document.getElementById('c-norte').value)||null};
+  const i=punt_c.findIndex(x=>x.id===id);if(i>=0)punt_c[i]=pt;else punt_c.push(pt);
+  ['c-pid','c-n','c-e','c-norte'].forEach(x=>document.getElementById(x).value='');
+  document.getElementById('c-prev').style.display='none';renderListCBit();updateTopbar();saveState();
+}
+function renderListCBit(){const c=document.getElementById('list-c-bit');if(!punt_c.length){c.innerHTML='<div class="empty"><i class="ti ti-inbox"></i>Sin puntos aún</div>';return;}c.innerHTML=punt_c.map((p,i)=>`<div class="chip"><div><span style="font-weight:700">${p.id}</span><span style="color:var(--g3);font-size:12px;margin-left:6px">${p.n} árb</span></div><div style="display:flex;gap:4px;align-items:center"><span class="tag tag-b">${p.abha.toFixed(2)} m²/ha</span><button style="background:none;border:none;cursor:pointer;color:var(--g3);padding:4px" onclick="delP('cb',${i})"><i class="ti ti-trash"></i></button></div></div>`).join('');}
+function renderListCPF(){const c=document.getElementById('list-c-pf');if(!parc_c.length){c.innerHTML='<div class="empty"><i class="ti ti-inbox"></i>Sin parcelas aún</div>';return;}c.innerHTML=parc_c.map((p,i)=>`<div class="chip"><div><span style="font-weight:700">${p.id}</span><span style="color:var(--g3);font-size:12px;margin-left:6px">${p.n} árb · ${p.sup}m²</span></div><div style="display:flex;gap:4px;align-items:center"><span class="tag tag-v">${p.nha.toLocaleString()} N/ha</span><span class="tag tag-v">Dg ${p.dg.toFixed(1)}cm</span><button style="background:none;border:none;cursor:pointer;color:var(--g3);padding:4px" onclick="delP('cp',${i})"><i class="ti ti-trash"></i></button></div></div>`).join('');}
+
+// ═══ BITTERLICH RÁPIDO ═══
+function prevBit(){const n=parseFloat(document.getElementById('b-n').value)||0;if(n>0){document.getElementById('b-abha-p').textContent=(n*cfg.fab).toFixed(2);document.getElementById('b-prev').style.display='block';}else document.getElementById('b-prev').style.display='none';}
+function savePuntoBit(){
+  const id=document.getElementById('b-pid').value.trim(),n=parseFloat(document.getElementById('b-n').value);
+  if(!id){alert('Indica el N° de punto');return;}if(!n||n<=0){alert('Ingresa N° árboles');return;}
+  const abha=n*cfg.fab,pt={id,n,abha,fab:cfg.fab,e:parseFloat(document.getElementById('b-e').value)||null,norte:parseFloat(document.getElementById('b-norte').value)||null};
+  const i=punt_b.findIndex(x=>x.id===id);if(i>=0)punt_b[i]=pt;else punt_b.push(pt);
+  ['b-pid','b-n','b-e','b-norte'].forEach(x=>document.getElementById(x).value='');
+  document.getElementById('b-prev').style.display='none';renderListB();updateTopbar();updateBitLive();saveState();
+}
+function updateBitLive(){
+  const nb=punt_b.length,card=document.getElementById('bit-live');
+  if(!nb){card.style.display='none';return;}card.style.display='block';
+  const abhas=punt_b.map(p=>p.abha),mAB=mean(abhas),sdAB=sd(abhas),cvAB=mAB>0?sdAB/mAB*100:0;
+  const t=tVal(nb),emAB=t*sdAB/Math.sqrt(nb),empAB=mAB>0?emAB/mAB*100:0;
+  document.getElementById('bl-abha').textContent=mAB.toFixed(2);
+  document.getElementById('bl-n').textContent=nb;
+  document.getElementById('bl-cv').textContent=cvAB.toFixed(1)+'%';document.getElementById('bl-cv').className='est-val '+cEM(cvAB);
+  document.getElementById('bl-em').textContent=empAB.toFixed(1);document.getElementById('bl-em').className='est-val '+cEM(empAB);
+  document.getElementById('bit-live-rows').innerHTML=`<div class="est-row"><span class="est-lbl">Desv. estándar</span><span class="est-val">${sdAB.toFixed(2)}</span></div><div class="est-row"><span class="est-lbl">t-student (${cfg.nc}%)</span><span class="est-val">${t.toFixed(3)}</span></div><div class="est-row"><span class="est-lbl">Error típico</span><span class="est-val">${(sdAB/Math.sqrt(nb)).toFixed(3)}</span></div><div class="est-row"><span class="est-lbl" style="font-weight:700">Error muestreo</span><span class="est-val ${cEM(empAB)}" style="font-weight:700">${emAB.toFixed(2)} m²/ha · ${empAB.toFixed(1)}%</span></div>`;
+  if(cfg.etAB){const dif=Math.abs(cfg.etAB-mAB)/cfg.etAB*100,ok=dif<=20;document.getElementById('bit-ver').style.display='block';document.getElementById('bit-ver-txt').textContent=`PM=${cfg.etAB} · Terreno=${mAB.toFixed(2)} · Dif=${dif.toFixed(1)}%`;document.getElementById('bit-ver-badge').innerHTML=ok?'<span class="ver-ok">✓ OK</span>':'<span class="ver-bad">✗ Revisar</span>';}
+}
+function renderListB(){const c=document.getElementById('list-b');if(!punt_b.length){c.innerHTML='<div class="empty"><i class="ti ti-inbox"></i>Sin puntos aún</div>';return;}c.innerHTML=punt_b.map((p,i)=>`<div class="chip"><div><span style="font-weight:700">${p.id}</span><span style="color:var(--g3);font-size:12px;margin-left:6px">${p.n} árb contados</span></div><div style="display:flex;gap:4px;align-items:center"><span class="tag tag-m">${p.abha.toFixed(2)} m²/ha</span><button style="background:none;border:none;cursor:pointer;color:var(--g3);padding:4px" onclick="delP('b',${i})"><i class="ti ti-trash"></i></button></div></div>`).join('');}
+
+function delP(tipo,i){
+  const map={t:[parc_t,renderListT],cb:[punt_c,renderListCBit],cp:[parc_c,renderListCPF],b:[punt_b,()=>{renderListB();updateBitLive();}]};
+  const [arr,fn]=map[tipo];
+  if(confirm('¿Eliminar '+arr[i].id+'?')){arr.splice(i,1);fn();updateTopbar();saveState();}
+}
+
+// ═══ ESTADÍGRAFOS ═══
+function calcEst(){
+  const parc=metodo==='trad'?parc_t:parc_c,punts=metodo==='comb'?punt_c:punt_b,allA=parc.flatMap(p=>p.arboles);
+  const np=parc.length,nb=punts.length;
+  document.getElementById('est-bit-card').style.display='none';document.getElementById('e-vol-row').style.display='none';
+  if(metodo==='bit'){
+    document.getElementById('e-nha').textContent='—';document.getElementById('e-dap').textContent='—';document.getElementById('e-dg').textContent='—';
+    if(nb>0){const abhas=punts.map(p=>p.abha),mAB=mean(abhas),sdAB=sd(abhas),cvAB=mAB>0?sdAB/mAB*100:0,t=tVal(nb),emAB=t*sdAB/Math.sqrt(nb),empAB=mAB>0?emAB/mAB*100:0;
+      document.getElementById('e-abha').textContent=mAB.toFixed(2);
+      document.getElementById('est-rows').innerHTML=`<div class="shdr shdr-m" style="margin-top:8px">Bitterlich rápido — AB/ha</div><div class="est-row"><span class="est-lbl">N° puntos</span><span class="est-val">${nb}</span></div><div class="est-row"><span class="est-lbl">Media AB/ha</span><span class="est-val">${mAB.toFixed(2)} m²/ha</span></div><div class="est-row"><span class="est-lbl">SD · CV%</span><span class="est-val">${sdAB.toFixed(2)} · <span class="${cEM(cvAB)}">${cvAB.toFixed(1)}%</span></span></div><div class="est-row"><span class="est-lbl">t (${cfg.nc}%)</span><span class="est-val">${t.toFixed(3)}</span></div><div class="est-row"><span class="est-lbl" style="font-weight:700">Error muestreo</span><span class="est-val ${cEM(empAB)}" style="font-weight:700">${emAB.toFixed(2)} · ${empAB.toFixed(1)}%</span></div>${cfg.etAB?`<div class="est-row"><span class="est-lbl">vs. Plan manejo</span><span class="est-val ${Math.abs(cfg.etAB-mAB)/cfg.etAB*100<=20?'ok':'bad'}">${(Math.abs(cfg.etAB-mAB)/cfg.etAB*100).toFixed(1)}% ${Math.abs(cfg.etAB-mAB)/cfg.etAB*100<=20?'✓':'✗'}</span></div>`:''}`;}
+    else document.getElementById('est-rows').innerHTML='<div class="empty"><i class="ti ti-database"></i>Ingresa puntos Bitterlich</div>';
+    return;
+  }
+  const mNha=np?mean(parc.map(p=>p.nha)):null,mABha=metodo==='comb'&&nb?mean(punts.map(p=>p.abha)):np?mean(parc.map(p=>p.abha)):null;
+  const dapM=allA.length?mean(allA.map(a=>a.dap)):null,absArr=allA.map(a=>gArea(a.dap)),dg=absArr.length?2*100*Math.sqrt(mean(absArr)/Math.PI):null;
+  document.getElementById('e-nha').textContent=mNha?Math.round(mNha).toLocaleString():'—';
+  document.getElementById('e-abha').textContent=mABha?mABha.toFixed(2):'—';
+  document.getElementById('e-dap').textContent=dapM?dapM.toFixed(1):'—';
+  document.getElementById('e-dg').textContent=dg?dg.toFixed(1):'—';
+  document.getElementById('esp-sub').textContent=metodo==='comb'?'AB/ha proporcional (Bitterlich)':'AB/ha desde parcelas';
+  let rows='';
+  if(np>0){
+    const nhas=parc.map(p=>p.nha),abhas=parc.map(p=>p.abha),sdN=sd(nhas),cvN=mNha>0?sdN/mNha*100:0,t=tVal(np),emN=t*sdN/Math.sqrt(np),empN=mNha>0?emN/mNha*100:0;
+    rows+=`<div class="shdr shdr-v" style="margin-top:8px">Parcela fija — N/ha</div><div class="est-row"><span class="est-lbl">N° parcelas · Total árb.</span><span class="est-val">${np} · ${allA.length}</span></div><div class="est-row"><span class="est-lbl">Media · SD · CV%</span><span class="est-val">${Math.round(mNha)} · ${sdN.toFixed(0)} · <span class="${cEM(cvN)}">${cvN.toFixed(1)}%</span></span></div><div class="est-row"><span class="est-lbl" style="font-weight:700">Error muestreo N/ha</span><span class="est-val ${cEM(empN)}" style="font-weight:700">${emN.toFixed(0)} · ${empN.toFixed(1)}%</span></div>`;
+    if(metodo==='trad'){const sdAB=sd(abhas),cvAB=mABha>0?sdAB/mABha*100:0,emAB=t*sdAB/Math.sqrt(np),empAB=mABha>0?emAB/mABha*100:0;rows+=`<div class="shdr shdr-c" style="margin-top:8px">Parcela fija — AB/ha</div><div class="est-row"><span class="est-lbl">Media · SD · CV%</span><span class="est-val">${mABha.toFixed(2)} · ${sdAB.toFixed(2)} · <span class="${cEM(cvAB)}">${cvAB.toFixed(1)}%</span></span></div><div class="est-row"><span class="est-lbl" style="font-weight:700">Error muestreo AB/ha</span><span class="est-val ${cEM(empAB)}" style="font-weight:700">${emAB.toFixed(2)} · ${empAB.toFixed(1)}%</span></div>`;
+      const vols=parc.filter(p=>p.volha).map(p=>p.volha);if(vols.length){const mVol=mean(vols);document.getElementById('e-vol-row').style.display='grid';document.getElementById('e-vol').textContent=mVol.toFixed(1);document.getElementById('e-nalt').textContent=parc.reduce((s,p)=>s+(p.arboles.filter(a=>a.alt).length),0);}}
+    if(cfg.etN){const d=Math.abs(cfg.etN-mNha)/cfg.etN*100;rows+=`<div class="est-row"><span class="est-lbl">N/ha vs plan manejo</span><span class="est-val ${d<=20?'ok':'bad'}">${d.toFixed(0)}% ${d<=20?'✓':'✗'}</span></div>`;}
+  }
+  document.getElementById('est-rows').innerHTML=rows||'<div class="empty"><i class="ti ti-database"></i>Ingresa parcelas para ver estadígrafos</div>';
+  if(metodo==='comb'&&nb>0){document.getElementById('est-bit-card').style.display='block';const abhas=punts.map(p=>p.abha),mAB=mean(abhas),sdAB=sd(abhas),cvAB=mAB>0?sdAB/mAB*100:0,t=tVal(nb),emAB=t*sdAB/Math.sqrt(nb),empAB=mAB>0?emAB/mAB*100:0;document.getElementById('est-bit-rows').innerHTML=`<div class="est-row"><span class="est-lbl">N° puntos · Media AB/ha</span><span class="est-val">${nb} · ${mAB.toFixed(2)} m²/ha</span></div><div class="est-row"><span class="est-lbl">SD · CV%</span><span class="est-val">${sdAB.toFixed(2)} · <span class="${cEM(cvAB)}">${cvAB.toFixed(1)}%</span></span></div><div class="est-row"><span class="est-lbl" style="font-weight:700">Error muestreo</span><span class="est-val ${cEM(empAB)}" style="font-weight:700">${emAB.toFixed(2)} · ${empAB.toFixed(1)}%</span></div>${cfg.etAB?`<div class="est-row"><span class="est-lbl">vs. plan manejo</span><span class="est-val ${Math.abs(cfg.etAB-mAB)/cfg.etAB*100<=20?'ok':'bad'}">${(Math.abs(cfg.etAB-mAB)/cfg.etAB*100).toFixed(1)}% ${Math.abs(cfg.etAB-mAB)/cfg.etAB*100<=20?'✓':'✗'}</span></div>`:'`}`;}
+}
+
+function renderCharts(){
+  const parc=metodo==='trad'?parc_t:parc_c,punts=metodo==='comb'?punt_c:punt_b,allA=parc.flatMap(p=>p.arboles);
+  const clases=[5,10,15,20,25,30,35,40,45,50,55,60],np=parc.length||1,factor=cfg.sup>0?10000/cfg.sup:1;
+  const counts=clases.map(c=>Math.round(allA.filter(a=>claseDap(a.dap)===c).length*factor/np));
+  if(chartD)chartD.destroy();
+  chartD=new Chart(document.getElementById('chart-distrib').getContext('2d'),{type:'bar',data:{labels:clases.map(c=>c+''),datasets:[{label:'N/ha',data:counts,backgroundColor:metodo==='bit'?'#7C3AED':'#2D6A4F',borderRadius:4,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>'N/ha: '+c.parsed.y.toLocaleString()}}},scales:{x:{grid:{display:false},ticks:{font:{size:11,family:'Inter'},color:'#636366'}},y:{grid:{color:'rgba(0,0,0,0.05)'},ticks:{font:{size:11,family:'Inter'},color:'#636366'},beginAtZero:true}}}});
+  const espMap={};especies.forEach(e=>{espMap[e.cod]=0;});
+  if(metodo==='comb'&&punts.length&&allA.length){const mABt=mean(punts.map(p=>p.abha)),abXesp={};allA.forEach(a=>{abXesp[a.sp]=(abXesp[a.sp]||0)+gArea(a.dap);});const abTot=Object.values(abXesp).reduce((s,v)=>s+v,0)||1;especies.forEach(e=>{espMap[e.cod]=parseFloat(((abXesp[e.cod]||0)/abTot*mABt).toFixed(3));});}
+  else if(allA.length){allA.forEach(a=>{espMap[a.sp]=(espMap[a.sp]||0)+gArea(a.dap)*factor/np;});}
+  const activas=especies.filter(e=>espMap[e.cod]>0);
+  const cols=['#2D6A4F','#6B3A2A','#1D4ED8','#7C3AED','#B45309','#0E7490','#BE185D','#15803D','#C2410C','#1E40AF'];
+  if(chartE)chartE.destroy();
+  chartE=new Chart(document.getElementById('chart-esp').getContext('2d'),{type:'bar',data:{labels:activas.map(e=>e.nom),datasets:[{label:'AB/ha',data:activas.map(e=>espMap[e.cod]),backgroundColor:activas.map((_,i)=>cols[i%cols.length]),borderRadius:4,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.parsed.y.toFixed(3)+' m²/ha'}}},scales:{x:{grid:{display:false},ticks:{font:{size:10,family:'Inter'},color:'#636366'}},y:{grid:{color:'rgba(0,0,0,0.05)'},ticks:{font:{size:11,family:'Inter'},color:'#636366'},beginAtZero:true}}}});
+}
+
+// ═══ RESUMEN ═══
+function renderResumen(){
+  const parc=metodo==='trad'?parc_t:parc_c,punts=metodo==='comb'?punt_c:punt_b,allA=parc.flatMap(p=>p.arboles);
+  const mNha=parc.length?mean(parc.map(p=>p.nha)):null;
+  const mABha=metodo==='comb'&&punts.length?mean(punts.map(p=>p.abha)):parc.length?mean(parc.map(p=>p.abha)):punts.length?mean(punts.map(p=>p.abha)):null;
+  const dapM=allA.length?mean(allA.map(a=>a.dap)):null,absArr=allA.map(a=>gArea(a.dap)),dg=absArr.length?2*100*Math.sqrt(mean(absArr)/Math.PI):null;
+  const vols=parc.filter(p=>p.volha).map(p=>p.volha),mVol=vols.length?mean(vols):null;
+  const np=parc.length,nb=punts.length;
+  const metNom=metodo==='trad'?'Tradicional (Forcípula)':metodo==='comb'?'Combinado (Bitterlich + Parcela fija)':'Bitterlich rápido';
+
+  let html=`<div style="background:linear-gradient(135deg,var(--v1),var(--v2));border-radius:var(--radio-sm);padding:14px 16px;margin-bottom:14px">
+    <div style="font-size:14px;font-weight:700;color:#fff;margin-bottom:3px">Informe de verificación dasométrica</div>
+    <div style="font-size:11px;color:rgba(255,255,255,.7)">${new Date().toLocaleDateString('es-CL')} · ${metNom} · ${currentUser?.name||''}</div>
+  </div>`;
+
+  html+='<div class="shdr shdr-v">Datos del predio</div>';
+  const adm=[['PMBN',admin.pmbn],['Propietario',admin.prop],['Predio',admin.predio],['Rol/Folio',admin.rol],['Comuna',admin.comuna],['Región',admin.region],['Profesional',admin.prof],['Fecha',admin.fecha]];
+  const admH=adm.filter(([,v])=>v).map(([l,v])=>`<div class="adm-row"><span class="adm-lbl">${l}</span><span class="adm-val">${v}</span></div>`).join('');
+  html+=admH||'<div style="font-size:12px;color:var(--g3);padding:6px 0">Completa los datos del predio arriba</div>';
+
+  html+='<div class="shdr shdr-b" style="margin-top:10px">Método y muestreo</div>';
+  html+=`<div class="adm-row"><span class="adm-lbl">Método</span><span class="adm-val">${metNom}</span></div>`;
+  if(np)html+=`<div class="adm-row"><span class="adm-lbl">N° parcelas</span><span class="adm-val">${np} · ${cfg.sup} m²</span></div>`;
+  if(nb)html+=`<div class="adm-row"><span class="adm-lbl">N° puntos relascopio</span><span class="adm-val">${nb} · FAB=${cfg.fab}</span></div>`;
+  if(allA.length)html+=`<div class="adm-row"><span class="adm-lbl">Total árboles medidos</span><span class="adm-val">${allA.length}</span></div>`;
+
+  html+='<div class="shdr shdr-v" style="margin-top:10px">Estadígrafos terreno</div>';
+  if(mNha)html+=`<div class="adm-row"><span class="adm-lbl">N/ha media</span><span class="adm-val">${Math.round(mNha).toLocaleString()}</span></div>`;
+  if(mABha)html+=`<div class="adm-row"><span class="adm-lbl">AB/ha media</span><span class="adm-val">${mABha.toFixed(2)} m²/ha</span></div>`;
+  if(dapM)html+=`<div class="adm-row"><span class="adm-lbl">DAP medio</span><span class="adm-val">${dapM.toFixed(1)} cm</span></div>`;
+  if(dg)html+=`<div class="adm-row"><span class="adm-lbl">Dg cuadrático</span><span class="adm-val">${dg.toFixed(1)} cm</span></div>`;
+  if(mVol)html+=`<div class="adm-row"><span class="adm-lbl">VOL/ha estimado</span><span class="adm-val">${mVol.toFixed(1)} m³/ha</span></div>`;
+  if(np>1){const nhas=parc.map(p=>p.nha),sdN=sd(nhas),t=tVal(np),emN=t*sdN/Math.sqrt(np),empN=mNha?emN/mNha*100:0;html+=`<div class="adm-row"><span class="adm-lbl">Error muest. N/ha</span><span class="adm-val ${cEM(empN)}">${emN.toFixed(0)} · ${empN.toFixed(1)}%</span></div>`;}
+  if(nb>1&&punts.length){const abhas=punts.map(p=>p.abha),sdAB=sd(abhas),t=tVal(nb),emAB=t*sdAB/Math.sqrt(nb),empAB=mABha?emAB/mABha*100:0;html+=`<div class="adm-row"><span class="adm-lbl">Error muest. AB/ha</span><span class="adm-val ${cEM(empAB)}">${emAB.toFixed(2)} · ${empAB.toFixed(1)}%</span></div>`;}
+
+  if(cfg.etN||cfg.etAB||cfg.etVol){
+    html+='<div class="shdr shdr-c" style="margin-top:10px">Comparación plan de manejo</div>';
+    const ver=(lbl,et,ter,fmt)=>{if(!et||ter===null||ter===undefined)return'';const d=Math.abs(et-ter)/et*100,ok=d<=20;return`<div class="adm-row"><span class="adm-lbl">${lbl}</span><span style="display:flex;flex-direction:column;align-items:flex-end;gap:3px"><span style="font-size:11px;color:var(--g3)">PM=${fmt(et)} · T=${fmt(ter)}</span><span class="${ok?'ver-ok':'ver-bad'}">${ok?'✓ OK':'✗ Revisar'} ${d.toFixed(1)}%</span></span></div>`;};
+    html+=ver('N/ha',cfg.etN,mNha,v=>Math.round(v).toLocaleString());
+    html+=ver('AB/ha (m²/ha)',cfg.etAB,mABha,v=>v.toFixed(2));
+    html+=ver('VOL/ha (m³/ha)',cfg.etVol,mVol,v=>v?v.toFixed(1):'—');
+    if(cfg.etNp&&np)html+=`<div class="adm-row"><span class="adm-lbl">N° parcelas PM/verif.</span><span class="adm-val">${cfg.etNp} / ${np}</span></div>`;
+  }
+  document.getElementById('res-content').innerHTML=html;
+}
+
+// ═══ ESPECIES ═══
+function renderEspCfg(){document.getElementById('esp-cfg').innerHTML=especies.map((e,i)=>`<div class="cfg-row"><span style="color:var(--g3)">${e.cod} — ${e.nom}</span><button style="background:none;border:none;cursor:pointer;color:var(--g3)" onclick="delEsp(${i})"><i class="ti ti-x"></i></button></div>`).join('');}
+function addEsp(){const cod=prompt('Código:');if(!cod)return;const nom=prompt('Nombre:');if(!nom)return;especies.push({cod:cod.trim(),nom:nom.trim()});renderEspSel();renderEspCfg();saveState();}
+function delEsp(i){if(confirm('¿Quitar '+especies[i].cod+'?')){especies.splice(i,1);renderEspSel();renderEspCfg();saveState();}}
+
+// ═══ LIMPIAR ═══
+function limpiar(){parc_t=[];arb_t=[];pid_t='';parc_c=[];arb_c=[];pid_c='';punt_c=[];punt_b=[];['card-t','card-c'].forEach(id=>{const e=document.getElementById(id);if(e)e.style.display='none';});document.getElementById('bit-live').style.display='none';renderListT();renderListCBit();renderListCPF();renderListB();updateTopbar();saveState();}
+
+// ═══ EXPORT ═══
+function exportXLSX(){
+  const parc=metodo==='trad'?parc_t:parc_c,punts=metodo==='comb'?punt_c:punt_b;
+  if(!parc.length&&!punts.length){alert('Sin datos para exportar');return;}
+  const wb=XLSX.utils.book_new();
+  const allA=parc.flatMap(p=>p.arboles);
+  const mNha=parc.length?mean(parc.map(p=>p.nha)):null;
+  const mABha=metodo==='comb'&&punts.length?mean(punts.map(p=>p.abha)):parc.length?mean(parc.map(p=>p.abha)):punts.length?mean(punts.map(p=>p.abha)):null;
+  const dapM=allA.length?mean(allA.map(a=>a.dap)):null;
+  const absArr=allA.map(a=>gArea(a.dap)),dg=absArr.length?2*100*Math.sqrt(mean(absArr)/Math.PI):null;
+  const vols=parc.filter(p=>p.volha).map(p=>p.volha),mVol=vols.length?mean(vols):null;
+  let sdN=0,sdAB=0,cvN=0,cvAB=0,empN=0,empAB=0;
+  if(parc.length>1){const nhas=parc.map(p=>p.nha);sdN=sd(nhas);cvN=mNha>0?sdN/mNha*100:0;const t=tVal(parc.length);empN=mNha>0?t*sdN/Math.sqrt(parc.length)/mNha*100:0;}
+  if(punts.length>1){const abhas=punts.map(p=>p.abha);sdAB=sd(abhas);cvAB=mABha>0?sdAB/mABha*100:0;const t=tVal(punts.length);empAB=mABha>0?t*sdAB/Math.sqrt(punts.length)/mABha*100:0;}
+  else if(parc.length>1){const abhas=parc.map(p=>p.abha);sdAB=sd(abhas);cvAB=mABha>0?sdAB/mABha*100:0;const t=tVal(parc.length);empAB=mABha>0?t*sdAB/Math.sqrt(parc.length)/mABha*100:0;}
+  const metNom=metodo==='trad'?'Tradicional':metodo==='comb'?'Combinado':'Bitterlich rápido';
+  const resRows=[
+    ['INFORME DE VERIFICACIÓN DASOMÉTRICA — ForestCheck'],
+    ['Fecha',new Date().toLocaleDateString('es-CL'),'Usuario',currentUser?.name||''],
+    ['Método',metNom,'',''],['','','',''],
+    ['DATOS DEL PREDIO','','',''],
+    ['PMBN',admin.pmbn||'','',''],['Propietario',admin.prop||'','',''],
+    ['Predio',admin.predio||'','',''],['Rol/Folio',admin.rol||'','',''],
+    ['Comuna',admin.comuna||'','',''],['Región',admin.region||'','',''],
+    ['Profesional',admin.prof||'','',''],['','','',''],
+    ['ESTADÍGRAFOS','Terreno','Plan de Manejo','Diferencia %'],
+  ];
+  const addE=(l,v,pm)=>{const d=pm&&typeof v==='number'?parseFloat((Math.abs(v-pm)/Math.abs(pm)*100).toFixed(1)):null;resRows.push([l,typeof v==='number'?parseFloat(v.toFixed(3)):v||'N/A',pm||'',d!==null?d:'']);};
+  addE('N/ha media',mNha?Math.round(mNha):null,cfg.etN);
+  addE('AB/ha media (m²/ha)',mABha?parseFloat(mABha.toFixed(2)):null,cfg.etAB);
+  addE('DAP medio (cm)',dapM?parseFloat(dapM.toFixed(1)):null,null);
+  addE('Dg cuadrático (cm)',dg?parseFloat(dg.toFixed(1)):null,null);
+  addE('VOL/ha (m³/ha)',mVol?parseFloat(mVol.toFixed(1)):null,cfg.etVol);
+  addE('Desv. est. N/ha',sdN?parseFloat(sdN.toFixed(1)):null,null);
+  addE('CV% N/ha',cvN?parseFloat(cvN.toFixed(1)):null,null);
+  addE('Desv. est. AB/ha',sdAB?parseFloat(sdAB.toFixed(2)):null,null);
+  addE('CV% AB/ha',cvAB?parseFloat(cvAB.toFixed(1)):null,null);
+  addE('Error muestreo N%',empN?parseFloat(empN.toFixed(1)):null,null);
+  addE('Error muestreo AB%',empAB?parseFloat(empAB.toFixed(1)):null,null);
+  const wsRes=XLSX.utils.aoa_to_sheet(resRows);wsRes['!cols']=[{wch:30},{wch:18},{wch:18},{wch:14}];
+  XLSX.utils.book_append_sheet(wb,wsRes,'RESUMEN');
+
+  const clases=[5,10,15,20,25,30,35,40,45,50,55,60],np2=parc.length||1,factor=cfg.sup>0?10000/cfg.sup:1;
+  const counts=clases.map(c=>Math.round(allA.filter(a=>claseDap(a.dap)===c).length*factor/np2));
+  const totN=counts.reduce((s,v)=>s+v,0)||1;
+  const distRows=[['Clase DAP (cm)','N/ha','% del total']];
+  clases.forEach((c,i)=>distRows.push([c,counts[i],parseFloat((counts[i]/totN*100).toFixed(1))]));
+  distRows.push(['TOTAL',totN,100.0]);
+  const wsDist=XLSX.utils.aoa_to_sheet(distRows);wsDist['!cols']=[{wch:16},{wch:12},{wch:14}];
+  XLSX.utils.book_append_sheet(wb,wsDist,'DISTRIBUCIÓN DAP');
+
+  if(punts.length){
+    const bitRows=[['N° Punto','N árboles contados','FAB','AB/ha (m²/ha)','Coord. E','Coord. N']];
+    punts.forEach(p=>bitRows.push([p.id,p.n,p.fab,parseFloat(p.abha.toFixed(4)),p.e||'',p.norte||'']));
+    bitRows.push([''],['Media AB/ha',parseFloat((mABha||0).toFixed(2))],['Desv. est.',parseFloat(sdAB.toFixed(2))],['CV%',parseFloat(cvAB.toFixed(1))],['Error muest. %',parseFloat(empAB.toFixed(1))]);
+    const wsBit=XLSX.utils.aoa_to_sheet(bitRows);wsBit['!cols']=[{wch:12},{wch:18},{wch:6},{wch:16},{wch:14},{wch:14}];
+    XLSX.utils.book_append_sheet(wb,wsBit,'BITTERLICH');
+  }
+  if(parc.length){
+    const parcRows=[['N° Parcela','N árboles','N/ha','AB/ha (m²/ha)','DAP medio (cm)','Dg (cm)','VOL/ha (m³/ha)','Sup (m²)']];
+    parc.forEach(p=>parcRows.push([p.id,p.n,p.nha,parseFloat(p.abha.toFixed(4)),parseFloat(p.dapM.toFixed(2)),parseFloat(p.dg.toFixed(2)),p.volha?parseFloat(p.volha.toFixed(2)):'',p.sup]));
+    const wsParc=XLSX.utils.aoa_to_sheet(parcRows);wsParc['!cols']=[{wch:14},{wch:10},{wch:10},{wch:16},{wch:16},{wch:12},{wch:16},{wch:10}];
+    XLSX.utils.book_append_sheet(wb,wsParc,'PARCELAS');
+    const arbRows=[['Parcela','N° árbol','Especie','DAP (cm)','Clase DAP','g (m²)','Altura (m)']];
+    parc.forEach(p=>p.arboles.forEach(a=>arbRows.push([p.id,a.id,a.sp,a.dap,claseDap(a.dap),parseFloat(gArea(a.dap).toFixed(6)),a.alt||''])));
+    const wsArb=XLSX.utils.aoa_to_sheet(arbRows);wsArb['!cols']=[{wch:12},{wch:10},{wch:10},{wch:10},{wch:12},{wch:12},{wch:12}];
+    XLSX.utils.book_append_sheet(wb,wsArb,'ÁRBOL A ÁRBOL');
+  }
+  XLSX.writeFile(wb,'ForestCheck_'+metodo+'_'+new Date().toISOString().slice(0,10)+'.xlsx');
+}
+
+function exportCSV(){
+  const parc=metodo==='trad'?parc_t:parc_c,punts=metodo==='comb'?punt_c:punt_b;
+  let csv=`MÉTODO,${metodo}\nUSUARIO,${currentUser?.name||''}\nPREDIO,${admin.predio||''}\nPROPIETARIO,${admin.prop||''}\nROL,${admin.rol||''}\nFECHA,${admin.fecha||''}\n\n`;
+  if(punts.length){csv+='=== BITTERLICH ===\nPunto,N_contados,FAB,AB_ha_m2\n';punts.forEach(p=>csv+=`${p.id},${p.n},${p.fab},${p.abha.toFixed(4)}\n`);csv+='\n';}
+  if(parc.length){csv+='=== PARCELAS ===\nParcela,N_arb,N_ha,AB_ha_m2,DAP_m_cm,Dg_cm,VOL_ha_m3,Sup_m2\n';parc.forEach(p=>csv+=`${p.id},${p.n},${p.nha},${p.abha.toFixed(4)},${p.dapM.toFixed(2)},${p.dg.toFixed(2)},${p.volha?p.volha.toFixed(2):''},${p.sup}\n`);csv+='\n=== ÁRBOL A ÁRBOL ===\nParcela,N,Especie,DAP_cm,Clase_DAP,g_m2,Altura_m\n';parc.forEach(p=>p.arboles.forEach(a=>csv+=`${p.id},${a.id},${a.sp},${a.dap},${claseDap(a.dap)},${gArea(a.dap).toFixed(6)},${a.alt||''}\n`));}
+  const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
+  const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='ForestCheck_'+metodo+'_'+new Date().toISOString().slice(0,10)+'.csv';a.click();URL.revokeObjectURL(url);
+}
+
+// ═══ INIT ═══
+initDefaultUsers();
+if(checkSession()){
+  document.getElementById('screen-welcome').style.display='none';
+  startApp();
+}
+</script>
+</body>
+</html>
