@@ -424,6 +424,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-se
       </div>
       <button class="btn btn-e" onclick="expXLSX()">📊 Exportar Excel (.xlsx)</button>
       <button class="btn" onclick="expCSV()" style="margin-top:6px">📄 Exportar CSV</button>
+      <button class="btn" onclick="expPDF()" style="margin-top:6px;background:#C62828;color:#fff;border-color:#C62828">📋 Exportar PDF (Informe)</button>
     </div>
 
     <!-- CONFIG -->
@@ -1010,6 +1011,97 @@ function expCSV(){
   if(parc.length){ csv+='PARCELAS\nParcela,N,N/ha,AB/ha,DAP,Dg,VOL/ha,Sup,Coord.E,Coord.N\n'; parc.forEach(function(p){csv+=p.id+','+p.n+','+p.nha+','+p.abha.toFixed(4)+','+p.dapM.toFixed(2)+','+p.dg.toFixed(2)+','+(p.volha?p.volha.toFixed(2):'')+','+p.sup+','+(p.coordE||'')+','+(p.coordN||'')+'\n';}); }
   var blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
   var url=URL.createObjectURL(blob); var a=document.createElement('a'); a.href=url; a.download='ForestCheck_'+new Date().toISOString().slice(0,10)+'.csv'; a.click(); URL.revokeObjectURL(url);
+}
+
+// ═══ EXPORTAR PDF ═══
+function expPDF(){
+  var parc=metodo==='trad'?parc_t:parc_c, punts=metodo==='comb'?punt_c:punt_b;
+  var allA=parc.reduce(function(a,p){return a.concat(p.arboles);},[]);
+  var mNha=parc.length?avg(parc.map(function(p){return p.nha;})):null;
+  var mABha=metodo==='comb'&&punts.length?avg(punts.map(function(p){return p.abha;})):parc.length?avg(parc.map(function(p){return p.abha;})):punts.length?avg(punts.map(function(p){return p.abha;})):null;
+  var dapM=allA.length?avg(allA.map(function(a){return a.dap;})):null;
+  var absArr=allA.map(function(a){return ga(a.dap);}), dg=absArr.length?2*100*Math.sqrt(avg(absArr)/Math.PI):null;
+  var vols_=parc.filter(function(p){return p.volha;}).map(function(p){return p.volha;}), mVol=vols_.length?avg(vols_):null;
+  var metNom=metodo==='trad'?'Tradicional (Forcípula)':metodo==='comb'?'Combinado (Bitterlich + Parcela fija)':'Bitterlich rápido';
+
+  var css='body{font-family:Arial,sans-serif;margin:0;padding:20px;color:#1C1C1E;font-size:13px}'
+    +'.pg{max-width:780px;margin:0 auto}'
+    +'.hdr{border-bottom:3px solid #1A3D28;padding-bottom:10px;margin-bottom:16px}'
+    +'.hdr-t{font-size:20px;font-weight:700;color:#1A3D28}'
+    +'.hdr-s{font-size:11px;color:#666;margin-top:3px}'
+    +'.sec{margin-bottom:14px}'
+    +'.sec-t{font-size:11px;font-weight:700;color:#1A3D28;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid #E5E5EA;padding-bottom:3px;margin-bottom:8px}'
+    +'.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}'
+    +'.fld{font-size:12px}.fld-l{color:#666;display:block;margin-bottom:1px;font-size:11px}.fld-v{font-weight:600}'
+    +'.tbl{width:100%;border-collapse:collapse;font-size:11px;margin-top:6px}'
+    +'.tbl th{background:#1A3D28;color:#fff;padding:5px 8px;text-align:center}'
+    +'.tbl td{padding:4px 8px;border-bottom:1px solid #E5E5EA;text-align:center}'
+    +'.tbl tr:nth-child(even) td{background:#F8F8F8}'
+    +'.ok{color:#059669;font-weight:700}.bad{color:#DC2626;font-weight:700}'
+    +'.ftr{margin-top:18px;padding-top:6px;border-top:1px solid #E5E5EA;font-size:10px;color:#999;text-align:center}'
+    +'@media print{body{padding:0}}';
+
+  var html='<div class="pg">'
+    +'<div class="hdr"><div class="hdr-t">🌲 ForestCheck — Informe de Verificación Dasométrica</div>'
+    +'<div class="hdr-s">'+new Date().toLocaleDateString('es-CL')+' · '+metNom+' · '+(CU?CU.name:'')+'</div></div>';
+
+  // Datos predio
+  html+='<div class="sec"><div class="sec-t">Datos del Predio</div><div class="grid">';
+  var admRows=[['PMBN / Expediente',adm.pmbn],['Fecha verificación',adm.fecha],['Propietario',adm.prop],['Predio',adm.predio],['Rol / Folio',adm.rol],['Profesional',adm.prof],['Región',adm.region],['Provincia',adm.provincia||adm.prov],['Comuna',adm.comuna]];
+  admRows.filter(function(r){return r[1];}).forEach(function(r){ html+='<div class="fld"><span class="fld-l">'+r[0]+'</span><span class="fld-v">'+r[1]+'</span></div>'; });
+  html+='</div></div>';
+
+  // Muestreo
+  html+='<div class="sec"><div class="sec-t">Muestreo</div><div class="grid">';
+  html+='<div class="fld"><span class="fld-l">Método</span><span class="fld-v">'+metNom+'</span></div>';
+  if(parc.length) html+='<div class="fld"><span class="fld-l">N° parcelas</span><span class="fld-v">'+parc.length+' · '+cfg.sup+' m²</span></div>';
+  if(punts.length) html+='<div class="fld"><span class="fld-l">N° puntos relascopio</span><span class="fld-v">'+punts.length+' · FAB='+cfg.fab+'</span></div>';
+  if(allA.length) html+='<div class="fld"><span class="fld-l">Total árboles medidos</span><span class="fld-v">'+allA.length+'</span></div>';
+  html+='</div></div>';
+
+  // Estadígrafos
+  html+='<div class="sec"><div class="sec-t">Estadígrafos del Rodal</div><div class="grid">';
+  if(mNha) html+='<div class="fld"><span class="fld-l">N/ha media</span><span class="fld-v">'+Math.round(mNha).toLocaleString()+'</span></div>';
+  if(mABha) html+='<div class="fld"><span class="fld-l">AB/ha media</span><span class="fld-v">'+mABha.toFixed(2)+' m²/ha</span></div>';
+  if(dapM) html+='<div class="fld"><span class="fld-l">DAP medio</span><span class="fld-v">'+dapM.toFixed(1)+' cm</span></div>';
+  if(dg) html+='<div class="fld"><span class="fld-l">Dg cuadrático</span><span class="fld-v">'+dg.toFixed(1)+' cm</span></div>';
+  if(mVol) html+='<div class="fld"><span class="fld-l">VOL/ha estimado</span><span class="fld-v">'+mVol.toFixed(1)+' m³/ha</span></div>';
+  html+='</div></div>';
+
+  // Comparación plan de manejo
+  if(cfg.etN||cfg.etAB){
+    html+='<div class="sec"><div class="sec-t">Comparación con Plan de Manejo</div>';
+    html+='<table class="tbl"><thead><tr><th>Parámetro</th><th>Plan de Manejo</th><th>Terreno</th><th>Diferencia %</th><th>Estado</th></tr></thead><tbody>';
+    function pmRow(l,et,ter,fmt){ if(!et||ter===null) return ''; var d=Math.abs(et-ter)/et*100,ok=d<=20; return '<tr><td>'+l+'</td><td>'+fmt(et)+'</td><td>'+fmt(ter)+'</td><td>'+d.toFixed(1)+'%</td><td class="'+(ok?'ok':'bad')+'">'+(ok?'✓ OK':'✗ Revisar')+'</td></tr>'; }
+    html+=pmRow('N/ha',cfg.etN,mNha,function(v){return v?Math.round(v).toLocaleString():'—';});
+    html+=pmRow('AB/ha (m²/ha)',cfg.etAB,mABha,function(v){return v?v.toFixed(2):'—';});
+    html+=pmRow('VOL/ha (m³/ha)',cfg.etVol,mVol,function(v){return v?v.toFixed(1):'—';});
+    html+='</tbody></table></div>';
+  }
+
+  // Tabla parcelas
+  if(parc.length){
+    html+='<div class="sec"><div class="sec-t">Resumen de Parcelas</div>';
+    html+='<table class="tbl"><thead><tr><th>Parcela</th><th>N árb.</th><th>N/ha</th><th>AB/ha</th><th>DAP med.</th><th>Dg</th><th>VOL/ha</th><th>Coord. E</th><th>Coord. N</th></tr></thead><tbody>';
+    parc.forEach(function(p){ html+='<tr><td>'+p.id+'</td><td>'+p.n+'</td><td>'+p.nha.toLocaleString()+'</td><td>'+p.abha.toFixed(2)+'</td><td>'+p.dapM.toFixed(1)+'</td><td>'+p.dg.toFixed(1)+'</td><td>'+(p.volha?p.volha.toFixed(1):'-')+'</td><td>'+(p.coordE||'-')+'</td><td>'+(p.coordN||'-')+'</td></tr>'; });
+    html+='</tbody></table></div>';
+  }
+
+  // Tabla puntos Bitterlich
+  if(punts.length){
+    html+='<div class="sec"><div class="sec-t">Puntos Bitterlich</div>';
+    html+='<table class="tbl"><thead><tr><th>N° Punto</th><th>N árb.</th><th>FAB</th><th>AB/ha</th><th>Coord. E</th><th>Coord. N</th></tr></thead><tbody>';
+    punts.forEach(function(p){ html+='<tr><td>'+p.id+'</td><td>'+p.n+'</td><td>'+p.fab+'</td><td>'+p.abha.toFixed(2)+'</td><td>'+(p.e||'-')+'</td><td>'+(p.norte||'-')+'</td></tr>'; });
+    html+='</tbody></table></div>';
+  }
+
+  html+='<div class="ftr">ForestCheck · Sistema de Inventario Forestal Dasométrico · '+new Date().toLocaleDateString('es-CL')+'</div></div>';
+
+  var w=window.open('','_blank');
+  if(!w){alert('Activa ventanas emergentes para exportar PDF');return;}
+  w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>ForestCheck - Informe</title><style>'+css+'</style></head><body>'+html+'</body></html>');
+  w.document.close();
+  setTimeout(function(){ w.print(); },600);
 }
 
 // ═══ CARGAR LIBRERÍAS EXTERNAS DE FORMA ASÍNCRONA ═══
