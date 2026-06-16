@@ -326,11 +326,6 @@ body{padding-bottom:80px}
       <div class="metric"><div class="lbl">DAP medio</div><div class="val" id="mdap-t">—</div><div class="unit">cm</div></div>
     </div>
     <div class="tree-list" id="tl-t"></div>
-    <div style="margin-top:8px;padding:10px;background:#F0F9FF;border-radius:10px">
-      <div style="font-size:11px;font-weight:700;color:#0369A1;margin-bottom:6px">📍 Coordenadas de la parcela</div>
-      <div class="row2"><div><label>Coord. E</label><input type="number" id="t-e" placeholder="700000" inputmode="numeric"></div><div><label>Coord. N</label><input type="number" id="t-norte" placeholder="5900000" inputmode="numeric"></div></div>
-      <button type="button" style="width:100%;padding:8px;background:#E8F5E9;color:#1A3D28;border:1.5px solid #A5D6A7;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;margin-top:6px" onclick="getGPS('t-e','t-norte','t-acc')">📍 GPS · Zona 18S <span id="t-acc" style="font-size:11px;color:#666"></span></button>
-    </div>
     <button class="btn btn-primary" onclick="saveParcela('t')" style="margin-top:8px"><i class="ti ti-device-floppy"></i>Guardar parcela</button>
   </div>
   <div class="shdr shdr-v">Parcelas guardadas</div>
@@ -344,7 +339,6 @@ body{padding-bottom:80px}
     <div class="card-title"><i class="ti ti-map-pin"></i>Punto de muestreo</div>
     <div class="row2"><div><label>N° punto</label><input type="text" id="c-pid" placeholder="PT-01" autocomplete="off"></div><div><label>N° árboles contados</label><input type="number" id="c-n" placeholder="22" step="1" min="0" inputmode="numeric" oninput="prevComb()"></div></div>
     <div class="row2"><div><label>Coord. E</label><input type="number" id="c-e" placeholder="UTM E"></div><div><label>Coord. N</label><input type="number" id="c-norte" placeholder="UTM N"></div></div>
-    <button type="button" style="width:100%;padding:10px;background:#E8F5E9;color:#1A3D28;border:1.5px solid #A5D6A7;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;margin-top:6px" onclick="getGPS('c-e','c-norte','c-acc')">📍 GPS · Zona 18S <span id="c-acc" style="font-size:11px;color:#666"></span></button>
     <div id="c-prev" style="display:none;margin-top:10px;padding:14px;background:var(--c4);border-radius:var(--radio-sm);text-align:center;border:1px solid var(--c3)">
       <div style="font-size:11px;color:var(--c1);font-weight:600;margin-bottom:2px;text-transform:uppercase;letter-spacing:.5px">AB/ha calculada</div>
       <div style="font-size:38px;font-weight:800;color:var(--c1)" id="c-abha-p">—</div>
@@ -387,7 +381,6 @@ body{padding-bottom:80px}
     <div class="card-title"><i class="ti ti-map-pin"></i>Punto de conteo</div>
     <div class="row2"><div><label>N° punto</label><input type="text" id="b-pid" placeholder="PT-01" autocomplete="off"></div><div><label>N° árboles contados</label><input type="number" id="b-n" placeholder="22" step="1" min="0" inputmode="numeric" oninput="prevBit()"></div></div>
     <div class="row2"><div><label>Coord. E</label><input type="number" id="b-e" placeholder="UTM E"></div><div><label>Coord. N</label><input type="number" id="b-norte" placeholder="UTM N"></div></div>
-    <button type="button" style="width:100%;padding:10px;background:#E8F5E9;color:#1A3D28;border:1.5px solid #A5D6A7;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;margin-top:6px" onclick="getGPS('b-e','b-norte','b-acc')">📍 GPS · Zona 18S <span id="b-acc" style="font-size:11px;color:#666"></span></button>
     <div id="b-prev" style="display:none;margin-top:12px;padding:16px 12px;background:#F5F3FF;border-radius:var(--radio-sm);border:1px solid #DDD6FE">
       <div style="font-size:10px;color:#5B21B6;text-align:center;font-weight:700;margin-bottom:2px;text-transform:uppercase;letter-spacing:.5px">AB/ha calculada</div>
       <div class="bit-big" id="b-abha-p">—</div>
@@ -825,12 +818,7 @@ function saveParcela(tipo){
   const abha=abs.reduce((s,v)=>s+v,0)*10000/cfg.sup,dapM=mean(arb.map(a=>a.dap)),dg=2*100*Math.sqrt(mean(abs)/Math.PI);
   const vols=arb.filter(a=>a.alt).map(a=>vol(a.dap,a.alt)*10000/cfg.sup);
   const volha=vols.length?mean(vols)*n/vols.length:null;
-  const coordE = document.getElementById(tipo==='t'?'t-e':'cp-e');
-    const coordN = document.getElementById(tipo==='t'?'t-norte':'cp-norte');
-    const p={id:pid,n,nha,abha,dapM,dg,volha,sup:cfg.sup,
-      coordE:coordE?+coordE.value||null:null,
-      coordN:coordN?+coordN.value||null:null,
-      arboles:[...arb]};
+  const p={id:pid,n,nha,abha,dapM,dg,volha,sup:cfg.sup,arboles:[...arb]};
   if(tipo==='t'){const i=parc_t.findIndex(x=>x.id===pid);if(i>=0)parc_t[i]=p;else parc_t.push(p);arb_t=[];pid_t='';document.getElementById('t-pid').value='';document.getElementById('card-t').style.display='none';renderArb('t');renderListT();}
   else{const i=parc_c.findIndex(x=>x.id===pid);if(i>=0)parc_c[i]=p;else parc_c.push(p);arb_c=[];pid_c='';document.getElementById('cp-pid').value='';document.getElementById('card-c').style.display='none';renderArb('c');renderListCPF();}
   updateTopbar();saveState();
@@ -1063,43 +1051,6 @@ function exportCSV(){
   if(parc.length){csv+='=== PARCELAS ===\nParcela,N_arb,N_ha,AB_ha_m2,DAP_m_cm,Dg_cm,VOL_ha_m3,Sup_m2\n';parc.forEach(p=>csv+=`${p.id},${p.n},${p.nha},${p.abha.toFixed(4)},${p.dapM.toFixed(2)},${p.dg.toFixed(2)},${p.volha?p.volha.toFixed(2):''},${p.sup}\n`);csv+='\n=== ÁRBOL A ÁRBOL ===\nParcela,N,Especie,DAP_cm,Clase_DAP,g_m2,Altura_m\n';parc.forEach(p=>p.arboles.forEach(a=>csv+=`${p.id},${a.id},${a.sp},${a.dap},${claseDap(a.dap)},${gArea(a.dap).toFixed(6)},${a.alt||''}\n`));}
   const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
   const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='ForestCheck_'+metodo+'_'+new Date().toISOString().slice(0,10)+'.csv';a.click();URL.revokeObjectURL(url);
-}
-
-
-// ═══ GPS Y COORDENADAS ═══
-var cfg_zona = 18; // Zona UTM por defecto
-
-function getGPS(eId, nId, accId){
-  if(!navigator.geolocation){ alert('GPS no disponible'); return; }
-  navigator.geolocation.getCurrentPosition(
-    function(pos){
-      var utm = latLonToUTM(pos.coords.latitude, pos.coords.longitude, cfg_zona);
-      var eEl = document.getElementById(eId);
-      var nEl = document.getElementById(nId);
-      var aEl = document.getElementById(accId);
-      if(eEl) eEl.value = utm.e;
-      if(nEl) nEl.value = utm.n;
-      if(aEl) aEl.textContent = '±' + Math.round(pos.coords.accuracy) + 'm';
-    },
-    function(err){ alert('Error GPS: ' + (err.code===1?'Permiso denegado':'No disponible')); },
-    {enableHighAccuracy:true, timeout:10000, maximumAge:0}
-  );
-}
-
-function latLonToUTM(lat, lon, zona){
-  var a=6378137, e2=0.00669438, k0=0.9996;
-  var latR=lat*Math.PI/180, lonR=lon*Math.PI/180;
-  var lon0=(zona*6-183)*Math.PI/180;
-  var N=a/Math.sqrt(1-e2*Math.sin(latR)*Math.sin(latR));
-  var T=Math.tan(latR)*Math.tan(latR);
-  var C=e2/(1-e2)*Math.cos(latR)*Math.cos(latR);
-  var A=Math.cos(latR)*(lonR-lon0);
-  var e4=e2*e2, e6=e2*e2*e2;
-  var M=a*((1-e2/4-3*e4/64-5*e6/256)*latR-(3*e2/8+3*e4/32+45*e6/1024)*Math.sin(2*latR)+(15*e4/256+45*e6/1024)*Math.sin(4*latR)-(35*e6/3072)*Math.sin(6*latR));
-  var E=k0*N*(A+(1-T+C)*A*A*A/6+(5-18*T+T*T+72*C-58*(e2/(1-e2)))*A*A*A*A*A/120)+500000;
-  var N2=k0*(M+N*Math.tan(latR)*(A*A/2+(5-T+9*C+4*C*C)*A*A*A*A/24+(61-58*T+T*T+600*C-330*(e2/(1-e2)))*A*A*A*A*A*A/720));
-  if(lat<0) N2+=10000000;
-  return {e:Math.round(E), n:Math.round(Math.abs(N2))};
 }
 
 // ═══ INIT ═══
