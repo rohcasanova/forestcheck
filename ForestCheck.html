@@ -1,4 +1,5 @@
-<!DOCTYPE html>
+// Service Worker deshabilitado - incompatible con Safari iOS via Blob URL
+// Los recursos se cachean automáticamente por el navegador<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -1556,49 +1557,7 @@ function exportCSV(){
 
 <script>
 // ── SERVICE WORKER INLINE (modo offline) ──
-if('serviceWorker' in navigator){
-  var swCode = `
-const CACHE = 'forestcheck-v1';
-const URLS = [
-  'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js',
-  'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js',
-  'https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.10.0/dist/tabler-icons.min.css',
-  'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap'
-];
-self.addEventListener('install', function(e){
-  e.waitUntil(
-    caches.open(CACHE).then(function(c){ return c.addAll(URLS); }).catch(function(){})
-  );
-  self.skipWaiting();
-});
-self.addEventListener('activate', function(e){
-  e.waitUntil(clients.claim());
-});
-self.addEventListener('fetch', function(e){
-  e.respondWith(
-    caches.match(e.request).then(function(cached){
-      if(cached) return cached;
-      return fetch(e.request).then(function(resp){
-        if(resp && resp.status===200){
-          var r=resp.clone();
-          caches.open(CACHE).then(function(c){ c.put(e.request,r); });
-        }
-        return resp;
-      }).catch(function(){
-        return cached || new Response('Sin conexión', {status:503});
-      });
-    })
-  );
-});
-`;
-  var blob = new Blob([swCode], {type:'application/javascript'});
-  var swUrl = URL.createObjectURL(blob);
-  navigator.serviceWorker.register(swUrl, {scope:'/'}).then(function(reg){
-    console.log('SW registrado:', reg.scope);
-  }).catch(function(err){
-    console.log('SW no disponible:', err);
-  });
-}
+// Offline: los recursos se guardan en caché del navegador automáticamente
 </script>
 
 <script>
