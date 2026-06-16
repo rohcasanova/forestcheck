@@ -906,22 +906,31 @@ function showGPSBtn(eId, nId, accId){
 // login listeners en HTML
 
 function doLogin(){
-  var user = document.getElementById('fu').value.trim().toLowerCase();
-  var pass = document.getElementById('fp').value;
-  var err  = document.getElementById('login-err');
-  var found = null;
-  var all = getAllUsers();
-  for(var i=0;i<all.length;i++){
-    if(all[i].id===user && all[i].pass===pass){ found=all[i]; break; }
-  }
-  if(found){
-    CU = found;
-    err.style.display='none';
-    document.getElementById('fp').value='';
-    document.getElementById('s-login').classList.remove('active');
-    document.getElementById('s-app').classList.add('active');
-    initApp();
-  } else {
+  try{
+    var user = document.getElementById('fu').value.trim().toLowerCase();
+    var pass = document.getElementById('fp').value;
+    var err  = document.getElementById('login-err');
+    // Usuarios hardcoded directos - sin depender de getAllUsers
+    var USERS_LOCAL = [
+      {id:'admin',       name:'Administrador', pass:'admin123',   role:'admin', color:'#1A3D28'},
+      {id:'epv',         name:'EPV',           pass:'epv123',     role:'user',  color:'#2E7D32'},
+      {id:'mcc',         name:'MCC',           pass:'mcc1055',    role:'user',  color:'#1565C0'},
+      {id:'rmz',         name:'RMZ',           pass:'rmz1055',    role:'user',  color:'#6A1B9A'},
+      {id:'hsv',         name:'HSV',           pass:'hsv1055',    role:'user',  color:'#BF360C'},
+      {id:'forestprueba',name:'Forest Prueba', pass:'prueba1055', role:'user',  color:'#00695C'},
+    ];
+    var found = null;
+    for(var i=0;i<USERS_LOCAL.length;i++){
+      if(USERS_LOCAL[i].id===user && USERS_LOCAL[i].pass===pass){ found=USERS_LOCAL[i]; break; }
+    }
+    if(found){
+      CU = found;
+      if(err) err.style.display='none';
+      document.getElementById('fp').value='';
+      document.getElementById('s-login').classList.remove('active');
+      document.getElementById('s-app').classList.add('active');
+      try{ initApp(); }catch(e2){ alert('Error initApp: '+e2.message); }
+    } else {
     err.style.display='block';
     document.getElementById('fp').value='';
   }
