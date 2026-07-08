@@ -171,32 +171,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-se
 .urow{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border:1px solid #E5E5EA;border-radius:10px;margin-bottom:7px}
 .uav{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0}
 
-/* ══ PROYECTOS ══ */
-#sproj{background:#F2F2F7;flex-direction:column}
-.proj-card{background:#fff;border-radius:14px;padding:14px 16px;margin-bottom:10px;border:1px solid #E5E5EA;cursor:pointer;display:flex;justify-content:space-between;align-items:center}
-.proj-card:active{opacity:.8}
-.proj-tipo{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:3px 8px;border-radius:6px;margin-bottom:4px;display:inline-block}
-.pt-pmbn{background:#D1FAE5;color:#065F46}
-.pt-pmpf{background:#DBEAFE;color:#1E40AF}
-.pt-for{background:#FEF3C7;color:#92400E}
-.proj-nombre{font-size:15px;font-weight:700;color:#1C1C1E}
-.proj-sub{font-size:12px;color:#8E8E93;margin-top:2px}
-.proj-arrow{font-size:20px;color:#C7C7CC}
-.rodal-card{background:#fff;border-radius:12px;padding:12px 14px;margin-bottom:8px;border:1px solid #E5E5EA;cursor:pointer;display:flex;justify-content:space-between;align-items:center}
-.rodal-card:active{opacity:.8}
-.rodal-num{width:36px;height:36px;border-radius:10px;background:#1A3D28;color:#fff;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.rodal-info{flex:1;margin-left:10px}
-.rodal-nombre{font-size:14px;font-weight:600;color:#1C1C1E}
-.rodal-met{font-size:11px;color:#8E8E93;margin-top:2px}
-.modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:200;display:none;align-items:flex-end;justify-content:center}
-.modal-overlay.show{display:flex}
-.modal-box{background:#fff;border-radius:20px 20px 0 0;padding:24px 20px 40px;width:100%;max-width:480px;max-height:85vh;overflow-y:auto}
-.modal-title{font-size:17px;font-weight:700;margin-bottom:16px;color:#1C1C1E}
-.modal-lbl{font-size:12px;font-weight:600;color:#3C3C43;display:block;margin-bottom:5px;margin-top:12px}
-.modal-inp{width:100%;padding:11px 13px;border:1.5px solid #E5E5EA;border-radius:10px;font-size:15px;background:#fff;-webkit-appearance:none;outline:none;font-family:inherit}
-.modal-inp:focus{border-color:#2D6A4F}
-.modal-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-
 </style>
 </head>
 <body>
@@ -245,8 +219,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-se
 </div>
 
 
-<!-- PROYECTOS -->
-<div class="screen" id="sproj">
+
+<!-- APP -->
+<div class="screen" id="sa">
   <div class="topbar">
     <div class="top-left">
       <div class="top-icon">
@@ -256,123 +231,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-se
       </div>
       <div>
         <div class="top-title">ForestCheck</div>
-        <div class="top-sub" id="proj-sub">Mis proyectos</div>
-      </div>
-    </div>
-    <div class="top-right">
-      <div class="top-user" id="proj-user">—</div>
-      <div class="top-role" id="proj-role">—</div>
-      <div class="top-logout" onclick="cerrar()">Cerrar sesión</div>
-    </div>
-  </div>
-  <div style="padding:14px 12px 100px">
-    <div id="lista-proyectos"><div class="empty">Sin proyectos aún</div></div>
-  </div>
-  <div style="position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;padding:12px;background:#F2F2F7;border-top:1px solid #E5E5EA">
-    <button class="btn btn-p" onclick="abrirModalProyecto()">+ Nuevo proyecto</button>
-  </div>
-</div>
-
-<!-- RODALES -->
-<div class="screen" id="srodal">
-  <div class="topbar">
-    <div class="top-left">
-      <div class="top-icon" onclick="show('sproj')" style="cursor:pointer">‹</div>
-      <div>
-        <div class="top-title" id="rodal-title">Proyecto</div>
-        <div class="top-sub" id="rodal-sub">Rodales</div>
-      </div>
-    </div>
-    <div class="top-right">
-      <div class="top-user" id="rodal-user">—</div>
-      <div class="top-logout" onclick="cerrar()">Cerrar sesión</div>
-    </div>
-  </div>
-  <div style="padding:14px 12px 100px">
-    <div id="lista-rodales"><div class="empty">Sin rodales aún</div></div>
-  </div>
-  <div style="position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;padding:12px;background:#F2F2F7;border-top:1px solid #E5E5EA">
-    <button class="btn btn-p" onclick="abrirModalRodal()">+ Nuevo rodal</button>
-  </div>
-</div>
-
-<!-- MODAL NUEVO PROYECTO -->
-<div class="modal-overlay" id="modal-proj">
-  <div class="modal-box">
-    <div class="modal-title">Nuevo proyecto</div>
-    <div class="modal-row">
-      <div>
-        <span class="modal-lbl">Tipo</span>
-        <select class="modal-inp" id="mp-tipo" onchange="updTipoProj()">
-          <option value="PMBN">PMBN</option>
-          <option value="PMPF">PMPF</option>
-          <option value="Forestación">Forestación</option>
-        </select>
-      </div>
-      <div>
-        <span class="modal-lbl" id="mp-exp-lbl">N° Solicitud</span>
-        <input class="modal-inp" type="text" id="mp-exp" placeholder="2024-001" autocomplete="off">
-      </div>
-    </div>
-    <span class="modal-lbl">Nombre del Predio</span>
-    <input class="modal-inp" type="text" id="mp-predio" placeholder="Nombre del predio" autocomplete="off">
-    <span class="modal-lbl">ROL</span>
-    <input class="modal-inp" type="text" id="mp-rol" placeholder="XX-YY" autocomplete="off">
-    <span class="modal-lbl">Comuna</span>
-    <select class="modal-inp" id="mp-prov" onchange="updComunasModal()">
-      <option value="">-- Provincia --</option>
-      <option value="Cautín">Cautín</option>
-      <option value="Malleco">Malleco</option>
-    </select>
-    <select class="modal-inp" id="mp-comuna" style="margin-top:6px">
-      <option value="">-- Selecciona provincia primero --</option>
-    </select>
-    <span class="modal-lbl">Analistas participantes</span>
-    <input class="modal-inp" type="text" id="mp-analistas" placeholder="Nombre 1, Nombre 2..." autocomplete="off">
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px">
-      <button class="btn" onclick="cerrarModalProyecto()">Cancelar</button>
-      <button class="btn btn-p" onclick="guardarProyecto()">Crear proyecto</button>
-    </div>
-  </div>
-</div>
-
-<!-- MODAL NUEVO RODAL -->
-<div class="modal-overlay" id="modal-rodal">
-  <div class="modal-box">
-    <div class="modal-title">Nuevo rodal</div>
-    <div class="modal-row">
-      <div>
-        <span class="modal-lbl">N° Rodal</span>
-        <input class="modal-inp" type="number" id="mr-num" placeholder="1" min="1" inputmode="numeric">
-      </div>
-      <div>
-        <span class="modal-lbl">Nombre / Código</span>
-        <input class="modal-inp" type="text" id="mr-nom" placeholder="Rodal Norte" autocomplete="off">
-      </div>
-    </div>
-    <span class="modal-lbl">Superficie (ha)</span>
-    <input class="modal-inp" type="number" id="mr-sup" placeholder="5.5" step="0.1" inputmode="decimal">
-    <span class="modal-lbl">Método de medición</span>
-    <select class="modal-inp" id="mr-met">
-      <option value="trad">Tradicional (Forcípula)</option>
-      <option value="comb">Combinado (Bitterlich + Parcela)</option>
-      <option value="bit">Bitterlich rápido</option>
-      <option value="prend">Prendimiento</option>
-    </select>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px">
-      <button class="btn" onclick="cerrarModalRodal()">Cancelar</button>
-      <button class="btn btn-p" onclick="guardarRodal()">Crear rodal</button>
-    </div>
-  </div>
-</div>
-
-<!-- APP -->
-<div class="screen" id="sa">
-  <div class="topbar">
-    <div class="top-left">
-      <div class="top-icon" onclick="volverRodales()" style="cursor:pointer;font-size:20px;font-weight:700">‹</div>
-      <div>
-        <div class="top-title" id="top-rodal-nom">ForestCheck</div>
         <div class="top-sub" id="top-sub">Listo</div>
       </div>
     </div>
@@ -763,8 +621,6 @@ function save(){
     ss(uk('fc-arbt'),JSON.stringify({pid:pid_t,arb:arb_t}));
     ss(uk('fc-arbc'),JSON.stringify({pid:pid_c,arb:arb_c}));
   }catch(e){}
-  // Guardar en rodal activo del proyecto
-  saveRodalActual();
   updInfo();
 }
 function load(){
@@ -823,12 +679,9 @@ function irApp(){
     document.getElementById('top-user').textContent=CU.name;
     document.getElementById('top-role').textContent=CU.role==='admin'?'Administrador':'Profesional';
     document.getElementById('adm-panel').style.display=CU.role==='admin'?'block':'none';
-    // Cargar proyectos e ir a pantalla de proyectos
-    loadProyectos();
-    document.getElementById('proj-user').textContent=CU.name;
-    document.getElementById('proj-role').textContent=CU.role==='admin'?'Administrador':'Profesional';
-    renderProyectos();
-    show('sproj');
+    load(); fillSups(); syncFab(); syncZona(); renderEspSel(); applyAdm(); updInfo();
+    show('sa');
+    if(metodo) iniciarUI(); else showSel();
   } else {
     err.style.display='block';
     document.getElementById('fp').value='';
@@ -836,9 +689,7 @@ function irApp(){
 }
 function cerrar(){
   if(!confirm('¿Cerrar sesión?')) return;
-  saveRodalActual(); // guardar datos del rodal activo antes de salir
-  CU=null; metodo=null; proyActual=null; proyActual_rodal=null;
-  proyectos=[];
+  CU=null; metodo=null;
   document.querySelectorAll('.pg').forEach(function(p){p.classList.remove('on');});
   document.getElementById('nav').className='nav';
   show('sw');
@@ -1639,207 +1490,6 @@ function renderLPrend(){
       +'<button style="background:none;border:none;cursor:pointer;color:#C7C7CC;font-size:18px;padding:4px" onclick="delP(\'prend\','+i+')">×</button></div></div>';
   }).join('');
 }
-
-
-function volverRodales(){
-  saveRodalActual();
-  metodo=null;
-  document.querySelectorAll('.pg').forEach(function(p){p.classList.remove('on');});
-  document.getElementById('nav').className='nav';
-  proyActual_rodal=null;
-  renderRodales();
-  show('srodal');
-}
-
-// ═══ PROYECTOS Y RODALES ═══
-var proyectos = [];
-var proyActual = null; // proyecto seleccionado
-
-var COMUNAS_LIST = {
-  "Cautín":["Carahue","Cholchol","Cunco","Curarrehue","Freire","Galvarino","Gorbea","Lautaro","Loncoche","Melipeuco","Nueva Imperial","Padre Las Casas","Perquenco","Pitrufquén","Pucón","Puerto Saavedra","Temuco","Teodoro Schmidt","Toltén","Vilcún","Villarrica"],
-  "Malleco":["Angol","Collipulli","Curacautín","Ercilla","Lonquimay","Los Sauces","Lumaco","Purén","Renaico","Traiguén","Victoria"]
-};
-
-function saveProyectos(){
-  try{ localStorage.setItem('fc-proyectos-'+CU.id, JSON.stringify(proyectos)); }catch(e){}
-}
-function loadProyectos(){
-  try{
-    var p = localStorage.getItem('fc-proyectos-'+CU.id);
-    if(p) proyectos = JSON.parse(p);
-  }catch(e){}
-}
-
-function renderProyectos(){
-  var c = document.getElementById('lista-proyectos');
-  if(!proyectos.length){ c.innerHTML='<div class="empty">Sin proyectos aún.<br>Toca "+ Nuevo proyecto" para comenzar.</div>'; return; }
-  c.innerHTML = proyectos.map(function(p,i){
-    var tipoCls = p.tipo==='PMBN'?'pt-pmbn':p.tipo==='PMPF'?'pt-pmpf':'pt-for';
-    var nRodales = p.rodales?p.rodales.length:0;
-    return '<div class="proj-card" onclick="selProyecto('+i+')">'
-      +'<div>'
-      +'<span class="proj-tipo '+tipoCls+'">'+p.tipo+'</span>'
-      +'<div class="proj-nombre">'+p.predio+'</div>'
-      +'<div class="proj-sub">'+p.exp+' · '+p.comuna+(nRodales?' · '+nRodales+' rodal'+(nRodales!==1?'es':''):'')+'</div>'
-      +'<div class="proj-sub" style="margin-top:2px">'+p.analistas+'</div>'
-      +'</div>'
-      +'<div style="display:flex;align-items:center;gap:8px">'
-      +'<span class="proj-arrow">›</span>'
-      +'<button style="background:none;border:none;cursor:pointer;color:#C7C7CC;font-size:20px;padding:4px" onclick="event.stopPropagation();elimProyecto('+i+')">×</button>'
-      +'</div></div>';
-  }).join('');
-}
-
-function selProyecto(i){
-  proyActual = i;
-  var p = proyectos[i];
-  document.getElementById('rodal-title').textContent = p.predio;
-  document.getElementById('rodal-sub').textContent = p.tipo+' · '+p.exp;
-  document.getElementById('rodal-user').textContent = CU.name;
-  // Filtrar métodos según tipo de proyecto
-  var mr = document.getElementById('mr-met');
-  if(p.tipo==='Forestación'){
-    mr.innerHTML = '<option value="prend">Prendimiento</option><option value="recep">Recepción técnica de faena</option>';
-  } else {
-    mr.innerHTML = '<option value="trad">Tradicional (Forcípula)</option><option value="comb">Combinado (Bitterlich + Parcela)</option><option value="bit">Bitterlich rápido</option>';
-  }
-  renderRodales();
-  show('srodal');
-}
-function elimProyecto(i){
-  if(!confirm('¿Eliminar proyecto "'+proyectos[i].predio+'"? Se perderán todos sus datos.')) return;
-  proyectos.splice(i,1); saveProyectos(); renderProyectos();
-}
-
-function renderRodales(){
-  var p = proyectos[proyActual];
-  var rodales = p.rodales||[];
-  var c = document.getElementById('lista-rodales');
-  if(!rodales.length){ c.innerHTML='<div class="empty">Sin rodales.<br>Toca "+ Nuevo rodal" para agregar.</div>'; return; }
-  var metNoms = {trad:'Tradicional',comb:'Combinado',bit:'Bitterlich rápido',prend:'Prendimiento',recep:'Recepción técnica'};
-  c.innerHTML = rodales.map(function(r,i){
-    var nParc = r.parcelas?r.parcelas.length:0;
-    return '<div class="rodal-card" onclick="entrarRodal('+i+')">'
-      +'<div class="rodal-num">'+r.num+'</div>'
-      +'<div class="rodal-info">'
-      +'<div class="rodal-nombre">'+r.nom+(r.sup?' · '+r.sup+' ha':'')+'</div>'
-      +'<div class="rodal-met">'+metNoms[r.met]+(nParc?' · '+nParc+' parc.':'')+'</div>'
-      +'</div>'
-      +'<div style="display:flex;align-items:center;gap:6px">'
-      +'<span class="proj-arrow">›</span>'
-      +'<button style="background:none;border:none;cursor:pointer;color:#C7C7CC;font-size:20px;padding:4px" onclick="event.stopPropagation();elimRodal('+i+')">×</button>'
-      +'</div></div>';
-  }).join('');
-}
-
-function entrarRodal(i){
-  var p = proyectos[proyActual];
-  var r = p.rodales[i];
-  // Cargar datos del rodal en las variables globales
-  metodo = r.met==='recep'?'prend':r.met; // recep usa el módulo prend
-  cfg = r.cfg || cfg;
-  parc_t = r.parc_t||[]; parc_c = r.parc_c||[];
-  punt_c = r.punt_c||[]; punt_b = r.punt_b||[];
-  um_prend = r.um_prend||[]; dpo = r.dpo||dpo;
-  arb_t=[]; pid_t=''; arb_c=[]; pid_c='';
-  // Restaurar formulario activo si existía
-  if(r.arb_t_activo){ pid_t=r.arb_t_activo.pid||''; arb_t=r.arb_t_activo.arb||[]; }
-  if(r.arb_c_activo){ pid_c=r.arb_c_activo.pid||''; arb_c=r.arb_c_activo.arb||[]; }
-  // Guardar índice de rodal activo
-  proyActual_rodal = i;
-  // Actualizar topbar
-  document.getElementById('top-user').textContent = CU.name;
-  document.getElementById('top-role').textContent = CU.role==='admin'?'Administrador':'Profesional';
-  document.getElementById('adm-panel').style.display = CU.role==='admin'?'block':'none';
-  fillSups(); syncFab(); syncZona(); renderEspSel(); applyAdm();
-  // Actualizar topbar con nombre del rodal
-  var rNom = p.rodales[i].num+' - '+p.rodales[i].nom;
-  document.getElementById('top-rodal-nom').textContent = rNom;
-  iniciarUI();
-  show('sa');
-}
-function elimRodal(i){
-  var p = proyectos[proyActual];
-  if(!confirm('¿Eliminar rodal "'+p.rodales[i].nom+'"?')) return;
-  p.rodales.splice(i,1); saveProyectos(); renderRodales();
-}
-
-// Variable para rodal activo
-var proyActual_rodal = null;
-
-// Guardar datos del rodal actual al salir
-function saveRodalActual(){
-  if(proyActual===null||proyActual_rodal===null) return;
-  var p = proyectos[proyActual];
-  var r = p.rodales[proyActual_rodal];
-  r.cfg = cfg;
-  r.parc_t = parc_t; r.parc_c = parc_c;
-  r.punt_c = punt_c; r.punt_b = punt_b;
-  r.um_prend = um_prend; r.dpo = dpo;
-  r.arb_t_activo = {pid:pid_t, arb:arb_t};
-  r.arb_c_activo = {pid:pid_c, arb:arb_c};
-  saveProyectos();
-}
-
-// MODALES PROYECTO
-function abrirModalProyecto(){
-  document.getElementById('mp-tipo').value='PMBN';
-  document.getElementById('mp-exp').value='';
-  document.getElementById('mp-predio').value='';
-  document.getElementById('mp-rol').value='';
-  document.getElementById('mp-prov').value='';
-  document.getElementById('mp-comuna').innerHTML='<option value="">-- Selecciona provincia primero --</option>';
-  document.getElementById('mp-analistas').value='';
-  updTipoProj();
-  document.getElementById('modal-proj').classList.add('show');
-}
-function cerrarModalProyecto(){ document.getElementById('modal-proj').classList.remove('show'); }
-
-function updTipoProj(){
-  var t = document.getElementById('mp-tipo').value;
-  document.getElementById('mp-exp-lbl').textContent = t==='Forestación'?'N° Contrato/Licitación':'N° Solicitud';
-}
-function updComunasModal(){
-  var pv = document.getElementById('mp-prov').value;
-  var com = document.getElementById('mp-comuna');
-  var lista = COMUNAS_LIST[pv]||[];
-  com.innerHTML = lista.length?'<option value="">-- Selecciona --</option>'+lista.map(function(c){return '<option value="'+c+'">'+c+'</option>';}).join(''):'<option value="">-- Selecciona provincia primero --</option>';
-}
-function guardarProyecto(){
-  var tipo=document.getElementById('mp-tipo').value;
-  var exp=document.getElementById('mp-exp').value.trim();
-  var predio=document.getElementById('mp-predio').value.trim();
-  var rol=document.getElementById('mp-rol').value.trim();
-  var comuna=document.getElementById('mp-comuna').value;
-  var analistas=document.getElementById('mp-analistas').value.trim();
-  if(!predio){alert('Ingresa el nombre del predio');return;}
-  if(!exp){alert('Ingresa el N° de solicitud/contrato');return;}
-  proyectos.push({tipo:tipo,exp:exp,predio:predio,rol:rol,comuna:comuna,analistas:analistas,rodales:[],fecha:new Date().toLocaleDateString('es-CL')});
-  saveProyectos(); renderProyectos(); cerrarModalProyecto();
-}
-
-// MODALES RODAL
-function abrirModalRodal(){
-  var p = proyectos[proyActual];
-  var n = (p.rodales?p.rodales.length:0)+1;
-  document.getElementById('mr-num').value=n;
-  document.getElementById('mr-nom').value='';
-  document.getElementById('mr-sup').value='';
-  document.getElementById('modal-rodal').classList.add('show');
-}
-function cerrarModalRodal(){ document.getElementById('modal-rodal').classList.remove('show'); }
-function guardarRodal(){
-  var num=+document.getElementById('mr-num').value||1;
-  var nom=document.getElementById('mr-nom').value.trim();
-  var sup=parseFloat(document.getElementById('mr-sup').value)||null;
-  var met=document.getElementById('mr-met').value;
-  if(!nom){alert('Ingresa el nombre del rodal');return;}
-  var p=proyectos[proyActual];
-  if(!p.rodales) p.rodales=[];
-  p.rodales.push({num:num,nom:nom,sup:sup,met:met,parc_t:[],parc_c:[],punt_c:[],punt_b:[],um_prend:[],dpo:[{sp:'',dens:0}],arb_t_activo:null,arb_c_activo:null});
-  saveProyectos(); renderRodales(); cerrarModalRodal();
-}
-
 // ═══ CARGAR LIBRERÍAS EXTERNAS DE FORMA ASÍNCRONA ═══
 // No bloquean el JS principal
 function loadScript(src,cb){
