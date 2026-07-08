@@ -136,6 +136,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-se
 .mcard.sel-v{border-color:#2D6A4F;background:#D1FAE5}
 .mcard.sel-c{border-color:#92400E;background:#FEF3C7}
 .mcard.sel-m{border-color:#7C3AED;background:#EDE9FE}
+.mcard.sel-p{border-color:#15803D;background:#DCFCE7}
 
 /* BITTERLICH */
 .bit-big{font-size:48px;font-weight:800;color:#5B21B6;text-align:center;padding:14px 0 2px;line-height:1}
@@ -254,10 +255,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-se
             <div class="mcard-t">Combinado</div>
             <div class="mcard-s">Bitterlich → AB/ha · Parcela → N/ha</div>
           </div>
-          <div class="mcard mcard-full" id="mc-bit" onclick="selMet('bit')">
+          <div class="mcard" id="mc-bit" onclick="selMet('bit')">
             <span class="mcard-icon">⚡</span>
             <div class="mcard-t">Bitterlich rápido</div>
             <div class="mcard-s">Solo relascopio · Verificación rápida de AB/ha</div>
+          </div>
+          <div class="mcard" id="mc-prend" onclick="selMet('prend')">
+            <span class="mcard-icon">🌱</span>
+            <div class="mcard-t">Prendimiento</div>
+            <div class="mcard-s">Forestación / Reforestación · % prendimiento al año siguiente</div>
           </div>
         </div>
         <button class="btn btn-p" id="btn-ini" style="display:none" onclick="iniciar()">▶ Iniciar con este método</button>
@@ -386,6 +392,39 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-se
       <div id="lst-b"><div class="empty">Sin puntos aún</div></div>
     </div>
 
+    <!-- PRENDIMIENTO -->
+    <div class="pg" id="pg-p1-prend">
+      <div style="text-align:right;margin-bottom:6px"><button onclick="cambiar()" style="background:none;border:1.5px solid #E5E5EA;border-radius:8px;padding:5px 12px;font-size:12px;color:#8E8E93;cursor:pointer;font-family:inherit">↔ Cambiar método</button></div>
+      <div class="ibox" style="background:#DCFCE7;border-color:#22C55E;color:#14532D"><strong>Verificación de prendimiento</strong> — % Prendimiento = (N/ha muestreado ÷ DPO) × 100</div>
+
+      <div class="card">
+        <div class="card-title"><span class="card-icon">🌱</span>Densidad de Plantación Original (DPO)</div>
+        <div style="font-size:11px;color:#8E8E93;margin-bottom:8px">Ingresa hasta 4 especies con su densidad original (plantas/ha)</div>
+        <div id="dpo-rows"></div>
+        <button class="btn" onclick="addDPO()" style="margin-top:6px">+ Agregar especie</button>
+        <div style="margin-top:10px;padding:10px 12px;background:#F0FDF4;border-radius:10px;display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:12px;font-weight:600;color:#14532D">DPO Total (plantas/ha)</span>
+          <span id="dpo-total" style="font-size:20px;font-weight:800;color:#15803D">0</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="card-icon">📍</span>Unidad de Muestreo (UM)</div>
+        <div class="r2"><div><span class="lbl">N° UM</span><input class="inp" type="text" id="pr-pid" placeholder="UM-01" autocomplete="off" autocapitalize="none"></div><div><span class="lbl">Sup. UM (m²)</span><select class="inp" id="pr-sup" onchange="cfg.sup=+this.value;syncSup()"></select></div></div>
+        <div id="pr-sp-rows" style="margin-top:10px"></div>
+        <div class="r2" style="margin-top:8px"><div><span class="lbl">Coord. E</span><input class="inp" type="number" id="pr-e" placeholder="700000" inputmode="numeric"></div><div><span class="lbl">Coord. N</span><input class="inp" type="number" id="pr-norte" placeholder="5700000" inputmode="numeric"></div></div>
+        <button class="btn-gps" onclick="getGPS('pr-e','pr-norte','pr-acc')">📍 GPS · Zona <span id="zona-pr">18</span>S <span id="pr-acc" style="font-size:11px;color:#666"></span></button>
+        <div id="pr-prev" style="display:none;margin-top:10px;padding:14px;background:#DCFCE7;border-radius:10px;text-align:center">
+          <div style="font-size:11px;color:#14532D;font-weight:700;margin-bottom:4px">Total plantas vivas en esta UM</div>
+          <div style="font-size:38px;font-weight:800;color:#15803D" id="pr-tot-p">—</div>
+        </div>
+        <button class="btn btn-p" onclick="saveUM()" style="margin-top:8px;background:#15803D;border-color:#15803D">💾 Guardar UM</button>
+      </div>
+
+      <div class="shdr" style="background:#DCFCE7;color:#14532D">Unidades de muestreo guardadas</div>
+      <div id="lst-prend"><div class="empty">Sin UM aún</div></div>
+    </div>
+
     <!-- ESTADÍGRAFOS -->
     <div class="pg" id="pg-est">
       <div class="card">
@@ -506,7 +545,7 @@ function getExtra(){ try{ return JSON.parse(sessionStorage.getItem('fc-extra'))|
 function getAllUsers(){ return USERS.concat(getExtra().filter(function(u){ return !USERS.find(function(x){ return x.id===u.id; }); })); }
 
 // ═══ STORAGE ═══
-function ss(k,v){ try{ sessionStorage.setItem(k,v); }catch(e){ try{ localStorage.setItem(k,v); }catch(e2){} } }
+function ss(k,v){ try{ localStorage.setItem(k,v); }catch(e){ try{ sessionStorage.setItem(k,v); }catch(e2){} } }
 function sg(k){ try{ return sessionStorage.getItem(k)||localStorage.getItem(k); }catch(e){ return null; } }
 function uk(k){ return CU?k+'-'+CU.id:k; }
 
@@ -528,6 +567,8 @@ var COMUNAS={
 var arb_t=[],pid_t='',parc_t=[];
 var arb_c=[],pid_c='',parc_c=[],punt_c=[];
 var punt_b=[];
+var dpo=[{sp:'Pi',dens:800}]; // Densidad Plantación Original por especie
+var um_prend=[]; // Unidades de muestreo de prendimiento guardadas
 var chD=null,chE=null;
 var COEF_VOL={
   "Ro":{a:-9.9449,b:2.4733,c:1.1777},
@@ -547,7 +588,7 @@ function volArb(d,h,sp){ var co=COEF_VOL[sp]; if(co&&h) return Math.exp(co.a+co.
 // ═══ SUPERFICIE DESPLEGABLE ═══
 function fillSups(){
   var opts=''; for(var v=100;v<=1000;v+=50) opts+='<option value="'+v+'"'+(v===cfg.sup?' selected':'')+'>'+v+' m²</option>';
-  ['t-sup','cp-sup','cfg-sup'].forEach(function(id){ var e=document.getElementById(id); if(e) e.innerHTML=opts; });
+  ['t-sup','cp-sup','cfg-sup','pr-sup'].forEach(function(id){ var e=document.getElementById(id); if(e) e.innerHTML=opts; });
 }
 function syncSup(){ fillSups(); }
 function syncFab(){
@@ -556,7 +597,7 @@ function syncFab(){
   var bs=document.getElementById('fab-b-sel'); if(bs) bs.value=cfg.fab;
 }
 function syncZona(){
-  ['zona-t','zona-c','zona-b','zona-cp'].forEach(function(id){ var e=document.getElementById(id); if(e) e.textContent=cfg.zona; });
+  ['zona-t','zona-c','zona-b','zona-cp','zona-pr'].forEach(function(id){ var e=document.getElementById(id); if(e) e.textContent=cfg.zona; });
 }
 
 // ═══ STORAGE DATOS ═══
@@ -571,6 +612,11 @@ function save(){
     ss(uk('fc-pc'),JSON.stringify(parc_c));
     ss(uk('fc-bc'),JSON.stringify(punt_c));
     ss(uk('fc-bb'),JSON.stringify(punt_b));
+    ss(uk('fc-dpo'),JSON.stringify(dpo));
+    ss(uk('fc-um'),JSON.stringify(um_prend));
+    // Auto-guardar formulario activo (árboles no guardados aún)
+    ss(uk('fc-arbt'),JSON.stringify({pid:pid_t,arb:arb_t}));
+    ss(uk('fc-arbc'),JSON.stringify({pid:pid_c,arb:arb_c}));
   }catch(e){}
   updInfo();
 }
@@ -585,6 +631,12 @@ function load(){
     var pc=sg(uk('fc-pc')); if(pc) parc_c=JSON.parse(pc);
     var bc=sg(uk('fc-bc')); if(bc) punt_c=JSON.parse(bc);
     var bb=sg(uk('fc-bb')); if(bb) punt_b=JSON.parse(bb);
+    var dp=sg(uk('fc-dpo')); if(dp) dpo=JSON.parse(dp);
+    var um=sg(uk('fc-um')); if(um) um_prend=JSON.parse(um);
+    // Restaurar formulario activo (árboles no guardados antes de salir)
+    var at=sg(uk('fc-arbt')); if(at){ try{ var obj=JSON.parse(at); pid_t=obj.pid||''; arb_t=obj.arb||[]; }catch(e){} }
+    var ac=sg(uk('fc-arbc')); if(ac){ try{ var obj2=JSON.parse(ac); pid_c=obj2.pid||''; arb_c=obj2.arb||[]; }catch(e){} } if(at){ var obj=JSON.parse(at); pid_t=obj.pid||''; arb_t=obj.arb||[]; }
+    var ac=sg(uk('fc-arbc')); if(ac){ var obj2=JSON.parse(ac); pid_c=obj2.pid||''; arb_c=obj2.arb||[]; }
   }catch(e){}
 }
 function saveAdm(){
@@ -650,8 +702,9 @@ function showSel(){
 }
 function selMet(m){
   metodo=m;
-  document.querySelectorAll('.mcard').forEach(function(c){c.classList.remove('sel-v','sel-c','sel-m');});
-  document.getElementById('mc-'+m).classList.add(m==='trad'?'sel-v':m==='comb'?'sel-c':'sel-m');
+  document.querySelectorAll('.mcard').forEach(function(c){c.classList.remove('sel-v','sel-c','sel-m','sel-p');});
+  var cls=m==='trad'?'sel-v':m==='comb'?'sel-c':m==='prend'?'sel-p':'sel-m';
+  document.getElementById('mc-'+m).classList.add(cls);
   document.getElementById('btn-ini').style.display='flex';
 }
 function iniciar(){ if(!metodo) return; save(); iniciarUI(); }
@@ -660,13 +713,27 @@ function iniciarUI(){
   var nav=document.getElementById('nav');
   if(metodo==='trad'){ n1.innerHTML='<span class="nb-icon">📏</span><span>Parcelas</span>'; n2.style.display='none'; nav.className='nav show cols4'; }
   else if(metodo==='comb'){ n1.innerHTML='<span class="nb-icon">⭕</span><span>Bitterlich</span>'; n2.style.display='flex'; nav.className='nav show cols5'; }
+  else if(metodo==='prend'){ n1.innerHTML='<span class="nb-icon">🌱</span><span>Prendim.</span>'; n2.style.display='none'; nav.className='nav show cols4'; }
   else{ n1.innerHTML='<span class="nb-icon">⚡</span><span>Bitterlich</span>'; n2.style.display='none'; nav.className='nav show cols4'; }
-  document.getElementById('cfg-met').textContent=metodo==='trad'?'Tradicional':metodo==='comb'?'Combinado':'Bitterlich rápido';
-  document.getElementById('cfg-fab-row').style.display=metodo==='trad'?'none':'flex';
+  document.getElementById('cfg-met').textContent=metodo==='trad'?'Tradicional':metodo==='comb'?'Combinado':metodo==='prend'?'Prendimiento':'Bitterlich rápido';
+  document.getElementById('cfg-fab-row').style.display=metodo==='trad'||metodo==='prend'?'none':'flex';
   renderLists(); applyAdm(); updTop();
+  // Restaurar formulario activo si había datos sin guardar
+  if(arb_t.length){ 
+    document.getElementById('card-t').style.display='block';
+    document.getElementById('t-pid').value=pid_t;
+    document.getElementById('lbl-t').textContent=pid_t;
+    renderArb('t'); updMini('t');
+  }
+  if(arb_c.length){ 
+    document.getElementById('card-c').style.display='block';
+    document.getElementById('cp-pid').value=pid_c;
+    document.getElementById('lbl-c').textContent=pid_c;
+    renderArb('c'); updMini('c');
+  }
   goP('p1');
 }
-function cambiar(){ metodo=null; document.querySelectorAll('.mcard').forEach(function(c){c.classList.remove('sel-v','sel-c','sel-m');}); document.getElementById('btn-ini').style.display='none'; showSel(); }
+function cambiar(){ metodo=null; document.querySelectorAll('.mcard').forEach(function(c){c.classList.remove('sel-v','sel-c','sel-m','sel-p');}); document.getElementById('btn-ini').style.display='none'; showSel(); }
 function goP(id){
   document.querySelectorAll('.pg').forEach(function(p){p.classList.remove('on');});
   document.querySelectorAll('.nb').forEach(function(b){b.classList.remove('on');});
@@ -685,7 +752,8 @@ function updTop(){
   if(metodo==='trad'&&parc_t.length) sub=parc_t.length+' parc · N/ha='+Math.round(avg(parc_t.map(function(p){return p.nha;}))).toLocaleString();
   else if(metodo==='comb'&&punt_c.length) sub=punt_c.length+' pts · AB/ha='+avg(punt_c.map(function(p){return p.abha;})).toFixed(1)+' m²/ha';
   else if(metodo==='bit'&&punt_b.length) sub=punt_b.length+' pts · AB/ha='+avg(punt_b.map(function(p){return p.abha;})).toFixed(2)+' m²/ha';
-  else sub=metodo==='trad'?'Método tradicional':metodo==='comb'?'Método combinado':'Bitterlich rápido';
+  else if(metodo==='prend'&&um_prend.length){ var dpoTot=dpo.reduce(function(s,d){return s+(d.dens||0);},0); var nhaP=avg(um_prend.map(function(u){return u.total*10000/u.sup;})); sub=um_prend.length+' UM · Prend.='+(dpoTot>0?(nhaP/dpoTot*100).toFixed(0):'—')+'%'; }
+  else sub=metodo==='trad'?'Método tradicional':metodo==='comb'?'Método combinado':metodo==='prend'?'Verificación de prendimiento':'Bitterlich rápido';
   document.getElementById('top-sub').textContent=sub;
 }
 
@@ -717,6 +785,8 @@ function addArb(t){
   }
   document.getElementById(dap_).value='';
   document.getElementById(dap_).focus();
+  vibrar();
+  save(); // auto-guardar tras cada árbol
 }
 function vibrar(){ try{ if(navigator.vibrate) navigator.vibrate(80); }catch(e){} }
 function renderArb(t){
@@ -750,13 +820,13 @@ function saveParc(t){
   var p={id:pid,n:n,nha:nha,abha:abha,dapM:dapM,dg:dg,volha:volha,sup:cfg.sup,
          coordE:eEl?+eEl.value||null:null, coordN:nEl?+nEl.value||null:null,
          arboles:arb.slice()};
-  if(t==='t'){ var i=parc_t.findIndex(function(x){return x.id===pid;}); if(i>=0)parc_t[i]=p;else parc_t.push(p); arb_t=[];pid_t=''; document.getElementById('t-pid').value=''; document.getElementById('card-t').style.display='none'; renderArb('t'); renderLT(); }
-  else{ var i=parc_c.findIndex(function(x){return x.id===pid;}); if(i>=0)parc_c[i]=p;else parc_c.push(p); arb_c=[];pid_c=''; document.getElementById('cp-pid').value=''; document.getElementById('card-c').style.display='none'; renderArb('c'); renderLCPF(); }
+  if(t==='t'){ var i=parc_t.findIndex(function(x){return x.id===pid;}); if(i>=0)parc_t[i]=p;else parc_t.push(p); arb_t=[];pid_t=''; try{localStorage.removeItem(uk('fc-arbt'));}catch(e){} document.getElementById('t-pid').value=''; document.getElementById('card-t').style.display='none'; renderArb('t'); renderLT(); }
+  else{ var i=parc_c.findIndex(function(x){return x.id===pid;}); if(i>=0)parc_c[i]=p;else parc_c.push(p); arb_c=[];pid_c=''; try{localStorage.removeItem(uk('fc-arbc'));}catch(e){} document.getElementById('cp-pid').value=''; document.getElementById('card-c').style.display='none'; renderArb('c'); renderLCPF(); }
   updTop(); save();
 }
 
 // ═══ RENDER LISTAS ═══
-function renderLists(){ renderLT(); renderLCBit(); renderLCPF(); renderLB(); }
+function renderLists(){ renderLT(); renderLCBit(); renderLCPF(); renderLB(); renderDPO(); renderLPrend(); }
 function renderLT(){
   var c=document.getElementById('lst-t');
   if(!parc_t.length){c.innerHTML='<div class="empty">Sin parcelas aún</div>';return;}
@@ -783,7 +853,7 @@ function renderLB(){
   c.innerHTML=punt_b.map(function(p,i){ return '<div class="chip"><div><span style="font-weight:700">'+p.id+'</span><span style="color:#8E8E93;font-size:12px;margin-left:6px">'+p.n+' árb</span></div><div style="display:flex;gap:4px;align-items:center"><span class="tag tg-m">'+p.abha.toFixed(2)+' m²/ha</span><button style="background:none;border:none;cursor:pointer;color:#C7C7CC;font-size:18px;padding:4px" onclick="delP(\'b\','+i+')">×</button></div></div>'; }).join('');
 }
 function delP(t,i){
-  var map={t:[parc_t,renderLT],cb:[punt_c,renderLCBit],cp:[parc_c,renderLCPF],b:[punt_b,function(){renderLB();updBitLive();}]};
+  var map={t:[parc_t,renderLT],cb:[punt_c,renderLCBit],cp:[parc_c,renderLCPF],b:[punt_b,function(){renderLB();updBitLive();}],prend:[um_prend,renderLPrend]};
   var arr=map[t][0], fn=map[t][1];
   if(confirm('¿Eliminar '+arr[i].id+'?')){ arr.splice(i,1); fn(); updTop(); save(); }
 }
@@ -822,11 +892,55 @@ function updBitLive(){
 }
 
 // ═══ ESTADÍGRAFOS ═══
+function calcEstPrend(){
+  document.getElementById('e-nha').textContent='—';
+  document.getElementById('e-abha').textContent='—';
+  document.getElementById('e-dap').textContent='—';
+  document.getElementById('e-dg').textContent='—';
+  var rowsEl=document.getElementById('est-rows');
+  if(!um_prend.length){ rowsEl.innerHTML='<div class="empty">Ingresa unidades de muestreo</div>'; return; }
+  var n=um_prend.length;
+  var totales=um_prend.map(function(u){return u.total;});
+  var nhaArr=um_prend.map(function(u){return u.total*10000/u.sup;});
+  var mTotal=avg(totales), mNha=avg(nhaArr);
+  var sdNha=std(nhaArr), cvNha=mNha>0?sdNha/mNha*100:0;
+  var t=tval(n), emNha=t*sdNha/Math.sqrt(n), empNha=mNha>0?emNha/mNha*100:0;
+  var dpoTotal=dpo.reduce(function(s,d){return s+(d.dens||0);},0);
+  var pPrend=dpoTotal>0?mNha/dpoTotal*100:0;
+  document.getElementById('e-nha').textContent=Math.round(mNha).toLocaleString();
+  var rows='<div class="shdr" style="background:#DCFCE7;color:#14532D">Densidad de Plantación Original (DPO)</div>';
+  rows+=dpo.filter(function(d){return d.dens>0;}).map(function(d){return '<div class="sr"><span class="sl">'+(d.sp||'—')+'</span><span class="sv">'+d.dens.toLocaleString()+' pl/ha</span></div>';}).join('');
+  rows+='<div class="sr"><span class="sl" style="font-weight:700">DPO Total</span><span class="sv" style="font-weight:700">'+dpoTotal.toLocaleString()+' pl/ha</span></div>';
+  rows+='<div class="shdr" style="background:#DCFCE7;color:#14532D;margin-top:8px">Muestreo de prendimiento</div>';
+  rows+='<div class="sr"><span class="sl">N° UM · Sup.</span><span class="sv">'+n+' · '+cfg.sup+' m²</span></div>';
+  rows+='<div class="sr"><span class="sl">Media muestreal (plantas/UM)</span><span class="sv">'+mTotal.toFixed(2)+'</span></div>';
+  rows+='<div class="sr"><span class="sl">Media poblacional (pl/ha)</span><span class="sv">'+Math.round(mNha).toLocaleString()+'</span></div>';
+  rows+='<div class="sr"><span class="sl">Desv. estándar · CV%</span><span class="sv">'+sdNha.toFixed(1)+' · <span class="'+cem(cvNha)+'">'+cvNha.toFixed(1)+'%</span></span></div>';
+  rows+='<div class="sr"><span class="sl">t-Student ('+cfg.nc+'%)</span><span class="sv">'+t.toFixed(3)+'</span></div>';
+  rows+='<div class="sr"><span class="sl" style="font-weight:700">Error muestreo</span><span class="sv '+cem(empNha)+'" style="font-weight:700">'+Math.round(emNha).toLocaleString()+' pl/ha · '+empNha.toFixed(1)+'%</span></div>';
+  var pColor=pPrend>=90?'#059669':pPrend>=70?'#D97706':'#DC2626';
+  rows+='<div style="margin-top:14px;padding:16px;background:'+(pPrend>=90?'#D1FAE5':pPrend>=70?'#FEF3C7':'#FEE2E2')+';border-radius:12px;text-align:center">'
+       +'<div style="font-size:11px;color:'+pColor+';font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">% Prendimiento</div>'
+       +'<div style="font-size:42px;font-weight:800;color:'+pColor+'">'+pPrend.toFixed(1)+'%</div>'
+       +'<div style="font-size:11px;color:'+pColor+';margin-top:2px">'+Math.round(mNha).toLocaleString()+' pl/ha (T) ÷ '+dpoTotal.toLocaleString()+' pl/ha (DPO)</div></div>';
+  // Por especie
+  if(dpo.length>1){
+    rows+='<div class="shdr sh-g" style="margin-top:10px">Prendimiento por especie</div>';
+    dpo.forEach(function(d,i){
+      var valsEsp=um_prend.map(function(u){return (u.vals[i]||0)*10000/u.sup;});
+      var mEsp=avg(valsEsp);
+      var pEsp=d.dens>0?mEsp/d.dens*100:0;
+      rows+='<div class="sr"><span class="sl">'+(d.sp||'Esp.'+(i+1))+' — '+Math.round(mEsp).toLocaleString()+' / '+d.dens.toLocaleString()+' pl/ha</span><span class="sv '+(pEsp>=90?'ok':pEsp>=70?'warn':'bad')+'">'+pEsp.toFixed(1)+'%</span></div>';
+    });
+  }
+  rowsEl.innerHTML=rows;
+}
 function calcEst(){
-  var parc=metodo==='trad'?parc_t:parc_c, punts=metodo==='comb'?punt_c:punt_b;
-  var allA=parc.reduce(function(a,p){return a.concat(p.arboles);},[]);
   document.getElementById('est-bit-card').style.display='none';
   document.getElementById('e-vol-row').style.display='none';
+  if(metodo==='prend'){ calcEstPrend(); return; }
+  var parc=metodo==='trad'?parc_t:parc_c, punts=metodo==='comb'?punt_c:punt_b;
+  var allA=parc.reduce(function(a,p){return a.concat(p.arboles);},[]);
   if(metodo==='bit'){
     document.getElementById('e-nha').textContent='—'; document.getElementById('e-dap').textContent='—'; document.getElementById('e-dg').textContent='—';
     if(punts.length){
@@ -884,7 +998,32 @@ function renderCharts(){
 }
 
 // ═══ RESUMEN ═══
+function renderResPrend(){
+  var n=um_prend.length;
+  var dpoTotal=dpo.reduce(function(s,d){return s+(d.dens||0);},0);
+  var nhaArr=um_prend.map(function(u){return u.total*10000/u.sup;});
+  var mNha=n?avg(nhaArr):null;
+  var pPrend=(dpoTotal>0&&mNha)?mNha/dpoTotal*100:null;
+  var html='<div style="background:linear-gradient(135deg,#15803D,#166534);border-radius:10px;padding:14px 16px;margin-bottom:14px"><div style="font-size:14px;font-weight:700;color:#fff;margin-bottom:3px">Informe de verificación de prendimiento</div><div style="font-size:11px;color:rgba(255,255,255,.7)">'+new Date().toLocaleDateString('es-CL')+' · Forestación / Reforestación · '+(CU?CU.name:'')+'</div></div>';
+  html+='<div class="shdr sh-v">Datos del predio</div>';
+  var admRows=[['PMBN',adm.pmbn],['Propietario',adm.prop],['Predio',adm.predio],['Rol/Folio',adm.rol],['Región',adm.region],['Provincia',adm.provincia||adm.prov],['Comuna',adm.comuna],['Profesional',adm.prof],['Fecha',adm.fecha]];
+  html+=admRows.filter(function(r){return r[1];}).map(function(r){return '<div class="arow"><span class="al">'+r[0]+'</span><span class="av">'+r[1]+'</span></div>';}).join('');
+  html+='<div class="shdr" style="background:#DCFCE7;color:#14532D;margin-top:10px">Plantación</div>';
+  html+='<div class="arow"><span class="al">DPO Total</span><span class="av">'+dpoTotal.toLocaleString()+' pl/ha</span></div>';
+  dpo.filter(function(d){return d.dens>0;}).forEach(function(d){ html+='<div class="arow"><span class="al">— '+(d.sp||'—')+'</span><span class="av">'+d.dens.toLocaleString()+' pl/ha</span></div>'; });
+  html+='<div class="shdr" style="background:#DCFCE7;color:#14532D;margin-top:10px">Muestreo</div>';
+  html+='<div class="arow"><span class="al">N° unidades de muestreo</span><span class="av">'+n+' · '+cfg.sup+' m²</span></div>';
+  if(mNha) html+='<div class="arow"><span class="al">Densidad muestreada</span><span class="av">'+Math.round(mNha).toLocaleString()+' pl/ha</span></div>';
+  if(pPrend!==null){
+    var ok=pPrend>=90;
+    html+='<div style="margin-top:10px;padding:14px;background:'+(ok?'#D1FAE5':'#FEE2E2')+';border-radius:10px;text-align:center">'
+      +'<div style="font-size:11px;color:'+(ok?'#065F46':'#991B1B')+';font-weight:700;text-transform:uppercase">% Prendimiento</div>'
+      +'<div style="font-size:36px;font-weight:800;color:'+(ok?'#065F46':'#991B1B')+'">'+pPrend.toFixed(1)+'%</div></div>';
+  }
+  document.getElementById('res-content').innerHTML=html;
+}
 function renderRes(){
+  if(metodo==='prend'){ renderResPrend(); return; }
   var parc=metodo==='trad'?parc_t:parc_c, punts=metodo==='comb'?punt_c:punt_b;
   var allA=parc.reduce(function(a,p){return a.concat(p.arboles);},[]);
   var mNha=parc.length?avg(parc.map(function(p){return p.nha;})):null;
@@ -1009,8 +1148,38 @@ function toUTM(lat,lon,zona){
 function limpiar(){ parc_t=[];arb_t=[];pid_t='';parc_c=[];arb_c=[];pid_c='';punt_c=[];punt_b=[]; ['card-t','card-c','bit-live'].forEach(function(id){var e=document.getElementById(id);if(e)e.style.display='none';}); renderLists(); updTop(); save(); }
 
 // ═══ EXPORTAR ═══
+function expXLSXPrend(){
+  if(!um_prend.length){alert('Sin datos para exportar');return;}
+  var wb=XLSX.utils.book_new();
+  var dpoTotal=dpo.reduce(function(s,d){return s+(d.dens||0);},0);
+  var nhaArr=um_prend.map(function(u){return u.total*10000/u.sup;});
+  var mNha=avg(nhaArr), sdNha=std(nhaArr), cvNha=mNha>0?sdNha/mNha*100:0;
+  var t=tval(um_prend.length), emNha=t*sdNha/Math.sqrt(um_prend.length);
+  var pPrend=dpoTotal>0?mNha/dpoTotal*100:0;
+  var rows=[['ForestCheck — Verificación de Prendimiento'],['Fecha',new Date().toLocaleDateString('es-CL'),'Usuario',CU?CU.name:''],[],
+    ['PREDIO'],['PMBN',adm.pmbn||''],['Propietario',adm.prop||''],['Predio',adm.predio||''],['Región',adm.region||''],['Provincia',adm.provincia||adm.prov||''],['Comuna',adm.comuna||''],[],
+    ['DENSIDAD DE PLANTACIÓN ORIGINAL (DPO)']];
+  dpo.filter(function(d){return d.dens>0;}).forEach(function(d){rows.push([d.sp,d.dens]);});
+  rows.push(['DPO Total',dpoTotal],[],
+    ['ESTADÍGRAFOS DEL MUESTREO'],
+    ['N° UM',um_prend.length],['Superficie UM (m²)',cfg.sup],
+    ['Media muestreal (pl/UM)',parseFloat(avg(um_prend.map(function(u){return u.total;})).toFixed(2))],
+    ['Media poblacional (pl/ha)',Math.round(mNha)],
+    ['Desv. estándar (pl/ha)',parseFloat(sdNha.toFixed(2))],
+    ['CV%',parseFloat(cvNha.toFixed(2))],
+    ['t-Student',parseFloat(t.toFixed(3))],
+    ['Error de muestreo (pl/ha)',Math.round(emNha)],
+    [],['% PRENDIMIENTO',parseFloat(pPrend.toFixed(1))]);
+  var ws=XLSX.utils.aoa_to_sheet(rows); ws['!cols']=[{wch:30},{wch:16},{wch:16},{wch:16}];
+  XLSX.utils.book_append_sheet(wb,ws,'RESUMEN');
+  var ur=[['UM','Sup. m²'].concat(dpo.map(function(d){return d.sp;})).concat(['Total','N/ha','Coord.E','Coord.N'])];
+  um_prend.forEach(function(u){ ur.push([u.id,u.sup].concat(u.vals).concat([u.total,Math.round(u.total*10000/u.sup),u.coordE||'',u.coordN||''])); });
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(ur),'UNIDADES DE MUESTREO');
+  XLSX.writeFile(wb,'ForestCheck_Prendimiento_'+new Date().toISOString().slice(0,10)+'.xlsx');
+}
 function expXLSX(){
   if(!window.XLSX){alert('Exportando como CSV (Excel cargando...)');expCSV();return;}
+  if(metodo==='prend'){ expXLSXPrend(); return; }
   var parc=metodo==='trad'?parc_t:parc_c, punts=metodo==='comb'?punt_c:punt_b;
   if(!parc.length&&!punts.length){alert('Sin datos para exportar');return;}
   var wb=XLSX.utils.book_new();
@@ -1025,7 +1194,20 @@ function expXLSX(){
   var ar=[['Parcela','N','Especie','DAP cm','Clase','g m²','Altura m']]; parc.forEach(function(p){p.arboles.forEach(function(a){ar.push([p.id,a.id,a.sp,a.dap,cls(a.dap),parseFloat(ga(a.dap).toFixed(6)),a.alt||'']);});}); XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(ar),'ÁRBOL A ÁRBOL'); }
   XLSX.writeFile(wb,'ForestCheck_'+new Date().toISOString().slice(0,10)+'.xlsx');
 }
+function expCSVPrend(){
+  if(!um_prend.length){alert('Sin datos para exportar');return;}
+  var dpoTotal=dpo.reduce(function(s,d){return s+(d.dens||0);},0);
+  var nhaArr=um_prend.map(function(u){return u.total*10000/u.sup;});
+  var mNha=avg(nhaArr), pPrend=dpoTotal>0?mNha/dpoTotal*100:0;
+  var csv='ForestCheck — Prendimiento\nFecha,'+new Date().toLocaleDateString('es-CL')+'\nUsuario,'+(CU?CU.name:'')+'\nPredio,'+(adm.predio||'')+'\n\n';
+  csv+='DPO Total,'+dpoTotal+'\nMedia poblacional (pl/ha),'+Math.round(mNha)+'\n% Prendimiento,'+pPrend.toFixed(1)+'\n\n';
+  csv+='UM,Sup m2,'+dpo.map(function(d){return d.sp;}).join(',')+',Total,N/ha\n';
+  um_prend.forEach(function(u){ csv+=u.id+','+u.sup+','+u.vals.join(',')+','+u.total+','+Math.round(u.total*10000/u.sup)+'\n'; });
+  var blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
+  var url=URL.createObjectURL(blob); var a=document.createElement('a'); a.href=url; a.download='ForestCheck_Prendimiento_'+new Date().toISOString().slice(0,10)+'.csv'; a.click(); URL.revokeObjectURL(url);
+}
 function expCSV(){
+  if(metodo==='prend'){ expCSVPrend(); return; }
   var parc=metodo==='trad'?parc_t:parc_c, punts=metodo==='comb'?punt_c:punt_b;
   var csv='ForestCheck\nFecha,'+new Date().toLocaleDateString('es-CL')+'\nMétodo,'+metodo+'\nUsuario,'+(CU?CU.name:'')+'\nPredio,'+(adm.predio||'')+'\n\n';
   if(punts.length){ csv+='BITTERLICH\nPunto,N,FAB,AB/ha,Coord.E,Coord.N\n'; punts.forEach(function(p){csv+=p.id+','+p.n+','+p.fab+','+p.abha.toFixed(4)+','+(p.e||'')+','+(p.norte||'')+'\n';}); csv+='\n'; }
@@ -1035,7 +1217,74 @@ function expCSV(){
 }
 
 // ═══ EXPORTAR PDF ═══
+function expPDFPrend(){
+  if(!um_prend.length){alert('Sin datos para exportar');return;}
+  var dpoTotal=dpo.reduce(function(s,d){return s+(d.dens||0);},0);
+  var nhaArr=um_prend.map(function(u){return u.total*10000/u.sup;});
+  var mNha=avg(nhaArr), sdNha=std(nhaArr), cvNha=mNha>0?sdNha/mNha*100:0;
+  var t=tval(um_prend.length), emNha=t*sdNha/Math.sqrt(um_prend.length), empNha=mNha>0?emNha/mNha*100:0;
+  var pPrend=dpoTotal>0?mNha/dpoTotal*100:0;
+  var ok=pPrend>=90;
+
+  var css='body{font-family:Arial,sans-serif;margin:0;padding:20px;color:#1C1C1E;font-size:13px}'
+    +'.pg{max-width:780px;margin:0 auto}'
+    +'.hdr{border-bottom:3px solid #15803D;padding-bottom:10px;margin-bottom:16px}'
+    +'.hdr-t{font-size:20px;font-weight:700;color:#15803D}'
+    +'.hdr-s{font-size:11px;color:#666;margin-top:3px}'
+    +'.sec{margin-bottom:14px}'
+    +'.sec-t{font-size:11px;font-weight:700;color:#15803D;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid #E5E5EA;padding-bottom:3px;margin-bottom:8px}'
+    +'.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}'
+    +'.fld{font-size:12px}.fld-l{color:#666;display:block;margin-bottom:1px;font-size:11px}.fld-v{font-weight:600}'
+    +'.tbl{width:100%;border-collapse:collapse;font-size:11px;margin-top:6px}'
+    +'.tbl th{background:#15803D;color:#fff;padding:5px 8px;text-align:center}'
+    +'.tbl td{padding:4px 8px;border-bottom:1px solid #E5E5EA;text-align:center}'
+    +'.tbl tr:nth-child(even) td{background:#F8F8F8}'
+    +'.pbox{margin-top:12px;padding:18px;border-radius:10px;text-align:center}'
+    +'.ftr{margin-top:18px;padding-top:6px;border-top:1px solid #E5E5EA;font-size:10px;color:#999;text-align:center}'
+    +'@media print{body{padding:0}}';
+
+  var html='<div class="pg"><div class="hdr"><div class="hdr-t">🌱 ForestCheck — Verificación de Prendimiento</div>'
+    +'<div class="hdr-s">'+new Date().toLocaleDateString('es-CL')+' · Forestación / Reforestación · '+(CU?CU.name:'')+'</div></div>';
+
+  html+='<div class="sec"><div class="sec-t">Datos del Predio</div><div class="grid">';
+  var admRows=[['PMBN / Expediente',adm.pmbn],['Fecha verificación',adm.fecha],['Propietario',adm.prop],['Predio',adm.predio],['Rol / Folio',adm.rol],['Profesional',adm.prof],['Región',adm.region],['Provincia',adm.provincia||adm.prov],['Comuna',adm.comuna]];
+  admRows.filter(function(r){return r[1];}).forEach(function(r){ html+='<div class="fld"><span class="fld-l">'+r[0]+'</span><span class="fld-v">'+r[1]+'</span></div>'; });
+  html+='</div></div>';
+
+  html+='<div class="sec"><div class="sec-t">Densidad de Plantación Original (DPO)</div>';
+  html+='<table class="tbl"><thead><tr><th>Especie</th><th>Plantas/ha</th></tr></thead><tbody>';
+  dpo.filter(function(d){return d.dens>0;}).forEach(function(d){ html+='<tr><td>'+d.sp+'</td><td>'+d.dens.toLocaleString()+'</td></tr>'; });
+  html+='<tr><td><strong>Total</strong></td><td><strong>'+dpoTotal.toLocaleString()+'</strong></td></tr></tbody></table></div>';
+
+  html+='<div class="sec"><div class="sec-t">Estadígrafos del Muestreo</div><div class="grid">';
+  html+='<div class="fld"><span class="fld-l">N° UM</span><span class="fld-v">'+um_prend.length+'</span></div>';
+  html+='<div class="fld"><span class="fld-l">Superficie UM</span><span class="fld-v">'+cfg.sup+' m²</span></div>';
+  html+='<div class="fld"><span class="fld-l">Media poblacional</span><span class="fld-v">'+Math.round(mNha).toLocaleString()+' pl/ha</span></div>';
+  html+='<div class="fld"><span class="fld-l">CV%</span><span class="fld-v">'+cvNha.toFixed(1)+'%</span></div>';
+  html+='<div class="fld"><span class="fld-l">t-Student ('+cfg.nc+'%)</span><span class="fld-v">'+t.toFixed(3)+'</span></div>';
+  html+='<div class="fld"><span class="fld-l">Error de muestreo</span><span class="fld-v">'+empNha.toFixed(1)+'%</span></div>';
+  html+='</div></div>';
+
+  html+='<div class="pbox" style="background:'+(ok?'#D1FAE5':'#FEE2E2')+'">'
+    +'<div style="font-size:11px;color:'+(ok?'#065F46':'#991B1B')+';font-weight:700;text-transform:uppercase">% Prendimiento</div>'
+    +'<div style="font-size:36px;font-weight:800;color:'+(ok?'#065F46':'#991B1B')+'">'+pPrend.toFixed(1)+'%</div>'
+    +'<div style="font-size:11px;color:'+(ok?'#065F46':'#991B1B')+'">'+Math.round(mNha).toLocaleString()+' pl/ha muestreado ÷ '+dpoTotal.toLocaleString()+' pl/ha DPO</div></div>';
+
+  html+='<div class="sec" style="margin-top:14px"><div class="sec-t">Unidades de Muestreo</div>';
+  html+='<table class="tbl"><thead><tr><th>UM</th>'+dpo.map(function(d){return '<th>'+d.sp+'</th>';}).join('')+'<th>Total</th><th>N/ha</th></tr></thead><tbody>';
+  um_prend.forEach(function(u){ html+='<tr><td>'+u.id+'</td>'+u.vals.map(function(v){return '<td>'+v+'</td>';}).join('')+'<td>'+u.total+'</td><td>'+Math.round(u.total*10000/u.sup)+'</td></tr>'; });
+  html+='</tbody></table></div>';
+
+  html+='<div class="ftr">ForestCheck · Verificación de Prendimiento · '+new Date().toLocaleDateString('es-CL')+'</div></div>';
+
+  var w=window.open('','_blank');
+  if(!w){alert('Activa ventanas emergentes para exportar PDF');return;}
+  w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>ForestCheck - Prendimiento</title><style>'+css+'</style></head><body>'+html+'</body></html>');
+  w.document.close();
+  setTimeout(function(){ w.print(); },600);
+}
 function expPDF(){
+  if(metodo==='prend'){ expPDFPrend(); return; }
   var parc=metodo==='trad'?parc_t:parc_c, punts=metodo==='comb'?punt_c:punt_b;
   var allA=parc.reduce(function(a,p){return a.concat(p.arboles);},[]);
   var mNha=parc.length?avg(parc.map(function(p){return p.nha;})):null;
@@ -1123,6 +1372,66 @@ function expPDF(){
   w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>ForestCheck - Informe</title><style>'+css+'</style></head><body>'+html+'</body></html>');
   w.document.close();
   setTimeout(function(){ w.print(); },600);
+}
+
+// ═══ PRENDIMIENTO — DPO ═══
+function renderDPO(){
+  var c=document.getElementById('dpo-rows');
+  c.innerHTML=dpo.map(function(d,i){
+    return '<div class="r2" style="margin-bottom:6px;align-items:end">'
+      +'<div><span class="lbl">Especie</span><input class="inp" type="text" value="'+d.sp+'" oninput="dpo['+i+'].sp=this.value;updDPOTotal();save()" placeholder="Pi"></div>'
+      +'<div style="display:flex;gap:6px;align-items:center">'
+      +'<div style="flex:1"><span class="lbl">Plantas/ha</span><input class="inp" type="number" value="'+d.dens+'" oninput="dpo['+i+'].dens=+this.value||0;updDPOTotal();save()" placeholder="800"></div>'
+      +(dpo.length>1?'<button onclick="delDPO('+i+')" style="background:none;border:none;cursor:pointer;color:#C7C7CC;font-size:20px;padding:6px 4px;margin-top:18px">×</button>':'<span style="width:28px"></span>')
+      +'</div></div>';
+  }).join('');
+  updDPOTotal();
+  renderPrendSpInputs();
+}
+function updDPOTotal(){
+  var tot=dpo.reduce(function(s,d){return s+(d.dens||0);},0);
+  var el=document.getElementById('dpo-total'); if(el) el.textContent=tot.toLocaleString();
+}
+function addDPO(){ if(dpo.length>=4){alert('Máximo 4 especies');return;} dpo.push({sp:'',dens:0}); renderDPO(); save(); }
+function delDPO(i){ if(dpo.length<=1)return; dpo.splice(i,1); renderDPO(); save(); }
+
+function renderPrendSpInputs(){
+  var c=document.getElementById('pr-sp-rows');
+  if(!c) return;
+  c.innerHTML='<div class="lbl" style="margin-top:0">Plantas vivas contadas (por especie)</div>'
+    +'<div class="r2" style="gap:8px;flex-wrap:wrap;display:grid;grid-template-columns:repeat(2,1fr)">'
+    +dpo.map(function(d,i){ return '<div><span class="lbl" style="margin-top:4px">'+(d.sp||'Esp.'+(i+1))+'</span><input class="inp" type="number" id="pr-sp-'+i+'" min="0" step="1" inputmode="numeric" placeholder="0" oninput="prevPrend()"></div>'; }).join('')
+    +'</div>';
+}
+function prevPrend(){
+  var tot=0;
+  dpo.forEach(function(d,i){ var e=document.getElementById('pr-sp-'+i); if(e&&e.value) tot+=+e.value; });
+  if(tot>0){ document.getElementById('pr-tot-p').textContent=tot; document.getElementById('pr-prev').style.display='block'; }
+  else document.getElementById('pr-prev').style.display='none';
+}
+function saveUM(){
+  var id=document.getElementById('pr-pid').value.trim();
+  if(!id){alert('Indica el N° de UM');return;}
+  var vals=dpo.map(function(d,i){ var e=document.getElementById('pr-sp-'+i); return e&&e.value?+e.value:0; });
+  var tot=vals.reduce(function(s,v){return s+v;},0);
+  if(tot<=0){alert('Ingresa al menos una planta viva');return;}
+  var eEl=document.getElementById('pr-e'), nEl=document.getElementById('pr-norte');
+  var um={id:id,vals:vals,total:tot,sup:cfg.sup,coordE:eEl?+eEl.value||null:null,coordN:nEl?+nEl.value||null:null};
+  var i=um_prend.findIndex(function(x){return x.id===id;}); if(i>=0)um_prend[i]=um;else um_prend.push(um);
+  document.getElementById('pr-pid').value='';
+  dpo.forEach(function(d,i){ var e=document.getElementById('pr-sp-'+i); if(e) e.value=''; });
+  document.getElementById('pr-prev').style.display='none';
+  renderLPrend(); updTop(); save();
+}
+function renderLPrend(){
+  var c=document.getElementById('lst-prend');
+  if(!um_prend.length){c.innerHTML='<div class="empty">Sin UM aún</div>';return;}
+  c.innerHTML=um_prend.map(function(u,i){
+    var nha=Math.round(u.total*10000/u.sup);
+    return '<div class="chip"><div><span style="font-weight:700">'+u.id+'</span><span style="color:#8E8E93;font-size:12px;margin-left:6px">'+u.total+' pl. · '+u.sup+'m²</span></div>'
+      +'<div style="display:flex;gap:4px;align-items:center"><span class="tag" style="background:#DCFCE7;color:#14532D">'+nha.toLocaleString()+' pl/ha</span>'
+      +'<button style="background:none;border:none;cursor:pointer;color:#C7C7CC;font-size:18px;padding:4px" onclick="delP(\'prend\','+i+')">×</button></div></div>';
+  }).join('');
 }
 
 // ═══ CARGAR LIBRERÍAS EXTERNAS DE FORMA ASÍNCRONA ═══
