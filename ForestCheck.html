@@ -1283,32 +1283,6 @@ function expPDFPrend(){
   var w=window.open('','_blank');
   if(!w){alert('Activa ventanas emergentes para exportar PDF');return;}
   w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>ForestCheck - Prendimiento</title><style>'+css+'
-/* ══ PROYECTOS ══ */
-#sproj{background:#F2F2F7;flex-direction:column}
-.proj-card{background:#fff;border-radius:14px;padding:14px 16px;margin-bottom:10px;border:1px solid #E5E5EA;cursor:pointer;display:flex;justify-content:space-between;align-items:center}
-.proj-card:active{opacity:.8}
-.proj-tipo{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:3px 8px;border-radius:6px;margin-bottom:4px;display:inline-block}
-.pt-pmbn{background:#D1FAE5;color:#065F46}
-.pt-pmpf{background:#DBEAFE;color:#1E40AF}
-.pt-for{background:#FEF3C7;color:#92400E}
-.proj-nombre{font-size:15px;font-weight:700;color:#1C1C1E}
-.proj-sub{font-size:12px;color:#8E8E93;margin-top:2px}
-.proj-arrow{font-size:20px;color:#C7C7CC}
-.rodal-card{background:#fff;border-radius:12px;padding:12px 14px;margin-bottom:8px;border:1px solid #E5E5EA;cursor:pointer;display:flex;justify-content:space-between;align-items:center}
-.rodal-card:active{opacity:.8}
-.rodal-num{width:36px;height:36px;border-radius:10px;background:#1A3D28;color:#fff;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.rodal-info{flex:1;margin-left:10px}
-.rodal-nombre{font-size:14px;font-weight:600;color:#1C1C1E}
-.rodal-met{font-size:11px;color:#8E8E93;margin-top:2px}
-.modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:200;display:none;align-items:flex-end;justify-content:center}
-.modal-overlay.show{display:flex}
-.modal-box{background:#fff;border-radius:20px 20px 0 0;padding:24px 20px 40px;width:100%;max-width:480px;max-height:85vh;overflow-y:auto}
-.modal-title{font-size:17px;font-weight:700;margin-bottom:16px;color:#1C1C1E}
-.modal-lbl{font-size:12px;font-weight:600;color:#3C3C43;display:block;margin-bottom:5px;margin-top:12px}
-.modal-inp{width:100%;padding:11px 13px;border:1.5px solid #E5E5EA;border-radius:10px;font-size:15px;background:#fff;-webkit-appearance:none;outline:none;font-family:inherit}
-.modal-inp:focus{border-color:#2D6A4F}
-.modal-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-
 </style></head><body>'+html+'</body></html>');
   w.document.close();
   setTimeout(function(){ w.print(); },600);
@@ -1400,32 +1374,6 @@ function expPDF(){
   var w=window.open('','_blank');
   if(!w){alert('Activa ventanas emergentes para exportar PDF');return;}
   w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>ForestCheck - Informe</title><style>'+css+'
-/* ══ PROYECTOS ══ */
-#sproj{background:#F2F2F7;flex-direction:column}
-.proj-card{background:#fff;border-radius:14px;padding:14px 16px;margin-bottom:10px;border:1px solid #E5E5EA;cursor:pointer;display:flex;justify-content:space-between;align-items:center}
-.proj-card:active{opacity:.8}
-.proj-tipo{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:3px 8px;border-radius:6px;margin-bottom:4px;display:inline-block}
-.pt-pmbn{background:#D1FAE5;color:#065F46}
-.pt-pmpf{background:#DBEAFE;color:#1E40AF}
-.pt-for{background:#FEF3C7;color:#92400E}
-.proj-nombre{font-size:15px;font-weight:700;color:#1C1C1E}
-.proj-sub{font-size:12px;color:#8E8E93;margin-top:2px}
-.proj-arrow{font-size:20px;color:#C7C7CC}
-.rodal-card{background:#fff;border-radius:12px;padding:12px 14px;margin-bottom:8px;border:1px solid #E5E5EA;cursor:pointer;display:flex;justify-content:space-between;align-items:center}
-.rodal-card:active{opacity:.8}
-.rodal-num{width:36px;height:36px;border-radius:10px;background:#1A3D28;color:#fff;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.rodal-info{flex:1;margin-left:10px}
-.rodal-nombre{font-size:14px;font-weight:600;color:#1C1C1E}
-.rodal-met{font-size:11px;color:#8E8E93;margin-top:2px}
-.modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:200;display:none;align-items:flex-end;justify-content:center}
-.modal-overlay.show{display:flex}
-.modal-box{background:#fff;border-radius:20px 20px 0 0;padding:24px 20px 40px;width:100%;max-width:480px;max-height:85vh;overflow-y:auto}
-.modal-title{font-size:17px;font-weight:700;margin-bottom:16px;color:#1C1C1E}
-.modal-lbl{font-size:12px;font-weight:600;color:#3C3C43;display:block;margin-bottom:5px;margin-top:12px}
-.modal-inp{width:100%;padding:11px 13px;border:1.5px solid #E5E5EA;border-radius:10px;font-size:15px;background:#fff;-webkit-appearance:none;outline:none;font-family:inherit}
-.modal-inp:focus{border-color:#2D6A4F}
-.modal-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-
 </style></head><body>'+html+'</body></html>');
   w.document.close();
   setTimeout(function(){ w.print(); },600);
