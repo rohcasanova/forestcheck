@@ -1282,8 +1282,7 @@ function expPDFPrend(){
 
   var w=window.open('','_blank');
   if(!w){alert('Activa ventanas emergentes para exportar PDF');return;}
-  w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>ForestCheck - Prendimiento</title><style>'+css+'
-</style></head><body>'+html+'</body></html>');
+  w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>ForestCheck - Prendimiento<\/title><\/head><body><!-- CSS inline --></head><body>'+html+'</body></html>');
   w.document.close();
   setTimeout(function(){ w.print(); },600);
 }
@@ -1373,8 +1372,7 @@ function expPDF(){
 
   var w=window.open('','_blank');
   if(!w){alert('Activa ventanas emergentes para exportar PDF');return;}
-  w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>ForestCheck - Informe</title><style>'+css+'
-</style></head><body>'+html+'</body></html>');
+  w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>ForestCheck - Informe<\/title>\u003cstyle\u003e'+css+'\u003c\/style\u003e<\/head><body>'+html+'<\/body><\/html>');
   w.document.close();
   setTimeout(function(){ w.print(); },600);
 }
