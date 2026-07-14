@@ -171,6 +171,48 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-se
 .urow{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border:1px solid #E5E5EA;border-radius:10px;margin-bottom:7px}
 .uav{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0}
 
+
+/* ══ VERIFICACIONES ══ */
+#sver{background:#F2F2F7;flex-direction:column}
+.ver-card{background:#fff;border-radius:14px;padding:14px 16px;margin-bottom:10px;border:1px solid #E5E5EA;display:flex;justify-content:space-between;align-items:center;box-shadow:0 1px 4px rgba(0,0,0,.05);cursor:pointer}
+.ver-card:active{opacity:.85}
+.ver-tipo{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:3px 8px;border-radius:6px;margin-bottom:5px;display:inline-block}
+.vt-pmbn{background:#D1FAE5;color:#065F46}
+.vt-pmpf{background:#DBEAFE;color:#1E40AF}
+.vt-for{background:#FEF3C7;color:#92400E}
+.ver-nombre{font-size:15px;font-weight:700;color:#1C1C1E;margin-bottom:2px}
+.ver-sub{font-size:12px;color:#8E8E93}
+.ver-analistas{font-size:11px;color:#8E8E93;margin-top:3px;font-style:italic}
+.ver-arrow{font-size:22px;color:#C7C7CC;flex-shrink:0;margin-left:10px}
+.ver-empty{text-align:center;padding:48px 20px;color:#8E8E93}
+.ver-empty-icon{font-size:44px;margin-bottom:10px}
+.ver-empty-title{font-size:15px;font-weight:600;color:#3C3C43;margin-bottom:6px}
+.ver-empty-sub{font-size:13px;line-height:1.5}
+.fab-bar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;padding:12px;background:#F2F2F7;border-top:1px solid #E5E5EA;z-index:50}
+
+/* RODALES */
+#srodal{background:#F2F2F7;flex-direction:column}
+.rodal-card{background:#fff;border-radius:12px;padding:12px 14px;margin-bottom:8px;border:1px solid #E5E5EA;cursor:pointer;display:flex;align-items:center;gap:10px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.rodal-card:active{opacity:.85}
+.rodal-num{width:36px;height:36px;border-radius:10px;background:#1A3D28;color:#fff;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.rodal-info{flex:1}
+.rodal-nombre{font-size:14px;font-weight:600;color:#1C1C1E}
+.rodal-met{font-size:11px;color:#8E8E93;margin-top:2px}
+.rodal-arrow{font-size:20px;color:#C7C7CC;flex-shrink:0}
+
+/* MODAL */
+.modal-bg{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.45);z-index:200;display:none;align-items:flex-end;justify-content:center}
+.modal-bg.open{display:flex}
+.modal-sheet{background:#fff;border-radius:20px 20px 0 0;padding:20px 20px 36px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto}
+.modal-handle{width:36px;height:4px;background:#E5E5EA;border-radius:2px;margin:0 auto 16px}
+.modal-h{font-size:17px;font-weight:700;color:#1C1C1E;margin-bottom:14px}
+.mlbl{font-size:12px;font-weight:600;color:#3C3C43;display:block;margin-bottom:4px;margin-top:10px}
+.mlbl:first-of-type{margin-top:0}
+.minp{width:100%;padding:11px 13px;border:1.5px solid #E5E5EA;border-radius:10px;font-size:15px;background:#fff;-webkit-appearance:none;outline:none;font-family:inherit}
+.minp:focus{border-color:#2D6A4F}
+.mrow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.mbtn-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+
 </style>
 </head>
 <body>
@@ -220,6 +262,205 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-se
 
 
 
+
+<!-- ═══ MIS VERIFICACIONES ═══ -->
+<div class="screen" id="sver">
+  <div class="topbar">
+    <div class="top-left">
+      <div class="top-icon">
+        <svg width="18" height="18" viewBox="0 0 80 80" fill="none">
+          <path d="M40 8 L58 36 H46 L60 56 H48 L62 76 H18 L32 56 H20 L34 36 H22 Z" fill="white" opacity=".9"/>
+        </svg>
+      </div>
+      <div>
+        <div class="top-title">ForestCheck</div>
+        <div class="top-sub">Mis verificaciones</div>
+      </div>
+    </div>
+    <div class="top-right">
+      <div class="top-user" id="ver-user">—</div>
+      <div class="top-role" id="ver-role">—</div>
+      <div class="top-logout" onclick="cerrar()">Cerrar sesión</div>
+    </div>
+  </div>
+  <div style="padding:14px 12px 24px">
+    <button class="btn btn-p" onclick="abrirModalVer()" style="margin-bottom:14px">+ Nueva verificación</button>
+    <div style="font-size:11px;font-weight:700;color:#8E8E93;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Mis verificaciones</div>
+    <div id="lista-ver">
+      <div class="ver-empty">
+        <div class="ver-empty-icon">🌲</div>
+        <div class="ver-empty-title">Sin verificaciones aún</div>
+        <div class="ver-empty-sub">Toca el botón de arriba<br>para comenzar</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ RODALES ═══ -->
+<div class="screen" id="srodal">
+  <div class="topbar">
+    <div class="top-left">
+      <div onclick="show('sver')" style="cursor:pointer;color:#fff;font-size:13px;font-weight:600;padding:6px 10px;background:rgba(255,255,255,.15);border-radius:8px">‹ Volver</div>
+      <div>
+        <div class="top-title" id="rodal-predio">Verificación</div>
+        <div class="top-sub" id="rodal-exp">—</div>
+      </div>
+    </div>
+    <div class="top-right">
+      <div class="top-user" id="rodal-user">—</div>
+      <div class="top-logout" onclick="cerrar()">Cerrar sesión</div>
+    </div>
+  </div>
+  <div style="padding:14px 12px 90px">
+    <div id="lista-rodales">
+      <div class="ver-empty">
+        <div class="ver-empty-icon">📍</div>
+        <div class="ver-empty-title">Sin rodales aún</div>
+        <div class="ver-empty-sub">Toca "+ Nuevo rodal"<br>para agregar</div>
+      </div>
+    </div>
+  </div>
+  <div class="fab-bar">
+    <button class="btn btn-p" onclick="abrirModalRodal()">+ Nuevo rodal</button>
+  </div>
+</div>
+
+<!-- ═══ MODAL NUEVA VERIFICACIÓN ═══ -->
+<div class="modal-bg" id="modal-ver">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-h">Nueva verificación</div>
+    <div class="mrow">
+      <div>
+        <span class="mlbl">Tipo</span>
+        <select class="minp" id="mv-tipo" onchange="updTipoVer()">
+          <option value="PMBN">PMBN</option>
+          <option value="PMPF">PMPF</option>
+          <option value="Forestación">Forestación</option>
+        </select>
+      </div>
+      <div>
+        <span class="mlbl" id="mv-exp-lbl">N° Solicitud</span>
+        <input class="minp" type="text" id="mv-exp" placeholder="2024-001" autocomplete="off">
+      </div>
+    </div>
+    <span class="mlbl">Propietario</span>
+    <input class="minp" type="text" id="mv-prop" placeholder="Nombre del propietario" autocomplete="off">
+    <span class="mlbl">Nombre del Predio</span>
+    <input class="minp" type="text" id="mv-predio" placeholder="Nombre del predio" autocomplete="off">
+    <span class="mlbl">ROL</span>
+    <input class="minp" type="text" id="mv-rol" placeholder="XX-YY" autocomplete="off">
+    <span class="mlbl">Fecha de verificación</span>
+    <input class="minp" type="date" id="mv-fecha">
+    <div class="mrow" style="margin-top:10px">
+      <div>
+        <span class="mlbl">Provincia</span>
+        <select class="minp" id="mv-prov" onchange="updComunasVer()">
+          <option value="">-- Selecciona --</option>
+          <option value="Cautín">Cautín</option>
+          <option value="Malleco">Malleco</option>
+        </select>
+      </div>
+      <div>
+        <span class="mlbl">Comuna</span>
+        <select class="minp" id="mv-comuna">
+          <option value="">-- Provincia --</option>
+        </select>
+      </div>
+    </div>
+    <span class="mlbl">Analistas participantes</span>
+    <input class="minp" type="text" id="mv-analistas" placeholder="Nombre 1, Nombre 2..." autocomplete="off">
+    <div class="mbtn-row">
+      <button class="btn" onclick="cerrarModalVer()">Cancelar</button>
+      <button class="btn btn-p" onclick="guardarVer()">Crear</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL NUEVO RODAL ═══ -->
+<div class="modal-bg" id="modal-rodal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-h">Nuevo rodal</div>
+
+    <!-- 1. PLAN DE MANEJO -->
+    <div style="font-size:11px;font-weight:700;color:#8E8E93;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">📄 Plan de manejo</div>
+    <div class="mrow">
+      <div>
+        <span class="mlbl">N° Rodal</span>
+        <input class="minp" type="number" id="mr-num" placeholder="1" min="1" inputmode="numeric">
+      </div>
+      <div>
+        <span class="mlbl">Nombre / Código</span>
+        <input class="minp" type="text" id="mr-nom" placeholder="Rodal Norte" autocomplete="off">
+      </div>
+    </div>
+    <div class="mrow">
+      <div>
+        <span class="mlbl">N/ha</span>
+        <input class="minp" type="number" id="mr-etn" placeholder="1840" inputmode="numeric">
+      </div>
+      <div>
+        <span class="mlbl">AB/ha (m²/ha)</span>
+        <input class="minp" type="number" id="mr-etab" placeholder="27" step="0.1" inputmode="decimal">
+      </div>
+    </div>
+    <div class="mrow">
+      <div>
+        <span class="mlbl">VOL/ha (m³/ha)</span>
+        <input class="minp" type="number" id="mr-etvol" placeholder="180" inputmode="decimal">
+      </div>
+      <div>
+        <span class="mlbl">N° parc. orig.</span>
+        <input class="minp" type="number" id="mr-etnp" placeholder="5" inputmode="numeric">
+      </div>
+    </div>
+
+    <!-- 2. ESTADÍGRAFOS DEL RODAL (PLAN DE MANEJO) -->
+    <div style="height:1px;background:#F2F2F7;margin:14px 0"></div>
+    <div style="font-size:11px;font-weight:700;color:#8E8E93;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">📊 Estadígrafos del rodal (Plan de manejo)</div>
+    <div style="font-size:11px;color:#8E8E93;margin-bottom:8px">Opcional — activa comparación por rango de confianza</div>
+    <div class="mrow">
+      <div>
+        <span class="mlbl">Error muestreo (%)</span>
+        <input class="minp" type="number" id="mr-em" placeholder="15.2" step="0.1" inputmode="decimal" oninput="prevRango()">
+      </div>
+      <div>
+        <span class="mlbl">Nivel confianza</span>
+        <select class="minp" id="mr-nc">
+          <option value="95">95%</option>
+          <option value="90">90%</option>
+          <option value="99">99%</option>
+        </select>
+      </div>
+    </div>
+    <div id="mr-rango" style="display:none;background:#F0FDF4;border:1px solid #A7F3D0;border-radius:10px;padding:10px 12px;margin-top:8px;font-size:11px;color:#065F46;line-height:1.7">
+      <strong>Rango aceptable N/ha:</strong><br>
+      <span id="mr-rango-txt">—</span>
+    </div>
+
+    <!-- 3. MÉTODO -->
+    <div style="height:1px;background:#F2F2F7;margin:14px 0"></div>
+    <div style="font-size:11px;font-weight:700;color:#8E8E93;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">⚙️ Método de medición</div>
+    <select class="minp" id="mr-met">
+      <option value="trad">Tradicional (Forcípula)</option>
+      <option value="comb">Combinado (Bitterlich + Parcela)</option>
+      <option value="bit">Bitterlich rápido</option>
+    </select>
+
+    <!-- 4. SUPERFICIE -->
+    <div style="height:1px;background:#F2F2F7;margin:14px 0"></div>
+    <div style="font-size:11px;font-weight:700;color:#8E8E93;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">📍 General</div>
+    <span class="mlbl">Superficie del rodal (ha)</span>
+    <input class="minp" type="number" id="mr-sup" placeholder="5.5" step="0.1" inputmode="decimal">
+
+    <div class="mbtn-row">
+      <button class="btn" onclick="cerrarModalRodal()">Cancelar</button>
+      <button class="btn btn-p" onclick="guardarRodal()">Crear rodal</button>
+    </div>
+  </div>
+</div>
+
 <!-- APP -->
 <div class="screen" id="sa">
   <div class="topbar">
@@ -230,7 +471,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-se
         </svg>
       </div>
       <div>
-        <div class="top-title">ForestCheck</div>
+        <div class="top-title" id="top-rodal-nom">ForestCheck</div>
         <div class="top-sub" id="top-sub">Listo</div>
       </div>
     </div>
@@ -275,7 +516,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-se
 
     <!-- TRAD: PARCELAS -->
     <div class="pg" id="pg-p1-trad">
-      <div style="text-align:right;margin-bottom:6px"><button onclick="cambiar()" style="background:#FEF3C7;border:1.5px solid #F59E0B;border-radius:8px;padding:5px 12px;font-size:12px;font-weight:600;color:#92400E;cursor:pointer;font-family:inherit">↔ Cambiar método</button></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+        <button onclick="volverRodales()" style="background:#1A3D28;color:#fff;border:none;border-radius:8px;padding:7px 14px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">‹ Volver</button>
+        <button onclick="cambiar()" style="background:#FEF3C7;border:1.5px solid #F59E0B;border-radius:8px;padding:7px 14px;font-size:12px;font-weight:600;color:#92400E;cursor:pointer;font-family:inherit">↔ Cambiar método</button>
+      </div>
       <div class="ibox ib-v"><strong>Forcípula</strong> — DAP + altura opcional → N/ha · AB/ha · VOL</div>
       <div class="card">
         <div class="card-title"><span class="card-icon">📍</span>Registro de árbol</div>
@@ -306,7 +550,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-se
 
     <!-- COMB: BITTERLICH -->
     <div class="pg" id="pg-p1-comb">
-      <div style="text-align:right;margin-bottom:6px"><button onclick="cambiar()" style="background:#FEF3C7;border:1.5px solid #F59E0B;border-radius:8px;padding:5px 12px;font-size:12px;font-weight:600;color:#92400E;cursor:pointer;font-family:inherit">↔ Cambiar método</button></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+        <button onclick="volverRodales()" style="background:#1A3D28;color:#fff;border:none;border-radius:8px;padding:7px 14px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">‹ Volver</button>
+        <button onclick="cambiar()" style="background:#FEF3C7;border:1.5px solid #F59E0B;border-radius:8px;padding:7px 14px;font-size:12px;font-weight:600;color:#92400E;cursor:pointer;font-family:inherit">↔ Cambiar método</button>
+      </div>
       <div class="ibox ib-c"><strong>Bitterlich FAB=<span id="fab-c">1</span></strong> — Cuenta árboles → AB/ha = N × FAB</div>
       <div class="card">
         <div class="card-title"><span class="card-icon">📍</span>Punto de muestreo</div>
@@ -355,7 +602,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-se
 
     <!-- BITTERLICH RÁPIDO -->
     <div class="pg" id="pg-p1-bit">
-      <div style="text-align:right;margin-bottom:6px"><button onclick="cambiar()" style="background:#FEF3C7;border:1.5px solid #F59E0B;border-radius:8px;padding:5px 12px;font-size:12px;font-weight:600;color:#92400E;cursor:pointer;font-family:inherit">↔ Cambiar método</button></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+        <button onclick="volverRodales()" style="background:#1A3D28;color:#fff;border:none;border-radius:8px;padding:7px 14px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">‹ Volver</button>
+        <button onclick="cambiar()" style="background:#FEF3C7;border:1.5px solid #F59E0B;border-radius:8px;padding:7px 14px;font-size:12px;font-weight:600;color:#92400E;cursor:pointer;font-family:inherit">↔ Cambiar método</button>
+      </div>
       <div class="ibox ib-m" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
         <div><strong>Bitterlich rápido</strong> — Verificación AB/ha en recorrido</div>
         <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
@@ -397,7 +647,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-se
 
     <!-- PRENDIMIENTO -->
     <div class="pg" id="pg-p1-prend">
-      <div style="text-align:right;margin-bottom:6px"><button onclick="cambiar()" style="background:#FEF3C7;border:1.5px solid #F59E0B;border-radius:8px;padding:5px 12px;font-size:12px;font-weight:600;color:#92400E;cursor:pointer;font-family:inherit">↔ Cambiar método</button></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+        <button onclick="volverRodales()" style="background:#1A3D28;color:#fff;border:none;border-radius:8px;padding:7px 14px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">‹ Volver</button>
+        <button onclick="cambiar()" style="background:#FEF3C7;border:1.5px solid #F59E0B;border-radius:8px;padding:7px 14px;font-size:12px;font-weight:600;color:#92400E;cursor:pointer;font-family:inherit">↔ Cambiar método</button>
+      </div>
       <div class="ibox" style="background:#DCFCE7;border-color:#22C55E;color:#14532D"><strong>Verificación de prendimiento</strong> — % Prendimiento = (N/ha muestreado ÷ DPO) × 100</div>
 
       <div class="card">
@@ -621,6 +874,7 @@ function save(){
     ss(uk('fc-arbt'),JSON.stringify({pid:pid_t,arb:arb_t}));
     ss(uk('fc-arbc'),JSON.stringify({pid:pid_c,arb:arb_c}));
   }catch(e){}
+  guardarRodalActual();
   updInfo();
 }
 function load(){
@@ -678,10 +932,11 @@ function irApp(){
     document.getElementById('fp').value='';
     document.getElementById('top-user').textContent=CU.name;
     document.getElementById('top-role').textContent=CU.role==='admin'?'Administrador':'Profesional';
-    document.getElementById('adm-panel').style.display=CU.role==='admin'?'block':'none';
-    load(); fillSups(); syncFab(); syncZona(); renderEspSel(); applyAdm(); updInfo();
-    show('sa');
-    if(metodo) iniciarUI(); else showSel();
+    loadVers();
+    document.getElementById('ver-user').textContent=CU.name;
+    document.getElementById('ver-role').textContent=CU.role==='admin'?'Administrador':'Profesional';
+    renderVers();
+    show('sver');
   } else {
     err.style.display='block';
     document.getElementById('fp').value='';
@@ -689,7 +944,8 @@ function irApp(){
 }
 function cerrar(){
   if(!confirm('¿Cerrar sesión?')) return;
-  CU=null; metodo=null;
+  guardarRodalActual();
+  CU=null; metodo=null; verActual=null; rodalActual=null; verificaciones=[];
   document.querySelectorAll('.pg').forEach(function(p){p.classList.remove('on');});
   document.getElementById('nav').className='nav';
   show('sw');
@@ -1436,6 +1692,257 @@ function renderLPrend(){
       +'<button style="background:none;border:none;cursor:pointer;color:#C7C7CC;font-size:18px;padding:4px" onclick="delP(\'prend\','+i+')">×</button></div></div>';
   }).join('');
 }
+
+// ═══════════════════════════════════════
+// MIS VERIFICACIONES
+// ═══════════════════════════════════════
+var verificaciones = [];
+var verActual = null;
+var rodalActual = null;
+
+var COMUNAS_VER = {
+  "Cautín":["Carahue","Cholchol","Cunco","Curarrehue","Freire","Galvarino","Gorbea","Lautaro","Loncoche","Melipeuco","Nueva Imperial","Padre Las Casas","Perquenco","Pitrufquén","Pucón","Puerto Saavedra","Temuco","Teodoro Schmidt","Toltén","Vilcún","Villarrica"],
+  "Malleco":["Angol","Collipulli","Curacautín","Ercilla","Lonquimay","Los Sauces","Lumaco","Purén","Renaico","Traiguén","Victoria"]
+};
+
+function saveVers(){
+  try{ localStorage.setItem('fc-vers-'+(CU?CU.id:''), JSON.stringify(verificaciones)); }catch(e){}
+}
+function loadVers(){
+  try{
+    var v = localStorage.getItem('fc-vers-'+(CU?CU.id:''));
+    if(v) verificaciones = JSON.parse(v);
+    else verificaciones = [];
+  }catch(e){ verificaciones=[]; }
+}
+
+// ── RENDER VERIFICACIONES ──
+function renderVers(){
+  var c = document.getElementById('lista-ver');
+  if(!verificaciones.length){
+    c.innerHTML = '<div class="ver-empty"><div class="ver-empty-icon">🌲</div><div class="ver-empty-title">Sin verificaciones aún</div><div class="ver-empty-sub">Toca \"+ Nueva verificación\"<br>para comenzar</div></div>';
+    return;
+  }
+  var tipoCls = function(t){ return t==='PMBN'?'vt-pmbn':t==='PMPF'?'vt-pmpf':'vt-for'; };
+  c.innerHTML = verificaciones.map(function(v,i){
+    var nr = v.rodales?v.rodales.length:0;
+    var sub = v.exp + ' \u00b7 ' + (v.comuna||'') + (nr?' \u00b7 '+nr+' rodal'+(nr!==1?'es':''):'');
+    return '<div class="ver-card" onclick="selVer('+i+')">'
+      +'<div><span class="ver-tipo '+tipoCls(v.tipo)+'">'+v.tipo+'</span>'
+      +'<div class="ver-nombre">'+v.predio+'</div>'
+      +'<div class="ver-sub">'+sub+'</div>'
+      +(v.analistas?'<div class="ver-analistas">'+v.analistas+'</div>':'')
+      +'</div>'
+      +'<div style="display:flex;align-items:center;gap:6px">'
+      +'<span class="ver-arrow">\u203a</span>'
+      +'<button style="background:none;border:none;cursor:pointer;color:#C7C7CC;font-size:20px;padding:4px" onclick="event.stopPropagation();elimVer('+i+')">×</button>'
+      +'</div></div>';
+  }).join('');
+}
+
+function selVer(i){
+  verActual = i;
+  var v = verificaciones[i];
+  document.getElementById('rodal-predio').textContent = v.predio;
+  document.getElementById('rodal-exp').textContent = v.tipo + ' \u00b7 ' + v.exp;
+  document.getElementById('rodal-user').textContent = CU?CU.name:'';
+  // Ajustar métodos según tipo
+  var mr = document.getElementById('mr-met');
+  if(v.tipo==='Forestación'){
+    mr.innerHTML = '<option value="prend">Prendimiento</option><option value="recep">Recepción técnica de faena</option>';
+  } else {
+    mr.innerHTML = '<option value="trad">Tradicional (Forcípula)</option><option value="comb">Combinado (Bitterlich + Parcela)</option><option value="bit">Bitterlich rápido</option>';
+  }
+  renderRodales();
+  show('srodal');
+}
+
+function elimVer(i){
+  if(!confirm('¿Eliminar la verificación "'+verificaciones[i].predio+'"?\nSe perderán todos sus datos.')) return;
+  verificaciones.splice(i,1);
+  if(verActual===i) verActual=null;
+  saveVers(); renderVers();
+}
+
+// ── RENDER RODALES ──
+function renderRodales(){
+  var c = document.getElementById('lista-rodales');
+  var rodales = (verificaciones[verActual]&&verificaciones[verActual].rodales)||[];
+  if(!rodales.length){
+    c.innerHTML = '<div class="ver-empty"><div class="ver-empty-icon">📍</div><div class="ver-empty-title">Sin rodales</div><div class="ver-empty-sub">Toca \"+ Nuevo rodal\"<br>para agregar</div></div>';
+    return;
+  }
+  var metNoms = {trad:'Tradicional',comb:'Combinado',bit:'Bitterlich rápido',prend:'Prendimiento',recep:'Recepción técnica'};
+  c.innerHTML = rodales.map(function(r,i){
+    var np = (r.parc_t?r.parc_t.length:0)+(r.punt_c?r.punt_c.length:0)+(r.punt_b?r.punt_b.length:0)+(r.um_prend?r.um_prend.length:0);
+    return '<div class="rodal-card" onclick="entrarRodal('+i+')">'
+      +'<div class="rodal-num">'+r.num+'</div>'
+      +'<div class="rodal-info">'
+      +'<div class="rodal-nombre">'+r.nom+(r.sup?' \u00b7 '+r.sup+' ha':'')+'</div>'
+      +'<div class="rodal-met">'+metNoms[r.met]+(np?' \u00b7 '+np+' registro'+(np!==1?'s':''):'')+'</div>'
+      +'</div>'
+      +'<span class="rodal-arrow">\u203a</span>'
+      +'<button style="background:none;border:none;cursor:pointer;color:#C7C7CC;font-size:20px;padding:4px" onclick="event.stopPropagation();elimRodal('+i+')">×</button>'
+      +'</div>';
+  }).join('');
+}
+
+function entrarRodal(i){
+  var v = verificaciones[verActual];
+  var r = v.rodales[i];
+  rodalActual = i;
+  // Cargar datos del rodal
+  metodo = r.met==='recep'?'prend':r.met;
+  parc_t = r.parc_t||[]; parc_c = r.parc_c||[];
+  punt_c = r.punt_c||[]; punt_b = r.punt_b||[];
+  um_prend = r.um_prend||[]; dpo = r.dpo||[{sp:'',dens:0}];
+  arb_t = r.arb_t||[]; pid_t = r.pid_t||'';
+  arb_c = r.arb_c||[]; pid_c = r.pid_c||'';
+  // Precargar datos del predio en el resumen
+  adm = {
+    pmbn: v.exp||'', fecha: v.fecha||'', prop: v.prop||'',
+    predio: v.predio||'', rol: v.rol||'',
+    provincia: v.prov||'', prov: v.prov||'', comuna: v.comuna||'',
+    region: 'La Araucanía', prof: v.analistas||''
+  };
+  // Cargar plan de manejo si existe
+  if(r.cfg){
+    cfg.etN=r.cfg.etN||null; cfg.etAB=r.cfg.etAB||null;
+    cfg.etVol=r.cfg.etVol||null; cfg.etNp=r.cfg.etNp||null;
+  }
+  // Actualizar topbar
+  document.getElementById('top-user').textContent = CU?CU.name:'';
+  document.getElementById('top-role').textContent = CU&&CU.role==='admin'?'Administrador':'Profesional';
+  document.getElementById('adm-panel').style.display = CU&&CU.role==='admin'?'block':'none';
+  fillSups(); syncFab(); syncZona(); renderEspSel(); applyAdm(); updInfo();
+  document.getElementById('top-rodal-nom').textContent = r.num+' - '+r.nom;
+  iniciarUI();
+  show('sa');
+}
+
+function elimRodal(i){
+  var v = verificaciones[verActual];
+  if(!confirm('¿Eliminar el rodal "'+v.rodales[i].nom+'"?')) return;
+  v.rodales.splice(i,1);
+  if(rodalActual===i) rodalActual=null;
+  saveVers(); renderRodales();
+}
+
+// ── GUARDAR DATOS AL SALIR DEL RODAL ──
+function guardarRodalActual(){
+  if(verActual===null||rodalActual===null) return;
+  var r = verificaciones[verActual].rodales[rodalActual];
+  r.parc_t=parc_t; r.parc_c=parc_c;
+  r.punt_c=punt_c; r.punt_b=punt_b;
+  r.um_prend=um_prend; r.dpo=dpo;
+  r.arb_t=arb_t; r.pid_t=pid_t;
+  r.arb_c=arb_c; r.pid_c=pid_c;
+  r.cfg={etN:cfg.etN,etAB:cfg.etAB,etVol:cfg.etVol,etNp:cfg.etNp};
+  saveVers();
+}
+
+// ── MODAL VERIFICACIÓN ──
+function abrirModalVer(){
+  document.getElementById('mv-tipo').value='PMBN';
+  document.getElementById('mv-exp').value='';
+  document.getElementById('mv-prop').value='';
+  document.getElementById('mv-predio').value='';
+  document.getElementById('mv-rol').value='';
+  document.getElementById('mv-fecha').value=new Date().toISOString().slice(0,10);
+  document.getElementById('mv-prov').value='';
+  document.getElementById('mv-comuna').innerHTML='<option value="">-- Provincia --</option>';
+  document.getElementById('mv-analistas').value='';
+  updTipoVer();
+  document.getElementById('modal-ver').classList.add('open');
+}
+function cerrarModalVer(){ document.getElementById('modal-ver').classList.remove('open'); }
+function updTipoVer(){
+  var t = document.getElementById('mv-tipo').value;
+  document.getElementById('mv-exp-lbl').textContent = t==='Forestación'?'N° Contrato/Licitación':'N° Solicitud';
+}
+function updComunasVer(){
+  var pv = document.getElementById('mv-prov').value;
+  var sel = document.getElementById('mv-comuna');
+  var lista = COMUNAS_VER[pv]||[];
+  sel.innerHTML = '<option value="">-- Selecciona --</option>'
+    + lista.map(function(c){ return '<option value="'+c+'">'+c+'</option>'; }).join('');
+}
+function guardarVer(){
+  var tipo=document.getElementById('mv-tipo').value;
+  var exp=document.getElementById('mv-exp').value.trim();
+  var prop=document.getElementById('mv-prop').value.trim();
+  var predio=document.getElementById('mv-predio').value.trim();
+  var rol=document.getElementById('mv-rol').value.trim();
+  var fecha=document.getElementById('mv-fecha').value;
+  var prov=document.getElementById('mv-prov').value;
+  var comuna=document.getElementById('mv-comuna').value;
+  var analistas=document.getElementById('mv-analistas').value.trim();
+  if(!predio){ alert('Ingresa el nombre del predio'); return; }
+  if(!exp){ alert('Ingresa el N° de solicitud/contrato'); return; }
+  verificaciones.unshift({tipo:tipo,exp:exp,prop:prop,predio:predio,rol:rol,fecha:fecha,prov:prov,comuna:comuna,analistas:analistas,rodales:[]});
+  saveVers(); renderVers(); cerrarModalVer();
+}
+
+// ── MODAL RODAL ──
+function abrirModalRodal(){
+  var v = verificaciones[verActual];
+  var n = v.rodales?v.rodales.length+1:1;
+  document.getElementById('mr-num').value=n;
+  document.getElementById('mr-nom').value='';
+  document.getElementById('mr-sup').value='';
+  document.getElementById('mr-etn').value='';
+  document.getElementById('mr-etab').value='';
+  document.getElementById('mr-etvol').value='';
+  document.getElementById('mr-etnp').value='';
+  document.getElementById('mr-em').value='';
+  document.getElementById('mr-rango').style.display='none';
+  document.getElementById('modal-rodal').classList.add('open');
+}
+function cerrarModalRodal(){ document.getElementById('modal-rodal').classList.remove('open'); }
+function prevRango(){
+  var nha = parseFloat(document.getElementById('mr-etn').value)||0;
+  var em = parseFloat(document.getElementById('mr-em').value)||0;
+  var rDiv = document.getElementById('mr-rango');
+  if(nha>0 && em>0){
+    var rMin = Math.round(nha*(1-em/100));
+    var rMax = Math.round(nha*(1+em/100));
+    document.getElementById('mr-rango-txt').textContent = rMin.toLocaleString()+' – '+rMax.toLocaleString()+' plantas/ha';
+    rDiv.style.display='block';
+  } else {
+    rDiv.style.display='none';
+  }
+}
+function guardarRodal(){
+  var num=+document.getElementById('mr-num').value||1;
+  var nom=document.getElementById('mr-nom').value.trim();
+  var sup=parseFloat(document.getElementById('mr-sup').value)||null;
+  var met=document.getElementById('mr-met').value;
+  var etn=parseFloat(document.getElementById('mr-etn').value)||null;
+  var etab=parseFloat(document.getElementById('mr-etab').value)||null;
+  var etvol=parseFloat(document.getElementById('mr-etvol').value)||null;
+  var etnp=parseFloat(document.getElementById('mr-etnp').value)||null;
+  var em=parseFloat(document.getElementById('mr-em').value)||null;
+  var nc=+document.getElementById('mr-nc').value||95;
+  if(!nom){ alert('Ingresa el nombre del rodal'); return; }
+  var v = verificaciones[verActual];
+  if(!v.rodales) v.rodales=[];
+  v.rodales.push({num:num,nom:nom,sup:sup,met:met,
+    parc_t:[],parc_c:[],punt_c:[],punt_b:[],um_prend:[],
+    dpo:[{sp:'',dens:0}],arb_t:[],pid_t:'',arb_c:[],pid_c:'',
+    cfg:{etN:etn,etAB:etab,etVol:etvol,etNp:etnp,emPlan:em,ncPlan:nc}});
+  saveVers(); renderRodales(); cerrarModalRodal();
+}
+
+// ── VOLVER A RODALES DESDE LA APP ──
+function volverRodales(){
+  guardarRodalActual();
+  metodo=null; rodalActual=null;
+  document.querySelectorAll('.pg').forEach(function(p){p.classList.remove('on');});
+  document.getElementById('nav').className='nav';
+  renderRodales();
+  show('srodal');
+}
+
 // ═══ CARGAR LIBRERÍAS EXTERNAS DE FORMA ASÍNCRONA ═══
 // No bloquean el JS principal
 function loadScript(src,cb){
