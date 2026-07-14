@@ -382,73 +382,94 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-se
   <div class="modal-sheet">
     <div class="modal-handle"></div>
     <div class="modal-h">Nuevo rodal</div>
+    <div id="mr-tipo-lbl" style="font-size:12px;color:#8E8E93;margin-bottom:12px"></div>
 
-    <!-- 1. PLAN DE MANEJO -->
-    <div style="font-size:11px;font-weight:700;color:#8E8E93;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">📄 Plan de manejo</div>
-    <div class="mrow">
-      <div>
-        <span class="mlbl">N° Rodal</span>
-        <input class="minp" type="number" id="mr-num" placeholder="1" min="1" inputmode="numeric">
+    <!-- SECCIÓN PMBN/PMPF -->
+    <div id="mr-sec-pm">
+      <div style="font-size:11px;font-weight:700;color:#8E8E93;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">📄 Plan de manejo</div>
+      <div class="mrow">
+        <div>
+          <span class="mlbl">N° Rodal</span>
+          <input class="minp" type="number" id="mr-num" placeholder="1" min="1" inputmode="numeric">
+        </div>
+        <div>
+          <span class="mlbl">Nombre / Código</span>
+          <input class="minp" type="text" id="mr-nom" placeholder="Rodal Norte" autocomplete="off">
+        </div>
       </div>
-      <div>
-        <span class="mlbl">Nombre / Código</span>
-        <input class="minp" type="text" id="mr-nom" placeholder="Rodal Norte" autocomplete="off">
+      <div class="mrow">
+        <div>
+          <span class="mlbl">N/ha</span>
+          <input class="minp" type="number" id="mr-etn" placeholder="1840" inputmode="numeric">
+        </div>
+        <div>
+          <span class="mlbl">AB/ha (m²/ha)</span>
+          <input class="minp" type="number" id="mr-etab" placeholder="27" step="0.1" inputmode="decimal">
+        </div>
       </div>
-    </div>
-    <div class="mrow">
-      <div>
-        <span class="mlbl">N/ha</span>
-        <input class="minp" type="number" id="mr-etn" placeholder="1840" inputmode="numeric">
+      <div class="mrow">
+        <div>
+          <span class="mlbl">VOL/ha (m³/ha)</span>
+          <input class="minp" type="number" id="mr-etvol" placeholder="180" inputmode="decimal">
+        </div>
+        <div>
+          <span class="mlbl">N° parc. orig.</span>
+          <input class="minp" type="number" id="mr-etnp" placeholder="5" inputmode="numeric">
+        </div>
       </div>
-      <div>
-        <span class="mlbl">AB/ha (m²/ha)</span>
-        <input class="minp" type="number" id="mr-etab" placeholder="27" step="0.1" inputmode="decimal">
+      <div style="height:1px;background:#F2F2F7;margin:14px 0"></div>
+      <div style="font-size:11px;font-weight:700;color:#8E8E93;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">📊 Estadígrafos del rodal (Plan de manejo)</div>
+      <div style="font-size:11px;color:#8E8E93;margin-bottom:8px">Opcional — activa comparación por rango de confianza</div>
+      <div class="mrow">
+        <div>
+          <span class="mlbl">Error muestreo (%)</span>
+          <input class="minp" type="number" id="mr-em" placeholder="15.2" step="0.1" inputmode="decimal" oninput="prevRango()">
+        </div>
+        <div>
+          <span class="mlbl">Nivel confianza</span>
+          <select class="minp" id="mr-nc">
+            <option value="95">95%</option>
+            <option value="90">90%</option>
+            <option value="99">99%</option>
+          </select>
+        </div>
       </div>
-    </div>
-    <div class="mrow">
-      <div>
-        <span class="mlbl">VOL/ha (m³/ha)</span>
-        <input class="minp" type="number" id="mr-etvol" placeholder="180" inputmode="decimal">
-      </div>
-      <div>
-        <span class="mlbl">N° parc. orig.</span>
-        <input class="minp" type="number" id="mr-etnp" placeholder="5" inputmode="numeric">
+      <div id="mr-rango" style="display:none;background:#F0FDF4;border:1px solid #A7F3D0;border-radius:10px;padding:10px 12px;margin-top:8px;font-size:11px;color:#065F46;line-height:1.7">
+        <strong>Rango aceptable N/ha:</strong><br>
+        <span id="mr-rango-txt">—</span>
       </div>
     </div>
 
-    <!-- 2. ESTADÍGRAFOS DEL RODAL (PLAN DE MANEJO) -->
+    <!-- SECCIÓN FORESTACIÓN -->
+    <div id="mr-sec-for" style="display:none">
+      <div style="font-size:11px;font-weight:700;color:#92400E;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">📄 Contrato / Licitación</div>
+      <div class="mrow">
+        <div>
+          <span class="mlbl">N° Rodal</span>
+          <input class="minp" type="number" id="mr-num-for" placeholder="1" min="1" inputmode="numeric">
+        </div>
+        <div>
+          <span class="mlbl">Nombre / Código</span>
+          <input class="minp" type="text" id="mr-nom-for" placeholder="Rodal Norte" autocomplete="off">
+        </div>
+      </div>
+      <span class="mlbl">Densidad exigida (plantas/ha)</span>
+      <input class="minp" type="number" id="mr-dens-for" placeholder="1000" inputmode="numeric">
+      <div style="background:#FEF3C7;border:1px solid #FBBF24;border-radius:10px;padding:10px 12px;margin-top:8px;font-size:11px;color:#92400E;line-height:1.6">
+        Densidad mínima exigida en el contrato. Se usará como referencia para el veredicto técnico.
+      </div>
+    </div>
+
+    <!-- MÉTODO -->
     <div style="height:1px;background:#F2F2F7;margin:14px 0"></div>
-    <div style="font-size:11px;font-weight:700;color:#8E8E93;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">📊 Estadígrafos del rodal (Plan de manejo)</div>
-    <div style="font-size:11px;color:#8E8E93;margin-bottom:8px">Opcional — activa comparación por rango de confianza</div>
-    <div class="mrow">
-      <div>
-        <span class="mlbl">Error muestreo (%)</span>
-        <input class="minp" type="number" id="mr-em" placeholder="15.2" step="0.1" inputmode="decimal" oninput="prevRango()">
-      </div>
-      <div>
-        <span class="mlbl">Nivel confianza</span>
-        <select class="minp" id="mr-nc">
-          <option value="95">95%</option>
-          <option value="90">90%</option>
-          <option value="99">99%</option>
-        </select>
-      </div>
-    </div>
-    <div id="mr-rango" style="display:none;background:#F0FDF4;border:1px solid #A7F3D0;border-radius:10px;padding:10px 12px;margin-top:8px;font-size:11px;color:#065F46;line-height:1.7">
-      <strong>Rango aceptable N/ha:</strong><br>
-      <span id="mr-rango-txt">—</span>
-    </div>
-
-    <!-- 3. MÉTODO -->
-    <div style="height:1px;background:#F2F2F7;margin:14px 0"></div>
-    <div style="font-size:11px;font-weight:700;color:#8E8E93;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">⚙️ Método de medición</div>
+    <div style="font-size:11px;font-weight:700;color:#8E8E93;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">⚙️ Método de verificación</div>
     <select class="minp" id="mr-met">
       <option value="trad">Tradicional (Forcípula)</option>
       <option value="comb">Combinado (Bitterlich + Parcela)</option>
       <option value="bit">Bitterlich rápido</option>
     </select>
 
-    <!-- 4. SUPERFICIE -->
+    <!-- SUPERFICIE -->
     <div style="height:1px;background:#F2F2F7;margin:14px 0"></div>
     <div style="font-size:11px;font-weight:700;color:#8E8E93;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">📍 General</div>
     <span class="mlbl">Superficie del rodal (ha)</span>
@@ -1913,15 +1934,25 @@ function guardarVer(){
 function abrirModalRodal(){
   var v = verificaciones[verActual];
   var n = v.rodales?v.rodales.length+1:1;
+  var esFor = v.tipo==='Forestación';
+  // Mostrar sección correcta
+  document.getElementById('mr-sec-pm').style.display = esFor?'none':'block';
+  document.getElementById('mr-sec-for').style.display = esFor?'block':'none';
+  document.getElementById('mr-tipo-lbl').textContent = v.tipo+' · '+v.exp;
+  // Limpiar campos PMBN/PMPF
   document.getElementById('mr-num').value=n;
   document.getElementById('mr-nom').value='';
-  document.getElementById('mr-sup').value='';
   document.getElementById('mr-etn').value='';
   document.getElementById('mr-etab').value='';
   document.getElementById('mr-etvol').value='';
   document.getElementById('mr-etnp').value='';
   document.getElementById('mr-em').value='';
   document.getElementById('mr-rango').style.display='none';
+  // Limpiar campos Forestación
+  document.getElementById('mr-num-for').value=n;
+  document.getElementById('mr-nom-for').value='';
+  document.getElementById('mr-dens-for').value='';
+  document.getElementById('mr-sup').value='';
   document.getElementById('modal-rodal').classList.add('open');
 }
 function cerrarModalRodal(){ document.getElementById('modal-rodal').classList.remove('open'); }
@@ -1939,23 +1970,33 @@ function prevRango(){
   }
 }
 function guardarRodal(){
-  var num=+document.getElementById('mr-num').value||1;
-  var nom=document.getElementById('mr-nom').value.trim();
-  var sup=parseFloat(document.getElementById('mr-sup').value)||null;
-  var met=document.getElementById('mr-met').value;
-  var etn=parseFloat(document.getElementById('mr-etn').value)||null;
-  var etab=parseFloat(document.getElementById('mr-etab').value)||null;
-  var etvol=parseFloat(document.getElementById('mr-etvol').value)||null;
-  var etnp=parseFloat(document.getElementById('mr-etnp').value)||null;
-  var em=parseFloat(document.getElementById('mr-em').value)||null;
-  var nc=+document.getElementById('mr-nc').value||95;
-  if(!nom){ alert('Ingresa el nombre del rodal'); return; }
   var v = verificaciones[verActual];
+  var esFor = v.tipo==='Forestación';
+  var num, nom, sup, met, cfg_rodal;
+  sup = parseFloat(document.getElementById('mr-sup').value)||null;
+  met = document.getElementById('mr-met').value;
+  if(esFor){
+    num = +document.getElementById('mr-num-for').value||1;
+    nom = document.getElementById('mr-nom-for').value.trim();
+    var densFor = parseFloat(document.getElementById('mr-dens-for').value)||null;
+    cfg_rodal = {densFor:densFor};
+  } else {
+    num = +document.getElementById('mr-num').value||1;
+    nom = document.getElementById('mr-nom').value.trim();
+    var etn=parseFloat(document.getElementById('mr-etn').value)||null;
+    var etab=parseFloat(document.getElementById('mr-etab').value)||null;
+    var etvol=parseFloat(document.getElementById('mr-etvol').value)||null;
+    var etnp=parseFloat(document.getElementById('mr-etnp').value)||null;
+    var em=parseFloat(document.getElementById('mr-em').value)||null;
+    var nc=+document.getElementById('mr-nc').value||95;
+    cfg_rodal = {etN:etn,etAB:etab,etVol:etvol,etNp:etnp,emPlan:em,ncPlan:nc};
+  }
+  if(!nom){ alert('Ingresa el nombre del rodal'); return; }
   if(!v.rodales) v.rodales=[];
   v.rodales.push({num:num,nom:nom,sup:sup,met:met,
     parc_t:[],parc_c:[],punt_c:[],punt_b:[],um_prend:[],
     dpo:[{sp:'',dens:0}],arb_t:[],pid_t:'',arb_c:[],pid_c:'',
-    cfg:{etN:etn,etAB:etab,etVol:etvol,etNp:etnp,emPlan:em,ncPlan:nc}});
+    cfg:cfg_rodal});
   saveVers(); renderRodales(); cerrarModalRodal();
 }
 
