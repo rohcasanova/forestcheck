@@ -1307,10 +1307,36 @@ function renderRes(){
   if(dg) html+='<div class="arow"><span class="al">Dg cuadrático</span><span class="av">'+dg.toFixed(1)+' cm</span></div>';
   if(mVol) html+='<div class="arow"><span class="al">VOL/ha estimado</span><span class="av">'+mVol.toFixed(1)+' m³/ha</span></div>';
   if(cfg.etN||cfg.etAB){
-    html+='<div class="shdr sh-c" style="margin-top:10px">vs. Plan de manejo</div>';
-    function vrow(l,et,ter,fmt){ if(!et||ter===null) return ''; var d=Math.abs(et-ter)/et*100,ok=d<=20; return '<div class="arow"><span class="al">'+l+'</span><span style="display:flex;flex-direction:column;align-items:flex-end;gap:3px"><span style="font-size:11px;color:#8E8E93">PM='+fmt(et)+' · T='+fmt(ter)+'</span><span class="'+(ok?'vok':'vbad')+'">'+(ok?'✓ OK':'✗ Revisar')+' '+d.toFixed(1)+'%</span></span></div>'; }
+    var emP = cfg.emPlan||null;
+    var usaRango = emP&&emP>0;
+    var tituloComp = usaRango
+      ? 'vs. Plan de manejo (rango ±'+emP.toFixed(1)+'%)'
+      : 'vs. Plan de manejo (tolerancia ±20%)';
+    html+='<div class="shdr sh-c" style="margin-top:10px">'+tituloComp+'</div>';
+    if(usaRango){
+      html+='<div style="font-size:11px;color:#8E8E93;margin-bottom:8px;padding:0 2px">La medición debe caer dentro del rango del plan original</div>';
+    }
+    function vrow(l,et,ter,fmt){
+      if(!et||ter===null) return '';
+      var ok, detalle;
+      if(usaRango){
+        var rMin=et*(1-emP/100), rMax=et*(1+emP/100);
+        ok = ter>=rMin && ter<=rMax;
+        detalle='Rango: '+fmt(rMin)+' – '+fmt(rMax);
+      } else {
+        var d=Math.abs(et-ter)/et*100;
+        ok = d<=20;
+        detalle='PM='+fmt(et)+' · T='+fmt(ter)+' · Dif='+d.toFixed(1)+'%';
+      }
+      return '<div class="arow"><span class="al">'+l+'</span>'
+        +'<span style="display:flex;flex-direction:column;align-items:flex-end;gap:3px">'
+        +'<span style="font-size:11px;color:#8E8E93">'+detalle+'</span>'
+        +'<span style="font-size:11px;color:#8E8E93">Terreno: '+fmt(ter)+'</span>'
+        +'<span class="'+(ok?'vok':'vbad')+'">'+(ok?'✓ Conforme':'✗ No conforme')+'</span>'
+        +'</span></div>';
+    }
     html+=vrow('N/ha',cfg.etN,mNha,function(v){return Math.round(v).toLocaleString();});
-    html+=vrow('AB/ha (m²/ha)',cfg.etAB,mABha,function(v){return v.toFixed(2);});
+    html+=vrow('AB/ha (m²/ha)',cfg.etAB,mABha,function(v){return v?v.toFixed(2):'—';});
     html+=vrow('VOL/ha (m³/ha)',cfg.etVol,mVol,function(v){return v?v.toFixed(1):'—';});
   }
   document.getElementById('res-content').innerHTML=html;
