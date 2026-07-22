@@ -56,9 +56,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-se
 .nav.show{display:grid}
 .nav.cols4{grid-template-columns:repeat(4,1fr)}
 .nav.cols5{grid-template-columns:repeat(5,1fr)}
-.nb{padding:10px 4px 8px;border:none;background:none;color:#8E8E93;font-size:10px;cursor:pointer;text-align:center;display:flex;flex-direction:column;align-items:center;gap:3px;-webkit-appearance:none;font-family:inherit}
+.nb{padding:10px 4px 8px;border:none;border-top:3px solid transparent;background:none;color:#8E8E93;font-size:10px;cursor:pointer;text-align:center;display:flex;flex-direction:column;align-items:center;gap:3px;-webkit-appearance:none;font-family:inherit}
 .nb-icon{font-size:22px}
-.nb.on{color:#2D6A4F;font-weight:600}
+.nb.on{color:#1A3D28;font-weight:700;border-top:3px solid #1A3D28}
 
 /* CONTENIDO */
 .main{flex:1;padding:12px 12px 80px;overflow-y:auto}
@@ -300,7 +300,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-se
 <div class="screen" id="srodal">
   <div class="topbar">
     <div class="top-left">
-      <div onclick="show('sver')" style="cursor:pointer;color:#fff;font-size:13px;font-weight:600;padding:6px 10px;background:rgba(255,255,255,.15);border-radius:8px">‹ Volver</div>
+      <div class="top-icon">
+        <svg width="18" height="18" viewBox="0 0 80 80" fill="none">
+          <path d="M40 8 L58 36 H46 L60 56 H48 L62 76 H18 L32 56 H20 L34 36 H22 Z" fill="white" opacity=".9"/>
+        </svg>
+      </div>
       <div>
         <div class="top-title" id="rodal-predio">Verificación</div>
         <div class="top-sub" id="rodal-exp">—</div>
@@ -311,7 +315,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-se
       <div class="top-logout" onclick="cerrar()">Cerrar sesión</div>
     </div>
   </div>
-  <div style="padding:14px 12px 90px">
+  <div style="padding:14px 12px 24px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <button onclick="show('sver')" style="background:#1A3D28;color:#fff;border:none;border-radius:8px;padding:7px 14px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">‹ Volver</button>
+      <button onclick="abrirModalRodal()" style="background:#F0FDF4;border:1.5px solid #A7F3D0;border-radius:8px;padding:7px 14px;font-size:13px;font-weight:700;color:#065F46;cursor:pointer;font-family:inherit">+ Nuevo rodal</button>
+    </div>
     <div id="lista-rodales">
       <div class="ver-empty">
         <div class="ver-empty-icon">📍</div>
@@ -319,9 +327,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-se
         <div class="ver-empty-sub">Toca "+ Nuevo rodal"<br>para agregar</div>
       </div>
     </div>
-  </div>
-  <div class="fab-bar">
-    <button class="btn btn-p" onclick="abrirModalRodal()">+ Nuevo rodal</button>
   </div>
 </div>
 
@@ -394,27 +399,27 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-se
         </div>
         <div>
           <span class="mlbl">Nombre / Código</span>
-          <input class="minp" type="text" id="mr-nom" placeholder="Rodal Norte" autocomplete="off">
+          <input class="minp" type="text" id="mr-nom" placeholder="Nombre o código" autocomplete="off">
         </div>
       </div>
       <div class="mrow">
         <div>
           <span class="mlbl">N/ha</span>
-          <input class="minp" type="number" id="mr-etn" placeholder="1840" inputmode="numeric">
+          <input class="minp" type="number" id="mr-etn" placeholder="N° árboles/ha" inputmode="numeric">
         </div>
         <div>
           <span class="mlbl">AB/ha (m²/ha)</span>
-          <input class="minp" type="number" id="mr-etab" placeholder="27" step="0.1" inputmode="decimal">
+          <input class="minp" type="number" id="mr-etab" placeholder="Área basal/ha" step="0.1" inputmode="decimal">
         </div>
       </div>
       <div class="mrow">
         <div>
           <span class="mlbl">VOL/ha (m³/ha)</span>
-          <input class="minp" type="number" id="mr-etvol" placeholder="180" inputmode="decimal">
+          <input class="minp" type="number" id="mr-etvol" placeholder="Volumen/ha" inputmode="decimal">
         </div>
         <div>
           <span class="mlbl">N° parc. orig.</span>
-          <input class="minp" type="number" id="mr-etnp" placeholder="5" inputmode="numeric">
+          <input class="minp" type="number" id="mr-etnp" placeholder="N° parcelas" inputmode="numeric">
         </div>
       </div>
       <div style="height:1px;background:#F2F2F7;margin:14px 0"></div>
@@ -423,7 +428,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-se
       <div class="mrow">
         <div>
           <span class="mlbl">Error muestreo (%)</span>
-          <input class="minp" type="number" id="mr-em" placeholder="15.2" step="0.1" inputmode="decimal" oninput="prevRango()">
+          <input class="minp" type="number" id="mr-em" placeholder="% error" step="0.1" inputmode="decimal" oninput="prevRango()">
         </div>
         <div>
           <span class="mlbl">Nivel confianza</span>
@@ -450,19 +455,55 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-se
         </div>
         <div>
           <span class="mlbl">Nombre / Código</span>
-          <input class="minp" type="text" id="mr-nom-for" placeholder="Rodal Norte" autocomplete="off">
+          <input class="minp" type="text" id="mr-nom-for" placeholder="Nombre o código" autocomplete="off">
         </div>
       </div>
-      <span class="mlbl">Densidad exigida (plantas/ha)</span>
-      <input class="minp" type="number" id="mr-dens-for" placeholder="1000" inputmode="numeric">
-      <div style="background:#FEF3C7;border:1px solid #FBBF24;border-radius:10px;padding:10px 12px;margin-top:8px;font-size:11px;color:#92400E;line-height:1.6">
-        Densidad mínima exigida en el contrato. Se usará como referencia para el veredicto técnico.
+
+      <div style="height:1px;background:#F2F2F7;margin:12px 0"></div>
+      <div style="font-size:11px;font-weight:700;color:#8E8E93;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">⚙️ Tipo de verificación</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
+        <button type="button" id="mr-btn-prend" onclick="selMetFor('prend')"
+          style="padding:10px 6px;border-radius:10px;font-size:12px;font-weight:700;border:2px solid #22C55E;background:#DCFCE7;color:#15803D;font-family:inherit;cursor:pointer;text-align:center;line-height:1.4">
+          🌱 Prendimiento<br><span style="font-weight:400;font-size:10px">vs. DPO</span>
+        </button>
+        <button type="button" id="mr-btn-recep" onclick="selMetFor('recep')"
+          style="padding:10px 6px;border-radius:10px;font-size:12px;font-weight:700;border:2px solid #E5E5EA;background:#fff;color:#8E8E93;font-family:inherit;cursor:pointer;text-align:center;line-height:1.4">
+          📋 Recepción técnica<br><span style="font-weight:400;font-size:10px">vs. Contrato</span>
+        </button>
+      </div>
+
+      <!-- Datos Prendimiento -->
+      <div id="mr-dat-prend">
+        <div style="font-size:11px;font-weight:700;color:#15803D;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">🌱 Datos de plantación</div>
+        <div class="mrow">
+          <div>
+            <span class="mlbl">DPO (plantas/ha)</span>
+            <input class="minp" type="number" id="mr-dpo" placeholder="Plantas/ha originales" inputmode="numeric">
+          </div>
+          <div>
+            <span class="mlbl">Año de plantación</span>
+            <input class="minp" type="number" id="mr-anio" placeholder="Año plantación" inputmode="numeric">
+          </div>
+        </div>
+        <div style="background:#DCFCE7;border:1px solid #22C55E;border-radius:10px;padding:10px 12px;font-size:11px;color:#14532D;line-height:1.6;margin-top:6px">
+          <strong>DPO</strong> = Densidad de Plantación Original.<br>Compara lo que sobrevivió vs. lo que se plantó.
+        </div>
+      </div>
+
+      <!-- Datos Recepción técnica -->
+      <div id="mr-dat-recep" style="display:none">
+        <div style="font-size:11px;font-weight:700;color:#1E40AF;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">📋 Datos del contrato</div>
+        <span class="mlbl">Densidad exigida en contrato (plantas/ha)</span>
+        <input class="minp" type="number" id="mr-dens-for" placeholder="Plantas/ha contrato" inputmode="numeric">
+        <div style="background:#DBEAFE;border:1px solid #60A5FA;border-radius:10px;padding:10px 12px;font-size:11px;color:#1E3A8A;line-height:1.6;margin-top:6px">
+          <strong>Densidad exigida</strong> = lo que especifica el contrato.<br>Verifica si el contratista cumplió técnicamente.
+        </div>
       </div>
     </div>
 
-    <!-- MÉTODO -->
-    <div style="height:1px;background:#F2F2F7;margin:14px 0"></div>
-    <div style="font-size:11px;font-weight:700;color:#8E8E93;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">⚙️ Método de verificación</div>
+    <!-- MÉTODO - solo para PMBN/PMPF, en Forestación se define por los botones -->
+    <div id="mr-sec-met" style="height:1px;background:#F2F2F7;margin:14px 0"></div>
+    <div id="mr-met-lbl" style="font-size:11px;font-weight:700;color:#8E8E93;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">⚙️ Método de medición</div>
     <select class="minp" id="mr-met">
       <option value="trad">Tradicional (Forcípula)</option>
       <option value="comb">Combinado (Bitterlich + Parcela)</option>
@@ -473,7 +514,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-se
     <div style="height:1px;background:#F2F2F7;margin:14px 0"></div>
     <div style="font-size:11px;font-weight:700;color:#8E8E93;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">📍 General</div>
     <span class="mlbl">Superficie del rodal (ha)</span>
-    <input class="minp" type="number" id="mr-sup" placeholder="5.5" step="0.1" inputmode="decimal">
+    <input class="minp" type="number" id="mr-sup" placeholder="Superficie en ha" step="0.1" inputmode="decimal">
 
     <div class="mbtn-row">
       <button class="btn" onclick="cerrarModalRodal()">Cancelar</button>
@@ -545,8 +586,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-se
       <div class="card">
         <div class="card-title"><span class="card-icon">📍</span>Registro de árbol</div>
         <div class="r2"><div><span class="lbl">N° parcela</span><input class="inp" type="text" id="t-pid" placeholder="P-01" autocomplete="off" autocapitalize="none"></div><div><span class="lbl">Sup. (m²)</span><select class="inp" id="t-sup" onchange="cfg.sup=+this.value;syncSup()"></select></div></div>
-        <div class="r2"><div><span class="lbl">DAP (cm)</span><input class="inp" type="number" id="t-dap" placeholder="18.5" step="0.1" min="0" inputmode="decimal"></div><div><span class="lbl">Especie</span><select class="inp" id="t-sp"></select></div></div>
-        <div class="r2"><div><span class="lbl">Altura (m)</span><input class="inp" type="number" id="t-alt" placeholder="14.0" step="0.1" min="0" inputmode="decimal"></div><div><span class="lbl">Obs.</span><input class="inp" type="text" id="t-obs" placeholder="..."></div></div>
+        <div class="r2"><div><span class="lbl">DAP (cm)</span><input class="inp" type="number" id="t-dap" placeholder="DAP en cm" step="0.1" min="0" inputmode="decimal"></div><div><span class="lbl">Especie</span><select class="inp" id="t-sp"></select></div></div>
+        <div class="r2"><div><span class="lbl">Altura (m)</span><input class="inp" type="number" id="t-alt" placeholder="Altura en m" step="0.1" min="0" inputmode="decimal"></div><div><span class="lbl">Obs.</span><input class="inp" type="text" id="t-obs" placeholder="..."></div></div>
         <button class="btn btn-p" onclick="addArb('t')">+ Agregar árbol</button>
       </div>
       <div class="card" id="card-t" style="display:none">
@@ -578,7 +619,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-se
       <div class="ibox ib-c"><strong>Bitterlich FAB=<span id="fab-c">1</span></strong> — Cuenta árboles → AB/ha = N × FAB</div>
       <div class="card">
         <div class="card-title"><span class="card-icon">📍</span>Punto de muestreo</div>
-        <div class="r2"><div><span class="lbl">N° punto</span><input class="inp" type="text" id="c-pid" placeholder="PT-01" autocomplete="off" autocapitalize="none"></div><div><span class="lbl">N° árboles</span><input class="inp" type="number" id="c-n" placeholder="22" step="1" min="0" inputmode="numeric" oninput="prevC()"></div></div>
+        <div class="r2"><div><span class="lbl">N° punto</span><input class="inp" type="text" id="c-pid" placeholder="PT-01" autocomplete="off" autocapitalize="none"></div><div><span class="lbl">N° árboles</span><input class="inp" type="number" id="c-n" placeholder="N° árboles" step="1" min="0" inputmode="numeric" oninput="prevC()"></div></div>
         <div class="r2"><div><span class="lbl">Coord. E</span><input class="inp" type="number" id="c-e" placeholder="700000" inputmode="numeric"></div><div><span class="lbl">Coord. N</span><input class="inp" type="number" id="c-norte" placeholder="5700000" inputmode="numeric"></div></div>
         <button class="btn-gps" onclick="getGPS('c-e','c-norte','c-acc')">📍 GPS · Zona <span id="zona-c">18</span>S <span id="c-acc" style="font-size:11px;color:#666"></span></button>
         <div id="c-prev" style="display:none;margin-top:10px;padding:14px;background:#FEF3C7;border-radius:10px;text-align:center">
@@ -598,7 +639,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-se
       <div class="card">
         <div class="card-title"><span class="card-icon">📍</span>Diámetros parcela</div>
         <div class="r2"><div><span class="lbl">N° parcela</span><input class="inp" type="text" id="cp-pid" placeholder="P-01" autocomplete="off" autocapitalize="none"></div><div><span class="lbl">Sup. (m²)</span><select class="inp" id="cp-sup" onchange="cfg.sup=+this.value;syncSup()"></select></div></div>
-        <div class="r2"><div><span class="lbl">DAP (cm)</span><input class="inp" type="number" id="cp-dap" placeholder="18.5" step="0.1" min="0" inputmode="decimal"></div><div><span class="lbl">Especie</span><select class="inp" id="cp-sp"></select></div></div>
+        <div class="r2"><div><span class="lbl">DAP (cm)</span><input class="inp" type="number" id="cp-dap" placeholder="DAP en cm" step="0.1" min="0" inputmode="decimal"></div><div><span class="lbl">Especie</span><select class="inp" id="cp-sp"></select></div></div>
         <button class="btn btn-p" onclick="addArb('c')">+ Agregar árbol</button>
       </div>
       <div class="card" id="card-c" style="display:none">
@@ -642,7 +683,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-se
       </div>
       <div class="card">
         <div class="card-title"><span class="card-icon">📍</span>Punto de conteo</div>
-        <div class="r2"><div><span class="lbl">N° punto</span><input class="inp" type="text" id="b-pid" placeholder="PT-01" autocomplete="off" autocapitalize="none"></div><div><span class="lbl">N° árboles</span><input class="inp" type="number" id="b-n" placeholder="22" step="1" min="0" inputmode="numeric" oninput="prevB()"></div></div>
+        <div class="r2"><div><span class="lbl">N° punto</span><input class="inp" type="text" id="b-pid" placeholder="PT-01" autocomplete="off" autocapitalize="none"></div><div><span class="lbl">N° árboles</span><input class="inp" type="number" id="b-n" placeholder="N° árboles" step="1" min="0" inputmode="numeric" oninput="prevB()"></div></div>
         <div class="r2"><div><span class="lbl">Coord. E</span><input class="inp" type="number" id="b-e" placeholder="700000" inputmode="numeric"></div><div><span class="lbl">Coord. N</span><input class="inp" type="number" id="b-norte" placeholder="5700000" inputmode="numeric"></div></div>
         <button class="btn-gps" onclick="getGPS('b-e','b-norte','b-acc')">📍 GPS · Zona <span id="zona-b">18</span>S <span id="b-acc" style="font-size:11px;color:#666"></span></button>
         <div id="b-prev" style="display:none;margin-top:12px;padding:16px;background:#EDE9FE;border-radius:10px;text-align:center">
@@ -672,9 +713,18 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-se
         <button onclick="volverRodales()" style="background:#1A3D28;color:#fff;border:none;border-radius:8px;padding:7px 14px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">‹ Volver</button>
         <button onclick="cambiar()" style="background:#FEF3C7;border:1.5px solid #F59E0B;border-radius:8px;padding:7px 14px;font-size:12px;font-weight:600;color:#92400E;cursor:pointer;font-family:inherit">↔ Cambiar método</button>
       </div>
-      <div class="ibox" style="background:#DCFCE7;border-color:#22C55E;color:#14532D"><strong>Verificación de prendimiento</strong> — % Prendimiento = (N/ha muestreado ÷ DPO) × 100</div>
+      <div class="ibox" id="prend-ibox" style="background:#DCFCE7;border-color:#22C55E;color:#14532D"><strong>Verificación de prendimiento</strong> — % Prendimiento = (N/ha muestreado ÷ DPO) × 100</div>
 
-      <div class="card">
+      <!-- Card densidad contrato para Recepción técnica -->
+      <div id="card-dens-contrato" class="card" style="display:none">
+        <div class="card-title"><span class="card-icon">📋</span>Densidad exigida en contrato</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;background:#DBEAFE;border-radius:10px;padding:12px 14px">
+          <span style="font-size:13px;font-weight:600;color:#1E40AF">Densidad contrato</span>
+          <span style="font-size:22px;font-weight:800;color:#1E40AF" id="dens-contrato-val">— pl/ha</span>
+        </div>
+        <div style="font-size:11px;color:#8E8E93;margin-top:6px">Ingresada al crear el rodal</div>
+      </div>
+      <div class="card" id="card-dpo">
         <div class="card-title"><span class="card-icon">🌱</span>Densidad de Plantación Original (DPO)</div>
         <div style="font-size:11px;color:#8E8E93;margin-bottom:8px">Ingresa hasta 4 especies con su densidad original (plantas/ha)</div>
         <div id="dpo-rows"></div>
@@ -705,15 +755,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-se
     <!-- ESTADÍGRAFOS -->
     <div class="pg" id="pg-est">
       <div class="card">
-        <div class="card-title"><span class="card-icon">📊</span>Distribución diamétrica</div>
-        <div class="ch-wrap"><canvas id="ch-dist"></canvas></div>
-        <div style="font-size:11px;color:#8E8E93;text-align:center">Clase DAP (cm) — N/ha por clase</div>
-      </div>
-      <div class="card">
-        <div class="card-title"><span class="card-icon">📊</span>AB/ha por especie</div>
-        <div class="ch-wrap"><canvas id="ch-esp"></canvas></div>
-      </div>
-      <div class="card">
         <div class="card-title"><span class="card-icon">🌲</span>Resumen rodal</div>
         <div class="mets">
           <div class="met met-g"><div class="met-lbl">N/ha</div><div class="met-val" id="e-nha">—</div></div>
@@ -727,6 +768,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-se
         </div>
         <div id="est-rows"></div>
       </div>
+      <div id="card-ch-dist" class="card">
+        <div class="card-title"><span class="card-icon">📊</span>Distribución diamétrica</div>
+        <div class="ch-wrap"><canvas id="ch-dist"></canvas></div>
+        <div style="font-size:11px;color:#8E8E93;text-align:center">Clase DAP (cm) — N/ha por clase</div>
+      </div>
+      <div id="card-ch-esp" class="card">
+        <div class="card-title"><span class="card-icon">📊</span>AB/ha por especie</div>
+        <div class="ch-wrap"><canvas id="ch-esp"></canvas></div>
+      </div>
       <div id="est-bit-card" style="display:none" class="card">
         <div class="card-title" style="color:#1D4ED8"><span class="card-icon">⭕</span>Bitterlich — AB/ha</div>
         <div id="est-bit-rows"></div>
@@ -735,7 +785,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-se
 
     <!-- RESUMEN -->
     <div class="pg" id="pg-res">
-      <div class="card">
+      <div class="card" id="res-card-predio">
         <div class="card-title"><span class="card-icon">🏢</span>Datos del predio</div>
         <div class="r2"><div><span class="lbl">PMBN / Expediente</span><input class="inp" type="text" id="r-pmbn" placeholder="PMBN-XXXX" oninput="saveAdm()"></div><div><span class="lbl">Fecha</span><input class="inp" type="date" id="r-fecha" oninput="saveAdm()"></div></div>
         <span class="lbl">Propietario</span><input class="inp" type="text" id="r-prop" placeholder="Nombre" oninput="saveAdm()">
@@ -744,10 +794,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-se
         <div class="r2"><div><span class="lbl">Región</span><select class="inp" id="r-region" onchange="saveAdm()"><option value="">-- Selecciona --</option><option value="La Araucanía">La Araucanía</option></select></div><div><span class="lbl">Provincia</span><select class="inp" id="r-prov" onchange="updComunas();saveAdm()"><option value="">-- Selecciona --</option><option value="Cautín">Cautín</option><option value="Malleco">Malleco</option></select></div></div>
         <span class="lbl">Comuna</span><select class="inp" id="r-comuna" onchange="saveAdm()"><option value="">-- Selecciona provincia --</option></select>
       </div>
-      <div class="card">
+      <div class="card" id="res-card-pm">
         <div class="card-title"><span class="card-icon">📄</span>Plan de manejo</div>
-        <div class="r2"><div><span class="lbl">N/ha</span><input class="inp" type="number" id="r-etn" placeholder="1840" oninput="cfg.etN=+this.value||null;save()"></div><div><span class="lbl">AB/ha (m²/ha)</span><input class="inp" type="number" id="r-etab" placeholder="27" step="0.1" oninput="cfg.etAB=+this.value||null;save()"></div></div>
-        <div class="r2"><div><span class="lbl">VOL/ha (m³/ha)</span><input class="inp" type="number" id="r-etvol" placeholder="180" oninput="cfg.etVol=+this.value||null;save()"></div><div><span class="lbl">N° parc. orig.</span><input class="inp" type="number" id="r-etnp" placeholder="5" oninput="cfg.etNp=+this.value||null;save()"></div></div>
+        <div class="r2"><div><span class="lbl">N/ha</span><input class="inp" type="number" id="r-etn" placeholder="N° árboles/ha" oninput="cfg.etN=+this.value||null;save()"></div><div><span class="lbl">AB/ha (m²/ha)</span><input class="inp" type="number" id="r-etab" placeholder="Área basal/ha" step="0.1" oninput="cfg.etAB=+this.value||null;save()"></div></div>
+        <div class="r2"><div><span class="lbl">VOL/ha (m³/ha)</span><input class="inp" type="number" id="r-etvol" placeholder="Volumen/ha" oninput="cfg.etVol=+this.value||null;save()"></div><div><span class="lbl">N° parc. orig.</span><input class="inp" type="number" id="r-etnp" placeholder="5" oninput="cfg.etNp=+this.value||null;save()"></div></div>
       </div>
       <div class="card">
         <div class="card-title"><span class="card-icon">📈</span>Informe</div>
@@ -993,7 +1043,27 @@ function iniciarUI(){
   var nav=document.getElementById('nav');
   if(metodo==='trad'){ n1.innerHTML='<span class="nb-icon">📏</span><span>Parcelas</span>'; n2.style.display='none'; nav.className='nav show cols4'; }
   else if(metodo==='comb'){ n1.innerHTML='<span class="nb-icon">⭕</span><span>Bitterlich</span>'; n2.style.display='flex'; nav.className='nav show cols5'; }
-  else if(metodo==='prend'){ n1.innerHTML='<span class="nb-icon">🌱</span><span>Prendim.</span>'; n2.style.display='none'; nav.className='nav show cols4'; }
+  else if(metodo==='prend'){
+    var esRecep = metodoReal==='recep';
+    var navLbl = esRecep?'Recepción':'Prendim.';
+    var navIcon = esRecep?'📋':'🌱';
+    n1.innerHTML='<span class="nb-icon">'+navIcon+'</span><span>'+navLbl+'</span>';
+    n2.style.display='none'; nav.className='nav show cols4';
+    // Actualizar info box
+    var ib = document.getElementById('prend-ibox');
+    if(ib){
+      if(esRecep){
+        ib.innerHTML='<strong>Recepción técnica de faena</strong> — % = (N/ha muestreado ÷ Densidad contrato) × 100';
+        ib.className='ibox ib-v';
+      } else {
+        ib.innerHTML='<strong>Verificación de prendimiento</strong> — % Prendimiento = (N/ha muestreado ÷ DPO) × 100';
+        ib.className='ibox ib-v';
+      }
+    }
+    // Ocultar/mostrar card DPO según modo
+    var cardDpo = document.getElementById('card-dpo');
+    if(cardDpo) cardDpo.style.display = esRecep?'none':'block';
+  }
   else{ n1.innerHTML='<span class="nb-icon">⚡</span><span>Bitterlich</span>'; n2.style.display='none'; nav.className='nav show cols4'; }
   document.getElementById('cfg-met').textContent=metodo==='trad'?'Tradicional':metodo==='comb'?'Combinado':metodo==='prend'?'Prendimiento':'Bitterlich rápido';
   document.getElementById('cfg-fab-row').style.display=metodo==='trad'||metodo==='prend'?'none':'flex';
@@ -1022,7 +1092,14 @@ function goP(id){
   var el=document.getElementById(pid); if(el) el.classList.add('on');
   var nb=document.getElementById('nb-'+id); if(nb) nb.classList.add('on');
   if(id==='est'){ calcEst(); renderCharts(); }
-  if(id==='res') renderRes();
+  if(id==='res'){
+    var esFor = metodo==='prend';
+    var cp=document.getElementById('res-card-predio');
+    var cpm=document.getElementById('res-card-pm');
+    if(cp) cp.style.display=esFor?'none':'block';
+    if(cpm) cpm.style.display=esFor?'none':'block';
+    renderRes();
+  }
   if(id==='cfg'){ renderEspCfg(); if(CU&&CU.role==='admin') renderAdm(); }
   document.getElementById('main').scrollTop=0;
 }
@@ -1032,7 +1109,7 @@ function updTop(){
   if(metodo==='trad'&&parc_t.length) sub=parc_t.length+' parc · N/ha='+Math.round(avg(parc_t.map(function(p){return p.nha;}))).toLocaleString();
   else if(metodo==='comb'&&punt_c.length) sub=punt_c.length+' pts · AB/ha='+avg(punt_c.map(function(p){return p.abha;})).toFixed(1)+' m²/ha';
   else if(metodo==='bit'&&punt_b.length) sub=punt_b.length+' pts · AB/ha='+avg(punt_b.map(function(p){return p.abha;})).toFixed(2)+' m²/ha';
-  else if(metodo==='prend'&&um_prend.length){ var dpoTot=dpo.reduce(function(s,d){return s+(d.dens||0);},0); var nhaP=avg(um_prend.map(function(u){return u.total*10000/u.sup;})); sub=um_prend.length+' UM · Prend.='+(dpoTot>0?(nhaP/dpoTot*100).toFixed(0):'—')+'%'; }
+  else if(metodo==='prend'&&um_prend.length){ var dpoTot=dpo.reduce(function(s,d){return s+(d.dens||0);},0); var nhaP=avg(um_prend.map(function(u){return u.total*10000/u.sup;})); sub=um_prend.length+' UM · '+(metodoReal==='recep'?'Recep.':'Prend.')+'='+(dpoTot>0?(nhaP/dpoTot*100).toFixed(0):'—')+'%'; }
   else sub=metodo==='trad'?'Método tradicional':metodo==='comb'?'Método combinado':metodo==='prend'?'Verificación de prendimiento':'Bitterlich rápido';
   document.getElementById('top-sub').textContent=sub;
 }
@@ -1111,10 +1188,14 @@ function renderLT(){
   var c=document.getElementById('lst-t');
   if(!parc_t.length){c.innerHTML='<div class="empty">Sin parcelas aún</div>';return;}
   c.innerHTML=parc_t.map(function(p,i){
-    return '<div class="chip"><div><span style="font-weight:700">'+p.id+'</span><span style="color:#8E8E93;font-size:12px;margin-left:6px">'+p.n+' árb · '+p.sup+'m²</span></div>'
-      +'<div style="display:flex;gap:4px;align-items:center"><span class="tag tg-v">'+p.nha.toLocaleString()+' N/ha</span><span class="tag tg-v">'+p.abha.toFixed(1)+' m²/ha</span>'
-      +(p.volha?'<span class="tag tg-c">'+p.volha.toFixed(0)+' m³</span>':'')
-      +'<button style="background:none;border:none;cursor:pointer;color:#C7C7CC;font-size:18px;padding:4px" onclick="delP(\'t\','+i+')">×</button></div></div>';
+    return '<div style="padding:12px;border:1px solid #E5E5EA;border-radius:12px;margin-bottom:8px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.04)">'
+      +'<div style="margin-bottom:6px"><span style="font-weight:700;font-size:14px">'+p.id+'</span><span style="color:#8E8E93;font-size:12px;margin-left:8px">'+p.n+' árb · '+p.sup+'m²</span></div>'
+      +'<div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px"><span class="tag tg-v">'+p.nha.toLocaleString()+' N/ha</span><span class="tag tg-v">'+p.abha.toFixed(1)+' m²/ha</span>'
+      +(p.volha?'<span class="tag tg-c">'+p.volha.toFixed(0)+' m³/ha</span>':'')+'</div>'
+      +'<div style="display:flex;gap:6px">'
+      +'<button onclick="editParc(\'t\','+i+')" style="flex:1;background:#F0FDF4;border:1.5px solid #A7F3D0;border-radius:8px;padding:7px;font-size:12px;font-weight:700;color:#065F46;cursor:pointer;font-family:inherit">✏️ Editar</button>'
+      +'<button onclick="delP(\'t\','+i+')" style="flex:1;background:#FEE2E2;border:1.5px solid #FCA5A5;border-radius:8px;padding:7px;font-size:12px;font-weight:700;color:#991B1B;cursor:pointer;font-family:inherit">🗑 Eliminar</button>'
+      +'</div></div>';
   }).join('');
 }
 function renderLCBit(){
@@ -1125,12 +1206,63 @@ function renderLCBit(){
 function renderLCPF(){
   var c=document.getElementById('lst-c-pf');
   if(!parc_c.length){c.innerHTML='<div class="empty">Sin parcelas aún</div>';return;}
-  c.innerHTML=parc_c.map(function(p,i){ return '<div class="chip"><div><span style="font-weight:700">'+p.id+'</span><span style="color:#8E8E93;font-size:12px;margin-left:6px">'+p.n+' árb · '+p.sup+'m²</span></div><div style="display:flex;gap:4px;align-items:center"><span class="tag tg-v">'+p.nha.toLocaleString()+' N/ha</span><span class="tag tg-v">Dg '+p.dg.toFixed(1)+'cm</span><button style="background:none;border:none;cursor:pointer;color:#C7C7CC;font-size:18px;padding:4px" onclick="delP(\'cp\','+i+')">×</button></div></div>'; }).join('');
+  c.innerHTML=parc_c.map(function(p,i){
+    return '<div style="padding:12px;border:1px solid #E5E5EA;border-radius:12px;margin-bottom:8px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.04)">'
+      +'<div style="margin-bottom:6px"><span style="font-weight:700;font-size:14px">'+p.id+'</span><span style="color:#8E8E93;font-size:12px;margin-left:8px">'+p.n+' árb · '+p.sup+'m²</span></div>'
+      +'<div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px"><span class="tag tg-v">'+p.nha.toLocaleString()+' N/ha</span><span class="tag tg-v">Dg '+p.dg.toFixed(1)+' cm</span></div>'
+      +'<div style="display:flex;gap:6px">'
+      +'<button onclick="editParc(\'c\','+i+')" style="flex:1;background:#F0FDF4;border:1.5px solid #A7F3D0;border-radius:8px;padding:7px;font-size:12px;font-weight:700;color:#065F46;cursor:pointer;font-family:inherit">✏️ Editar</button>'
+      +'<button onclick="delP(\'cp\','+i+')" style="flex:1;background:#FEE2E2;border:1.5px solid #FCA5A5;border-radius:8px;padding:7px;font-size:12px;font-weight:700;color:#991B1B;cursor:pointer;font-family:inherit">🗑 Eliminar</button>'
+      +'</div></div>';
+  }).join('');
 }
 function renderLB(){
   var c=document.getElementById('lst-b');
   if(!punt_b.length){c.innerHTML='<div class="empty">Sin puntos aún</div>';return;}
   c.innerHTML=punt_b.map(function(p,i){ return '<div class="chip"><div><span style="font-weight:700">'+p.id+'</span><span style="color:#8E8E93;font-size:12px;margin-left:6px">'+p.n+' árb</span></div><div style="display:flex;gap:4px;align-items:center"><span class="tag tg-m">'+p.abha.toFixed(2)+' m²/ha</span><button style="background:none;border:none;cursor:pointer;color:#C7C7CC;font-size:18px;padding:4px" onclick="delP(\'b\','+i+')">×</button></div></div>'; }).join('');
+}
+function editParc(t,i){
+  var parc = t==='t'?parc_t:parc_c;
+  var p = parc[i];
+  if(!p) return;
+  // Confirmar si hay datos no guardados en el formulario actual
+  var arbActuales = t==='t'?arb_t:arb_c;
+  if(arbActuales.length>0){
+    if(!confirm('Hay '+arbActuales.length+' árbol(es) sin guardar en el formulario. ¿Descartar y editar "'+p.id+'"?')) return;
+  }
+  // Cargar parcela en el formulario
+  if(t==='t'){
+    arb_t = p.arboles.slice();
+    pid_t = p.id;
+    document.getElementById('t-pid').value = p.id;
+    document.getElementById('t-sup').value = p.sup;
+    cfg.sup = p.sup;
+    document.getElementById('card-t').style.display='block';
+    document.getElementById('lbl-t').textContent = p.id;
+    // Cargar coordenadas si existen
+    if(p.coordE){ document.getElementById('t-e').value=p.coordE; }
+    if(p.coordN){ document.getElementById('t-norte').value=p.coordN; }
+    renderArb('t'); updMini('t');
+    // Eliminar la parcela del array (se volverá a guardar al presionar Guardar)
+    parc_t.splice(i,1);
+    renderLT();
+  } else {
+    arb_c = p.arboles.slice();
+    pid_c = p.id;
+    document.getElementById('cp-pid').value = p.id;
+    document.getElementById('cp-sup').value = p.sup;
+    cfg.sup = p.sup;
+    document.getElementById('card-c').style.display='block';
+    document.getElementById('lbl-c').textContent = p.id;
+    if(p.coordE){ document.getElementById('cp-e').value=p.coordE; }
+    if(p.coordN){ document.getElementById('cp-norte').value=p.coordN; }
+    renderArb('c'); updMini('c');
+    parc_c.splice(i,1);
+    renderLCPF();
+  }
+  // Scroll arriba para ver el formulario
+  document.getElementById('main').scrollTop=0;
+  save();
 }
 function delP(t,i){
   var map={t:[parc_t,renderLT],cb:[punt_c,renderLCBit],cp:[parc_c,renderLCPF],b:[punt_b,function(){renderLB();updBitLive();}],prend:[um_prend,renderLPrend]};
@@ -1173,10 +1305,17 @@ function updBitLive(){
 
 // ═══ ESTADÍGRAFOS ═══
 function calcEstPrend(){
-  document.getElementById('e-nha').textContent='—';
+  var esRecep = metodoReal==='recep';
+  // Ocultar métricas dasométricas que no aplican
+  document.getElementById('e-nha').textContent=esRecep?'—':'—';
   document.getElementById('e-abha').textContent='—';
   document.getElementById('e-dap').textContent='—';
   document.getElementById('e-dg').textContent='—';
+  // Ocultar cards N/ha, AB/ha, DAP, Dg en modo Forestación
+  var metsEl=document.querySelector('#pg-est .mets');
+  if(metsEl) metsEl.style.display=esRecep?'none':'grid';
+  var volRow=document.getElementById('e-vol-row');
+  if(volRow) volRow.style.display='none';
   var rowsEl=document.getElementById('est-rows');
   if(!um_prend.length){ rowsEl.innerHTML='<div class="empty">Ingresa unidades de muestreo</div>'; return; }
   var n=um_prend.length;
@@ -1186,25 +1325,37 @@ function calcEstPrend(){
   var sdNha=std(nhaArr), cvNha=mNha>0?sdNha/mNha*100:0;
   var t=tval(n), emNha=t*sdNha/Math.sqrt(n), empNha=mNha>0?emNha/mNha*100:0;
   var dpoTotal=dpo.reduce(function(s,d){return s+(d.dens||0);},0);
-  var pPrend=dpoTotal>0?mNha/dpoTotal*100:0;
-  document.getElementById('e-nha').textContent=Math.round(mNha).toLocaleString();
-  var rows='<div class="shdr" style="background:#DCFCE7;color:#14532D">Densidad de Plantación Original (DPO)</div>';
-  rows+=dpo.filter(function(d){return d.dens>0;}).map(function(d){return '<div class="sr"><span class="sl">'+(d.sp||'—')+'</span><span class="sv">'+d.dens.toLocaleString()+' pl/ha</span></div>';}).join('');
-  rows+='<div class="sr"><span class="sl" style="font-weight:700">DPO Total</span><span class="sv" style="font-weight:700">'+dpoTotal.toLocaleString()+' pl/ha</span></div>';
-  rows+='<div class="shdr" style="background:#DCFCE7;color:#14532D;margin-top:8px">Muestreo de prendimiento</div>';
+  // Para recepción técnica usar densidad contrato
+  var refDens = esRecep?(cfg.densContrato||dpoTotal):dpoTotal;
+  var pPrend=refDens>0?mNha/refDens*100:0;
+  if(!esRecep) document.getElementById('e-nha').textContent=Math.round(mNha).toLocaleString();
+  // Títulos dinámicos
+  var titRef = esRecep?'Densidad exigida en contrato':'Densidad de Plantación Original (DPO)';
+  var titRefTotal = esRecep?'Densidad contrato':'DPO Total';
+  var titMuestreo = esRecep?'Muestreo':'Muestreo de prendimiento';
+  var titResultado = esRecep?'% vs. Densidad contratada':'% Prendimiento';
+  var subtResultado = esRecep?
+    Math.round(mNha).toLocaleString()+' pl/ha (T) ÷ '+refDens.toLocaleString()+' pl/ha (Contrato)':
+    Math.round(mNha).toLocaleString()+' pl/ha (T) ÷ '+dpoTotal.toLocaleString()+' pl/ha (DPO)';
+  var rows='<div class="shdr" style="background:#DCFCE7;color:#14532D">'+titRef+'</div>';
+  if(!esRecep){
+    rows+=dpo.filter(function(d){return d.dens>0;}).map(function(d){return '<div class="sr"><span class="sl">'+(d.sp||'—')+'</span><span class="sv">'+d.dens.toLocaleString()+' pl/ha</span></div>';}).join('');
+  }
+  rows+='<div class="sr"><span class="sl" style="font-weight:700">'+titRefTotal+'</span><span class="sv" style="font-weight:700">'+refDens.toLocaleString()+' pl/ha</span></div>';
+  rows+='<div class="shdr" style="background:#DCFCE7;color:#14532D;margin-top:8px">'+titMuestreo+'</div>';
   rows+='<div class="sr"><span class="sl">N° UM · Sup.</span><span class="sv">'+n+' · '+cfg.sup+' m²</span></div>';
   rows+='<div class="sr"><span class="sl">Media muestreal (plantas/UM)</span><span class="sv">'+mTotal.toFixed(2)+'</span></div>';
   rows+='<div class="sr"><span class="sl">Media poblacional (pl/ha)</span><span class="sv">'+Math.round(mNha).toLocaleString()+'</span></div>';
   rows+='<div class="sr"><span class="sl">Desv. estándar · CV%</span><span class="sv">'+sdNha.toFixed(1)+' · <span class="'+cem(cvNha)+'">'+cvNha.toFixed(1)+'%</span></span></div>';
   rows+='<div class="sr"><span class="sl">t-Student ('+cfg.nc+'%)</span><span class="sv">'+t.toFixed(3)+'</span></div>';
   rows+='<div class="sr"><span class="sl" style="font-weight:700">Error muestreo</span><span class="sv '+cem(empNha)+'" style="font-weight:700">'+Math.round(emNha).toLocaleString()+' pl/ha · '+empNha.toFixed(1)+'%</span></div>';
-  var pColor=pPrend>=90?'#059669':pPrend>=70?'#D97706':'#DC2626';
-  rows+='<div style="margin-top:14px;padding:16px;background:'+(pPrend>=90?'#D1FAE5':pPrend>=70?'#FEF3C7':'#FEE2E2')+';border-radius:12px;text-align:center">'
-       +'<div style="font-size:11px;color:'+pColor+';font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">% Prendimiento</div>'
-       +'<div style="font-size:42px;font-weight:800;color:'+pColor+'">'+pPrend.toFixed(1)+'%</div>'
-       +'<div style="font-size:11px;color:'+pColor+';margin-top:2px">'+Math.round(mNha).toLocaleString()+' pl/ha (T) ÷ '+dpoTotal.toLocaleString()+' pl/ha (DPO)</div></div>';
-  // Por especie
-  if(dpo.length>1){
+  var okColor=pPrend>=100?'#059669':pPrend>=90?'#D97706':'#DC2626';
+  var okBg=pPrend>=100?'#D1FAE5':pPrend>=90?'#FEF3C7':'#FEE2E2';
+  rows+='<div style="margin-top:14px;padding:16px;background:'+okBg+';border-radius:12px;text-align:center">'
+       +'<div style="font-size:11px;color:'+okColor+';font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">'+titResultado+'</div>'
+       +'<div style="font-size:42px;font-weight:800;color:'+okColor+'">'+pPrend.toFixed(1)+'%</div>'
+       +'<div style="font-size:11px;color:'+okColor+';margin-top:2px">'+subtResultado+'</div></div>';
+  if(!esRecep && dpo.length>1){
     rows+='<div class="shdr sh-g" style="margin-top:10px">Prendimiento por especie</div>';
     dpo.forEach(function(d,i){
       var valsEsp=um_prend.map(function(u){return (u.vals[i]||0)*10000/u.sup;});
@@ -1260,6 +1411,12 @@ function calcEst(){
   }
 }
 function renderCharts(){
+  var esForest = metodo==='prend';
+  var cdist=document.getElementById('card-ch-dist');
+  var cesp=document.getElementById('card-ch-esp');
+  if(cdist) cdist.style.display=esForest?'none':'block';
+  if(cesp) cesp.style.display=esForest?'none':'block';
+  if(esForest) return;
   var parc=metodo==='trad'?parc_t:parc_c, allA=parc.reduce(function(a,p){return a.concat(p.arboles);},[]);
   var punts=metodo==='comb'?punt_c:punt_b;
   var clases=[5,10,15,20,25,30,35,40,45,50,55,60], np=parc.length||1, factor=cfg.sup>0?10000/cfg.sup:1;
@@ -1284,9 +1441,11 @@ function renderResPrend(){
   var nhaArr=um_prend.map(function(u){return u.total*10000/u.sup;});
   var mNha=n?avg(nhaArr):null;
   var pPrend=(dpoTotal>0&&mNha)?mNha/dpoTotal*100:null;
-  var html='<div style="background:linear-gradient(135deg,#15803D,#166534);border-radius:10px;padding:14px 16px;margin-bottom:14px"><div style="font-size:14px;font-weight:700;color:#fff;margin-bottom:3px">Informe de verificación de prendimiento</div><div style="font-size:11px;color:rgba(255,255,255,.7)">'+new Date().toLocaleDateString('es-CL')+' · Forestación / Reforestación · '+(CU?CU.name:'')+'</div></div>';
+  var tituloInf = metodoReal==='recep'?'Informe de recepción técnica de faena':'Informe de verificación de prendimiento';
+  var html='<div style="background:linear-gradient(135deg,#15803D,#166534);border-radius:10px;padding:14px 16px;margin-bottom:14px"><div style="font-size:14px;font-weight:700;color:#fff;margin-bottom:3px">'+tituloInf+'</div><div style="font-size:11px;color:rgba(255,255,255,.7)">'+new Date().toLocaleDateString('es-CL')+' · Forestación / Reforestación · '+(CU?CU.name:'')+'</div></div>';
   html+='<div class="shdr sh-v">Datos del predio</div>';
-  var admRows=[['PMBN',adm.pmbn],['Propietario',adm.prop],['Predio',adm.predio],['Rol/Folio',adm.rol],['Región',adm.region],['Provincia',adm.provincia||adm.prov],['Comuna',adm.comuna],['Profesional',adm.prof],['Fecha',adm.fecha]];
+  var expLabel = metodoReal==='recep'?'N° Contrato/Licitación':metodoReal==='prend'?'N° Contrato':'PMBN';
+  var admRows=[[expLabel,adm.pmbn],['Propietario',adm.prop],['Predio',adm.predio],['Rol/Folio',adm.rol],['Región',adm.region],['Provincia',adm.provincia||adm.prov],['Comuna',adm.comuna],['Profesional',adm.prof],['Fecha',adm.fecha]];
   html+=admRows.filter(function(r){return r[1];}).map(function(r){return '<div class="arow"><span class="al">'+r[0]+'</span><span class="av">'+r[1]+'</span></div>';}).join('');
   html+='<div class="shdr" style="background:#DCFCE7;color:#14532D;margin-top:10px">Plantación</div>';
   html+='<div class="arow"><span class="al">DPO Total</span><span class="av">'+dpoTotal.toLocaleString()+' pl/ha</span></div>';
@@ -1353,7 +1512,7 @@ function renderRes(){
         +'<span style="display:flex;flex-direction:column;align-items:flex-end;gap:3px">'
         +'<span style="font-size:11px;color:#8E8E93">'+detalle+'</span>'
         +'<span style="font-size:11px;color:#8E8E93">Terreno: '+fmt(ter)+'</span>'
-        +'<span class="'+(ok?'vok':'vbad')+'">'+(ok?'✓ Conforme':'✗ No conforme')+'</span>'
+        +'<span class="'+(ok?'vok':'vbad')+'">'+(ok?'✓ Dentro del intervalo de confianza':'✗ Fuera del intervalo de confianza')+'</span>'
         +'</span></div>';
     }
     html+=vrow('N/ha',cfg.etN,mNha,function(v){return Math.round(v).toLocaleString();});
@@ -1687,7 +1846,7 @@ function renderDPO(){
     return '<div class="r2" style="margin-bottom:6px;align-items:end">'
       +'<div><span class="lbl">Especie</span><input class="inp" type="text" value="'+d.sp+'" oninput="dpo['+i+'].sp=this.value;updDPOTotal();save()" placeholder="Pi"></div>'
       +'<div style="display:flex;gap:6px;align-items:center">'
-      +'<div style="flex:1"><span class="lbl">Plantas/ha</span><input class="inp" type="number" value="'+d.dens+'" oninput="dpo['+i+'].dens=+this.value||0;updDPOTotal();save()" placeholder="800"></div>'
+      +'<div style="flex:1"><span class="lbl">Plantas/ha</span><input class="inp" type="number" value="'+d.dens+'" oninput="dpo['+i+'].dens=+this.value||0;updDPOTotal();save()" placeholder="Plantas/ha"></div>'
       +(dpo.length>1?'<button onclick="delDPO('+i+')" style="background:none;border:none;cursor:pointer;color:#C7C7CC;font-size:20px;padding:6px 4px;margin-top:18px">×</button>':'<span style="width:28px"></span>')
       +'</div></div>';
   }).join('');
@@ -1746,6 +1905,7 @@ function renderLPrend(){
 var verificaciones = [];
 var verActual = null;
 var rodalActual = null;
+var metodoReal = null; // método real del rodal (prend/recep/trad/etc)
 
 var COMUNAS_VER = {
   "Cautín":["Carahue","Cholchol","Cunco","Curarrehue","Freire","Galvarino","Gorbea","Lautaro","Loncoche","Melipeuco","Nueva Imperial","Padre Las Casas","Perquenco","Pitrufquén","Pucón","Puerto Saavedra","Temuco","Teodoro Schmidt","Toltén","Vilcún","Villarrica"],
@@ -1839,6 +1999,7 @@ function entrarRodal(i){
   var r = v.rodales[i];
   rodalActual = i;
   // Cargar datos del rodal
+  metodoReal = r.metReal||r.met; // restaurar método real guardado
   metodo = r.met==='recep'?'prend':r.met;
   parc_t = r.parc_t||[]; parc_c = r.parc_c||[];
   punt_c = r.punt_c||[]; punt_b = r.punt_b||[];
@@ -1856,15 +2017,55 @@ function entrarRodal(i){
   if(r.cfg){
     cfg.etN=r.cfg.etN||null; cfg.etAB=r.cfg.etAB||null;
     cfg.etVol=r.cfg.etVol||null; cfg.etNp=r.cfg.etNp||null;
+    cfg.emPlan=r.cfg.emPlan||null;
+    // Para forestación: precargar DPO o densidad contrato en el módulo prendimiento
+    if(v.tipo==='Forestación'){
+      if(r.met==='prend' && r.cfg.dpoFor){
+        // Precargar DPO en la primera especie
+        dpo = [{sp:'Pi', dens:r.cfg.dpoFor}];
+      } else if(r.met==='recep' && r.cfg.densFor){
+        // Guardar densidad contrato en cfg para usarla en el módulo
+        cfg.densContrato = r.cfg.densFor;
+      }
+    }
   }
   // Actualizar topbar
   document.getElementById('top-user').textContent = CU?CU.name:'';
   document.getElementById('top-role').textContent = CU&&CU.role==='admin'?'Administrador':'Profesional';
   document.getElementById('adm-panel').style.display = CU&&CU.role==='admin'?'block':'none';
   fillSups(); syncFab(); syncZona(); renderEspSel(); applyAdm(); updInfo();
+  var metNoms = {trad:'Tradicional',comb:'Combinado',bit:'Bitterlich rápido',prend:'🌱 Prendimiento',recep:'📋 Recepción técnica de faena'};
   document.getElementById('top-rodal-nom').textContent = r.num+' - '+r.nom;
+  document.getElementById('top-sub').textContent = metNoms[metodoReal]||metodoReal;
   iniciarUI();
   show('sa');
+  // Actualizar ibox, cards y topbar DESPUÉS de mostrar la pantalla
+  if(metodo==='prend'){
+    var esR = metodoReal==='recep';
+    // Info box
+    var ib=document.getElementById('prend-ibox');
+    if(ib){
+      ib.innerHTML=esR?'<strong>Recepción técnica de faena</strong> — % = (N/ha muestreado ÷ Densidad contrato) × 100'
+                      :'<strong>Verificación de prendimiento</strong> — % Prendimiento = (N/ha muestreado ÷ DPO) × 100';
+      ib.style.background=esR?'#DBEAFE':'#DCFCE7';
+      ib.style.borderColor=esR?'#60A5FA':'#22C55E';
+      ib.style.color=esR?'#1E3A8A':'#14532D';
+    }
+    // Card DPO (ocultar en recep)
+    var cd=document.getElementById('card-dpo');
+    if(cd) cd.style.display=esR?'none':'block';
+    // Card densidad contrato (mostrar en recep)
+    var cdc=document.getElementById('card-dens-contrato');
+    if(cdc){
+      cdc.style.display=esR?'block':'none';
+      if(esR){
+        var dcVal=document.getElementById('dens-contrato-val');
+        if(dcVal) dcVal.textContent=(cfg.densContrato||'—').toLocaleString()+' pl/ha';
+      }
+    }
+    // Topbar método
+    document.getElementById('top-sub').textContent = metNoms[metodoReal]||metodoReal;
+  }
 }
 
 function elimRodal(i){
@@ -1884,7 +2085,8 @@ function guardarRodalActual(){
   r.um_prend=um_prend; r.dpo=dpo;
   r.arb_t=arb_t; r.pid_t=pid_t;
   r.arb_c=arb_c; r.pid_c=pid_c;
-  r.cfg={etN:cfg.etN,etAB:cfg.etAB,etVol:cfg.etVol,etNp:cfg.etNp};
+  r.cfg={etN:cfg.etN,etAB:cfg.etAB,etVol:cfg.etVol,etNp:cfg.etNp,
+         emPlan:cfg.emPlan,densContrato:cfg.densContrato};
   saveVers();
 }
 
@@ -1951,11 +2153,40 @@ function abrirModalRodal(){
   // Limpiar campos Forestación
   document.getElementById('mr-num-for').value=n;
   document.getElementById('mr-nom-for').value='';
-  document.getElementById('mr-dens-for').value='';
+  if(document.getElementById('mr-dpo')) document.getElementById('mr-dpo').value='';
+  if(document.getElementById('mr-anio')) document.getElementById('mr-anio').value='';
+  if(document.getElementById('mr-dens-for')) document.getElementById('mr-dens-for').value='';
+  // Resetear selector tipo verificación forestación
+  if(esFor){ selMetFor('prend'); }
   document.getElementById('mr-sup').value='';
+  // Ocultar/mostrar selector de método según tipo
+  var secMet = document.getElementById('mr-sec-met');
+  var metLbl = document.getElementById('mr-met-lbl');
+  var mrMet = document.getElementById('mr-met');
+  if(secMet) secMet.style.display = esFor?'none':'block';
+  if(metLbl) metLbl.style.display = esFor?'none':'block';
+  if(mrMet) mrMet.style.display = esFor?'none':'block';
   document.getElementById('modal-rodal').classList.add('open');
 }
 function cerrarModalRodal(){ document.getElementById('modal-rodal').classList.remove('open'); }
+function selMetFor(tipo){
+  var btnP=document.getElementById('mr-btn-prend');
+  var btnR=document.getElementById('mr-btn-recep');
+  var datP=document.getElementById('mr-dat-prend');
+  var datR=document.getElementById('mr-dat-recep');
+  if(tipo==='prend'){
+    btnP.style.cssText='padding:10px 6px;border-radius:10px;font-size:12px;font-weight:700;border:2px solid #22C55E;background:#DCFCE7;color:#15803D;font-family:inherit;cursor:pointer;text-align:center;line-height:1.4';
+    btnR.style.cssText='padding:10px 6px;border-radius:10px;font-size:12px;font-weight:700;border:2px solid #E5E5EA;background:#fff;color:#8E8E93;font-family:inherit;cursor:pointer;text-align:center;line-height:1.4';
+    datP.style.display='block'; datR.style.display='none';
+  } else {
+    btnR.style.cssText='padding:10px 6px;border-radius:10px;font-size:12px;font-weight:700;border:2px solid #60A5FA;background:#DBEAFE;color:#1E40AF;font-family:inherit;cursor:pointer;text-align:center;line-height:1.4';
+    btnP.style.cssText='padding:10px 6px;border-radius:10px;font-size:12px;font-weight:700;border:2px solid #E5E5EA;background:#fff;color:#8E8E93;font-family:inherit;cursor:pointer;text-align:center;line-height:1.4';
+    datP.style.display='none'; datR.style.display='block';
+  }
+  // Actualizar el select de método
+  var mr=document.getElementById('mr-met');
+  mr.value = tipo==='prend'?'prend':'recep';
+}
 function prevRango(){
   var nha = parseFloat(document.getElementById('mr-etn').value)||0;
   var em = parseFloat(document.getElementById('mr-em').value)||0;
@@ -1978,8 +2209,11 @@ function guardarRodal(){
   if(esFor){
     num = +document.getElementById('mr-num-for').value||1;
     nom = document.getElementById('mr-nom-for').value.trim();
-    var densFor = parseFloat(document.getElementById('mr-dens-for').value)||null;
-    cfg_rodal = {densFor:densFor};
+    met = document.getElementById('mr-met').value; // prend o recep
+    var densFor = parseFloat(document.getElementById('mr-dens-for')&&document.getElementById('mr-dens-for').value)||null;
+    var dpo_val = parseFloat(document.getElementById('mr-dpo')&&document.getElementById('mr-dpo').value)||null;
+    var anio_val = +document.getElementById('mr-anio')&&document.getElementById('mr-anio').value||null;
+    cfg_rodal = {densFor:densFor, dpoFor:dpo_val, anioFor:anio_val};
   } else {
     num = +document.getElementById('mr-num').value||1;
     nom = document.getElementById('mr-nom').value.trim();
@@ -1993,7 +2227,7 @@ function guardarRodal(){
   }
   if(!nom){ alert('Ingresa el nombre del rodal'); return; }
   if(!v.rodales) v.rodales=[];
-  v.rodales.push({num:num,nom:nom,sup:sup,met:met,
+  v.rodales.push({num:num,nom:nom,sup:sup,met:met,metReal:met,
     parc_t:[],parc_c:[],punt_c:[],punt_b:[],um_prend:[],
     dpo:[{sp:'',dens:0}],arb_t:[],pid_t:'',arb_c:[],pid_c:'',
     cfg:cfg_rodal});
